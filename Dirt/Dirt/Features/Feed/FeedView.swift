@@ -378,13 +378,18 @@ struct FilterPill: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(
-                    isSelected ?
-                        LinearGradient(
-                            gradient: Gradient(colors: [Color.blue, Color.purple]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        ) :
-                        Color(.systemGray6)
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(
+                            isSelected ?
+                                AnyShapeStyle(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [Color.blue, Color.purple]),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                ) :
+                                AnyShapeStyle(Color(.systemGray6))
+                        )
                 )
                 .cornerRadius(20)
                 .animation(.easeInOut, value: isSelected)
