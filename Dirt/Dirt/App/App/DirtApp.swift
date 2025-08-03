@@ -8,7 +8,7 @@ struct DirtApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AuthView()
+            HomeView()
                 .environmentObject(supabaseManager)
         }
     }
