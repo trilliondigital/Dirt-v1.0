@@ -22,15 +22,19 @@ final class SupabaseManager: ObservableObject {
         }
     }
     
-    private func listenToAuthState() async {
-        for await (event, session) in await client.auth.authStateChanges {
-            switch event {
-            case .signedIn, .tokenRefreshed:
-                self.session = session
-            case .signedOut, .userDeleted, .userUpdated:
-                self.session = nil
-            @unknown default:
-                break
+    private func listenToAuthState() {
+        Task {
+            for await (event, session) in client.auth.authStateChanges {
+                await MainActor.run {
+                    switch event {
+                    case .signedIn, .tokenRefreshed:
+                        self.session = session
+                    case .signedOut, .userDeleted, .userUpdated:
+                        self.session = nil
+                    @unknown default:
+                        self.session = nil
+                    }
+                }
             }
         }
     }
