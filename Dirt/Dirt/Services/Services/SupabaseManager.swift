@@ -30,14 +30,19 @@ class SupabaseManager: ObservableObject {
             for await (event, session) in client.auth.authStateChanges {
                 await MainActor.run {
                     switch event {
-                    case .signedIn, .tokenRefreshed:
+                    case .initialSession, .signedIn, .tokenRefreshed:
                         self.session = session
                         Task { await self.fetchTodos() }
-                    case .signedOut, .userDeleted, .userUpdated:
+                    case .signedOut:
+                        self.session = nil
+                        self.todos = []
+                    case .userUpdated:
+                        self.session = session
+                    case .userDeleted:
                         self.session = nil
                         self.todos = []
                     @unknown default:
-                        self.session = nil
+                        break
                     }
                 }
             }
@@ -51,23 +56,26 @@ class SupabaseManager: ObservableObject {
             email: email,
             password: password
         )
+        
         await MainActor.run {
             self.session = session
         }
     }
     
     func signUp(email: String, password: String) async throws {
-        let session = try await client.auth.signUp(
+        let response = try await client.auth.signUp(
             email: email,
             password: password
         )
+        
         await MainActor.run {
-            self.session = session
+            self.session = response.session
         }
     }
     
     func signOut() async throws {
         try await client.auth.signOut()
+        
         await MainActor.run {
             self.session = nil
             self.todos = []
@@ -83,7 +91,7 @@ class SupabaseManager: ObservableObject {
             let todos: [Todo] = try await client
                 .from("todos")
                 .select()
-                .eq("user_id", value: userId)
+                .eq("user_id", value: userId.uuidString)
                 .order("created_at", ascending: false)
                 .execute()
                 .value
@@ -97,7 +105,7 @@ class SupabaseManager: ObservableObject {
     }
     
     func addTodo(title: String) async throws {
-        guard let userId = session?.user.id else { return }
+        guard let userId = session?.user.id else { throw NSError(domain: "com.yourapp.error", code: -1, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"]) }
         
         let newTodo = Todo(
             title: title,
@@ -105,13 +113,13 @@ class SupabaseManager: ObservableObject {
             userId: userId
         )
         
-        let _: Todo = try await client
+        _ = try await client
             .from("todos")
             .insert(newTodo)
             .select()
             .single()
             .execute()
-            .value
+            .value as Todo
         
         await fetchTodos()
     }
@@ -128,14 +136,14 @@ class SupabaseManager: ObservableObject {
             updatedAt: todo.updatedAt
         )
         
-        let _: Todo = try await client
+        _ = try await client
             .from("todos")
             .update(updatedTodo)
             .eq("id", value: todoId)
             .select()
             .single()
             .execute()
-            .value
+            .value as Todo
         
         await fetchTodos()
     }
@@ -143,11 +151,12 @@ class SupabaseManager: ObservableObject {
     func deleteTodo(_ todo: Todo) async throws {
         guard let todoId = todo.id else { return }
         
-        try await client
+        _ = try await client
             .from("todos")
             .delete()
             .eq("id", value: todoId)
             .execute()
+            .value
         
         await fetchTodos()
     }
