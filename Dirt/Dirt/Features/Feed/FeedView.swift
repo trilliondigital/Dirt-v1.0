@@ -1,4 +1,6 @@
 import SwiftUI
+import Combine
+import UIKit
 
 struct Post: Identifiable {
     let id = UUID()
@@ -69,88 +71,84 @@ struct FeedView: View {
     @State private var posts: [Post] = Post.samplePosts
     @State private var selectedFilter = "Latest"
     @State private var showNewPostView = false
+    @State private var isRefreshing = false
+    @State private var showProfile = false
+    @State private var showSearch = false
     
     let filters = ["Latest", "Trending", "Following", "Nearby"]
+    private let refreshPublisher = PassthroughSubject<Void, Never>()
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // Header
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Welcome back")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                        Text("Dirt Feed")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                    }
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    // Header
+                    headerView
+                        .padding(.horizontal)
+                        .padding(.bottom, 12)
                     
-                    Spacer()
-                    
-                    NavigationLink(destination: NotificationsView()) {
-                        Image(systemName: "bell")
-                            .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(.primary)
-                            .padding(8)
-                            .background(Color(.systemGray6))
-                            .clipShape(Circle())
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.top, 8)
-                .padding(.bottom, 12)
-                .background(Color(.systemBackground))
-                .overlay(Divider(), alignment: .bottom)
-                
-                // Filter Tabs
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        ForEach(filters, id: \.self) { filter in
-                            FilterPill(
-                                title: filter,
-                                isSelected: selectedFilter == filter,
-                                action: { selectedFilter = filter }
-                            )
+                    // Filter tabs
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(filters, id: \.self) { filter in
+                                FilterPill(
+                                    title: filter,
+                                    isSelected: selectedFilter == filter,
+                                    action: {
+                                        withAnimation(.spring()) {
+                                            selectedFilter = filter
+                                            HapticFeedback.impact(style: .light)
+                                        }
+                                    }
+                                )
+                            }
                         }
+                        .padding(.horizontal)
+                        .padding(.bottom, 16)
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                }
-                .background(Color(.systemBackground))
-                
-                // Posts
-                ScrollView {
+                    
+                    // Posts
                     LazyVStack(spacing: 16) {
                         ForEach(posts) { post in
                             PostCard(post: post)
                                 .padding(.horizontal)
-                                .padding(.vertical, 8)
-                                .transition(.opacity)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
                         }
                     }
-                    .padding(.vertical, 8)
+                    .padding(.bottom, 24)
                 }
-                .background(Color(.systemGroupedBackground))
+                .padding(.top, 8)
             }
+            .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
             .navigationBarHidden(true)
-            .sheet(isPresented: $showNewPostView) {
-                CreatePostView()
+            .refreshable {
+                await refreshData()
             }
-            .onAppear {
-                // Refresh feed data
-            }
+            .overlay(
+                newPostButton,
+                alignment: .bottomTrailing
+            )
+        }
+        .navigationBarHidden(true)
+        .sheet(isPresented: $showNewPostView) {
+            CreatePostView()
         }
     }
 }
 
-// MARK: - Post Card
 struct PostCard: View {
     let post: Post
     @State private var isLiked: Bool
     @State private var isBookmarked: Bool
     @State private var showComments = false
-    @State private var showShareSheet = false
+    @State private var isExpanded = false
+    @State private var showActionSheet = false
+    @State private var currentScale: CGFloat = 1.0
+    @GestureState private var isLongPressing = false
+    
+    // Constants
+    private let maxContentLines = 5
+    private let animationDuration = 0.2
     
     init(post: Post) {
         self.post = post
@@ -159,211 +157,408 @@ struct PostCard: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 0) {
             // Header
             HStack(alignment: .top, spacing: 12) {
-                // User Avatar
-                Circle()
-                    .fill(post.userColor.opacity(0.2))
-                    .frame(width: 44, height: 44)
-                    .overlay(
-                        Text(post.userInitial)
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(post.userColor)
-                    )
+                // User Avatar with tap gesture for profile
+                NavigationLink(destination: ProfileView()) {
+                    ZStack {
+                        Circle()
+                            .fill(post.userColor.opacity(0.2))
+                            .frame(width: 42, height: 42)
+                            .overlay(
+                                Text(post.userInitial)
+                                    .font(.headline)
+                                    .foregroundColor(post.userColor)
+                            )
+                    }
+                    .contentShape(Circle())
+                }
+                .buttonStyle(ScaleButtonStyle())
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    // User Info
                     HStack(spacing: 4) {
                         Text(post.username)
                             .font(.subheadline)
                             .fontWeight(.semibold)
+                            .lineLimit(1)
                         
                         if post.isVerified {
                             Image(systemName: "checkmark.seal.fill")
                                 .foregroundColor(.blue)
-                                .font(.caption)
+                                .font(.caption2)
                         }
                         
                         Spacer()
                         
                         Text(post.timestamp)
-                            .font(.caption)
-                            .foregroundColor(.gray)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .padding(.trailing, 4)
                     }
                     
-                    // Tags
-                    if !post.tags.isEmpty {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 6) {
-                                ForEach(post.tags.prefix(3), id: \.self) { tag in
-                                    Text(tag)
-                                        .font(.system(size: 12, weight: .medium))
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 4)
-                                        .background(
-                                            tag.lowercased().contains("red") ?
-                                                Color.red.opacity(0.1) :
-                                                Color.green.opacity(0.1)
-                                        )
-                                        .foregroundColor(
-                                            tag.lowercased().contains("red") ?
-                                                .red :
-                                                .green
-                                        )
-                                        .cornerRadius(12)
+                    // Post content with read more/less
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(post.content)
+                            .font(.subheadline)
+                            .lineSpacing(4)
+                            .lineLimit(isExpanded ? nil : maxContentLines)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .onTapGesture {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    isExpanded.toggle()
                                 }
+                            }
+                        
+                        if !isExpanded && needsTruncation(text: post.content) {
+                            Button(action: {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    isExpanded = true
+                                }
+                            }) {
+                                Text("Read more")
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.blue)
                             }
                         }
                     }
                 }
-                
-                Button(action: {
-                    // More options
-                }) {
-                    Image(systemName: "ellipsis")
-                        .foregroundColor(.gray)
-                        .padding(8)
-                }
-                .offset(y: -8)
             }
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, post.imageName != nil ? 0 : 16)
             
-            // Content
-            Text(post.content)
-                .font(.body)
-                .lineSpacing(4)
-                .fixedSize(horizontal: false, vertical: true)
-            
-            // Image if available
+            // Post Image with zoom and save
             if let imageName = post.imageName {
-                Image(imageName)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(height: 240)
-                    .frame(maxWidth: .infinity)
-                    .clipped()
-                    .cornerRadius(12)
+                ZStack(alignment: .topTrailing) {
+                    Image(imageName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                        .scaleEffect(currentScale)
+                        .gesture(
+                            MagnificationGesture()
+                                .onChanged { value in
+                                    currentScale = value.magnitude
+                                }
+                                .onEnded { _ in
+                                    withAnimation(.spring()) {
+                                        currentScale = 1.0
+                                    }
+                                }
+                        )
+                        .simultaneousGesture(
+                            LongPressGesture(minimumDuration: 0.5)
+                                .updating($isLongPressing) { currentState, gestureState, _ in
+                                    gestureState = currentState
+                                    if currentState {
+                                        HapticFeedback.impact(style: .medium)
+                                    }
+                                }
+                        )
+                    
+                    if isLongPressing {
+                        Button(action: {
+                            // Save image action
+                            HapticFeedback.notification(type: .success)
+                            showActionSheet = true
+                        }) {
+                            Image(systemName: "square.and.arrow.down")
+                                .font(.system(size: 20, weight: .medium))
+                                .foregroundColor(.white)
+                                .padding(8)
+                                .background(Color.black.opacity(0.6))
+                                .clipShape(Circle())
+                                .padding(8)
+                        }
+                        .transition(.opacity.combined(with: .scale))
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .actionSheet(isPresented: $showActionSheet) {
+                    ActionSheet(
+                        title: Text("Save Image"),
+                        message: Text("Would you like to save this image to your photos?"),
+                        buttons: [
+                            .default(Text("Save")) {
+                                // Implement save to photos
+                            },
+                            .cancel()
+                        ]
+                    )
+                }
             }
             
-            // Action Buttons
+            // Enhanced Action Buttons with animations
             HStack(spacing: 0) {
-                // Like Button
+                // Like Button with animation
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         isLiked.toggle()
+                        HapticFeedback.impact(style: isLiked ? .heavy : .light)
                     }
-                    HapticFeedback.impact(style: .light)
                 }) {
                     HStack(spacing: 6) {
-                        Image(systemName: isLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(isLiked ? .blue : .gray)
-                        Text(formatNumber(post.upvotes + (isLiked ? 1 : 0)))
-                            .font(.subheadline)
-                            .foregroundColor(isLiked ? .blue : .gray)
+                        ZStack {
+                            Group {
+                                Image(systemName: "heart.fill")
+                                    .opacity(isLiked ? 1 : 0)
+                                    .scaleEffect(isLiked ? 1.0 : 0.1)
+                                
+                                Image(systemName: "heart")
+                                    .opacity(isLiked ? 0 : 1)
+                            }
+                            .font(.system(size: 18))
+                            .foregroundColor(isLiked ? .red : .primary)
+                        }
+                        .frame(width: 24, height: 24)
+                        
+                        Text(formatNumber(post.upvotes + (isLiked && !post.isLiked ? 1 : 0)))
+                            .font(.caption)
+                            .foregroundColor(isLiked ? .red : .primary)
+                            .contentTransition(.numericText())
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(20)
+                    .padding(8)
+                    .padding(.horizontal, 4)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(ScaleButtonStyle())
                 
-                Spacer()
-                
-                // Comment Button
+                // Comment Button with animation
                 Button(action: {
-                    showComments = true
                     HapticFeedback.impact(style: .light)
+                    showComments = true
                 }) {
                     HStack(spacing: 6) {
                         Image(systemName: "bubble.left")
-                            .font(.system(size: 16, weight: .medium))
+                            .font(.system(size: 16))
+                        
                         Text(formatNumber(post.comments))
-                            .font(.subheadline)
+                            .font(.caption)
                     }
-                    .foregroundColor(.gray)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(20)
+                    .padding(8)
+                    .padding(.horizontal, 4)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(ScaleButtonStyle())
                 .sheet(isPresented: $showComments) {
-                    // Comments View
-                    Text("Comments")
-                }
-                
-                Spacer()
-                
-                // Share Button
-                Button(action: {
-                    showShareSheet = true
-                    HapticFeedback.impact(style: .light)
-                }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "arrowshape.turn.up.right")
-                            .font(.system(size: 16, weight: .medium))
-                        Text(formatNumber(post.shares))
-                            .font(.subheadline)
+                    // Comments view would go here
+                    NavigationView {
+                        Text("Comments")
+                            .navigationTitle("Comments")
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    Button("Done") {
+                                        showComments = false
+                                    }
+                                }
+                            }
                     }
-                    .foregroundColor(.gray)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(20)
-                }
-                .sheet(isPresented: $showShareSheet) {
-                    // Share Sheet
-                    Text("Share Options")
                 }
                 
                 Spacer()
                 
-                // Bookmark Button
+                // Share Button with menu
+                Menu {
+                    Button(action: {
+                        // Share to messages
+                        HapticFeedback.impact(style: .medium)
+                    }) {
+                        Label("Share via Messages", systemImage: "message.fill")
+                    }
+                    
+                    Button(action: {
+                        // Share to other apps
+                        HapticFeedback.impact(style: .medium)
+                    }) {
+                        Label("Share via...", systemImage: "square.and.arrow.up")
+                    }
+                    
+                    Button(action: {
+                        // Copy link
+                        HapticFeedback.notification(type: .success)
+                    }) {
+                        Label("Copy Link", systemImage: "link")
+                    }
+                    
+                    Button(role: .destructive, action: {
+                        // Report post
+                        HapticFeedback.impact(style: .heavy)
+                    }) {
+                        Label("Report Post", systemImage: "flag")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 16, weight: .bold))
+                        .padding(8)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(ScaleButtonStyle())
+                
+                // Bookmark Button with animation
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         isBookmarked.toggle()
+                        HapticFeedback.impact(style: .light)
                     }
-                    HapticFeedback.impact(style: .light)
                 }) {
-                    Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(isBookmarked ? .blue : .gray)
-                        .padding(10)
-                        .background(Color(.systemGray6))
-                        .clipShape(Circle())
+                    ZStack {
+                        Group {
+                            Image(systemName: "bookmark.fill")
+                                .opacity(isBookmarked ? 1 : 0)
+                                .scaleEffect(isBookmarked ? 1.0 : 0.1)
+                            
+                            Image(systemName: "bookmark")
+                                .opacity(isBookmarked ? 0 : 1)
+                        }
+                        .font(.system(size: 18))
+                        .foregroundColor(isBookmarked ? .blue : .primary)
+                    }
+                    .frame(width: 24, height: 24)
+                    .padding(8)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(ScaleButtonStyle())
             }
-            .padding(.top, 4)
+            .foregroundColor(.primary)
+            .padding(.horizontal, 8)
+            .padding(.bottom, 12)
         }
-        .padding(16)
         .background(Color(.systemBackground))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 2)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8)
+        .contextMenu {
+            Button(action: {
+                // Copy post text
+                UIPasteboard.general.string = post.content
+                HapticFeedback.notification(type: .success)
+            }) {
+                Label("Copy Text", systemImage: "doc.on.doc")
+            }
+            
+            Button(action: {
+                // Save post
+                isBookmarked.toggle()
+                HapticFeedback.impact(style: .light)
+            }) {
+                Label(
+                    isBookmarked ? "Remove from Saved" : "Save Post",
+                    systemImage: isBookmarked ? "bookmark.slash" : "bookmark"
+                )
+            }
+            
+            Button(role: .destructive, action: {
+                // Report post
+                HapticFeedback.impact(style: .heavy)
+            }) {
+                Label("Report Post", systemImage: "flag")
+            }
+        }
         .padding(.horizontal, 4)
     }
     
     private func formatNumber(_ number: Int) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 1
-        
-        if number >= 1000 {
-            let formatted = formatter.string(from: NSNumber(value: Double(number) / 1000.0)) ?? ""
-            return "\(formatted)K"
+        return formatter.string(from: NSNumber(value: number)) ?? "\(number)"
+    }
+    
+    private func needsTruncation(text: String) -> Bool {
+        let textView = UITextView()
+        textView.text = text
+        textView.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        let size = textView.sizeThatFits(CGSize(width: UIScreen.main.bounds.width - 64, height: .greatestFiniteMagnitude))
+        let lineHeight = textView.font?.lineHeight ?? 20
+        let maxHeight = lineHeight * CGFloat(maxContentLines)
+        return size.height > maxHeight
+    }
+}
+
+// MARK: - Subviews
+private extension FeedView {
+    var headerView: some View {
+        HStack {
+            Button(action: { showProfile = true }) {
+                Image(systemName: "person.circle.fill")
+                    .font(.system(size: 28))
+                    .foregroundColor(.primary)
+            }
+            .sheet(isPresented: $showProfile) {
+                // Profile view would go here
+                Text("Profile")
+            }
+            
+            Spacer()
+            
+            VStack(alignment: .center, spacing: 4) {
+                Text("Welcome back")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Text("Dirt Feed")
+                    .font(.title3)
+                    .fontWeight(.semibold)
+            }
+            
+            Spacer()
+            
+            HStack(spacing: 12) {
+                Button(action: { showSearch = true }) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(.primary)
+                }
+                
+                NavigationLink(destination: NotificationsView()) {
+                    ZStack(alignment: .topTrailing) {
+                        Image(systemName: "bell")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(.primary)
+                        
+                        Circle()
+                            .fill(Color.red)
+                            .frame(width: 10, height: 10)
+                            .offset(x: 4, y: -2)
+                    }
+                }
+            }
         }
-        return "\(number)"
+    }
+    
+    var newPostButton: some View {
+        Button(action: {
+            HapticFeedback.impact(style: .medium)
+            showNewPostView = true
+        }) {
+            Image(systemName: "plus.circle.fill")
+                .font(.system(size: 56))
+                .foregroundColor(.blue)
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+        }
+        .padding(.trailing, 24)
+        .padding(.bottom, 24)
+        .sheet(isPresented: $showNewPostView) {
+            // Create post view would go here
+            Text("New Post")
+        }
+    }
+    
+    private func refreshData() async {
+        isRefreshing = true
+        // Simulate network request
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        isRefreshing = false
     }
 }
 
-// MARK: - Haptic Feedback
-struct HapticFeedback {
-    static func impact(style: UIImpactFeedbackGenerator.FeedbackStyle) {
-        let generator = UIImpactFeedbackGenerator(style: style)
-        generator.impactOccurred()
-    }
-}
-
-// MARK: - Filter Pill
+// MARK: - Filter Pill View
 struct FilterPill: View {
     let title: String
     let isSelected: Bool
@@ -403,7 +598,20 @@ struct ScaleButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .animation(.easeInOut(duration: 0.2), value: configuration.isPressed)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: configuration.isPressed)
+    }
+}
+
+// MARK: - Haptic Feedback
+struct HapticFeedback {
+    static func impact(style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        let generator = UIImpactFeedbackGenerator(style: style)
+        generator.impactOccurred()
+    }
+    
+    static func notification(type: UINotificationFeedbackGenerator.FeedbackType) {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(type)
     }
 }
 
