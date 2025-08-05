@@ -15,7 +15,6 @@ struct BlurView: UIViewRepresentable {
     }
 }
 
-// MARK: - Post Model
 struct Post: Identifiable {
     let id = UUID()
     let username: String
@@ -81,7 +80,6 @@ struct Post: Identifiable {
     ]
 }
 
-// MARK: - FeedView
 struct FeedView: View {
     @State private var posts: [Post] = Post.samplePosts
     @State private var selectedFilter = "Latest"
@@ -215,76 +213,66 @@ struct FeedView: View {
                             }
                             .padding(.horizontal)
                         }
+                    
+                    // Posts
+                    LazyVStack(spacing: 16) {
+                        ForEach(posts) { post in
+                            PostCard(post: post)
+                                .padding(.horizontal)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
+                        }
                         
-                        // Posts
-                        LazyVStack(spacing: 16) {
-                            ForEach(posts) { post in
-                                PostCard(post: post)
-                                    .padding(.horizontal)
-                                    .transition(.opacity.combined(with: .move(edge: .top)))
-                            }
-                            
-                            // End of feed message
-                            VStack(spacing: 16) {
-                                Image(systemName: "checkmark.shield.fill")
-                                    .font(.title2)
-                                    .foregroundColor(.blue)
-                                Text("You're all caught up!")
-                                    .font(.headline)
-                                Text("New posts will appear here")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 32)
+                        // End of feed message
+                        VStack(spacing: 16) {
+                            Image(systemName: "checkmark.shield.fill")
+                                .font(.title2)
+                                .foregroundColor(.blue)
+                            Text("You're all caught up!")
+                                .font(.headline)
+                            Text("New posts will appear here")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                         }
-                        .padding(.vertical, 16)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 32)
                     }
-                    .padding(.top, 8)
+                    .padding(.vertical, 16)
                 }
-                .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
-                .navigationBarHidden(true)
-                .refreshable {
-                    await refreshData()
-                }
-                .overlay(
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            Button(action: {
-                                showNewPostView = true
-                            }) {
-                                Image(systemName: "plus")
-                                    .font(.title2.weight(.bold))
-                                    .foregroundColor(.white)
-                                    .frame(width: 56, height: 56)
-                                    .background(LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing))
-                                    .clipShape(Circle())
-                                    .shadow(radius: 5)
-                                    .padding()
-                            }
-                        }
-                    }
-                )
+                .padding(.top, 8)
             }
+            .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
             .navigationBarHidden(true)
-            .sheet(isPresented: $showNewPostView) {
-                // Create post view would go here
-                Text("New Post")
+            .refreshable {
+                await refreshData()
             }
+            .overlay(
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            showNewPostView = true
+                        }) {
+                            Image(systemName: "plus")
+                                .font(.title2.weight(.bold))
+                                .foregroundColor(.white)
+                                .frame(width: 56, height: 56)
+                                .background(LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                                .clipShape(Circle())
+                                .shadow(radius: 5)
+                                .padding()
+                        }
+                    }
+                }
+            )
         }
-    }
-    
-    private func refreshData() async {
-        isRefreshing = true
-        // Simulate network request
-        try? await Task.sleep(nanoseconds: 1_500_000_000)
-        isRefreshing = false
+        .navigationBarHidden(true)
+        .sheet(isPresented: $showNewPostView) {
+            CreatePostView()
+        }
     }
 }
 
-// MARK: - PostCard
 struct PostCard: View {
     let post: Post
     @State private var isLiked: Bool
@@ -293,15 +281,15 @@ struct PostCard: View {
     @State private var isExpanded = false
     @State private var isImageExpanded = false
     @State private var isLongPressing = false
-    @State private var currentScale: CGFloat = 1.0
-    
-    private let animationDuration = 0.2
     
     init(post: Post) {
         self.post = post
         _isLiked = State(initialValue: post.isLiked)
         _isBookmarked = State(initialValue: post.isBookmarked)
     }
+    @State private var currentScale: CGFloat = 1.0
+    
+    private let animationDuration = 0.2
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -380,8 +368,6 @@ struct PostCard: View {
                         .foregroundColor(.blue)
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 8)
             }
             
             // Post Image if available
@@ -525,61 +511,63 @@ struct PostCard: View {
         }
     }
     
-    private func formatNumber(_ number: Int) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 1
+    // TabButton view for the tab bar
+    struct TabButton: View {
+        let title: String
+        let isSelected: Bool
+        let action: () -> Void
         
-        if number >= 1000 {
-            let formatted = Double(number) / 1000.0
-            return "\(formatter.string(from: NSNumber(value: formatted)) ?? "")\\k"
-        } else {
-            return "\(number)"
-        }
-    }
-    
-    private func needsTruncation(text: String) -> Bool {
-        let textView = UITextView()
-        textView.text = text
-        textView.font = UIFont.preferredFont(forTextStyle: .body)
-        let size = textView.sizeThatFits(CGSize(width: UIScreen.main.bounds.width - 32, height: .greatestFiniteMagnitude))
-        let lineHeight = textView.font?.lineHeight ?? 0
-        let maxHeight = lineHeight * 5 // 5 lines
-        return size.height > maxHeight
-    }
-}
-
-// MARK: - TabButton
-struct TabButton: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 4) {
-                Text(title)
-                    .font(.subheadline)
-                    .fontWeight(isSelected ? .semibold : .regular)
-                    .foregroundColor(isSelected ? .primary : .secondary)
-                
-                if isSelected {
-                    Capsule()
-                        .fill(Color.blue)
-                        .frame(width: 30, height: 3)
-                        .transition(.scale.combined(with: .opacity))
-                } else {
-                    Capsule()
-                        .fill(Color.clear)
-                        .frame(width: 30, height: 3)
+        var body: some View {
+            Button(action: action) {
+                VStack(spacing: 4) {
+                    Text(title)
+                        .font(.subheadline)
+                        .fontWeight(isSelected ? .semibold : .regular)
+                        .foregroundColor(isSelected ? .primary : .secondary)
+                    
+                    if isSelected {
+                        Capsule()
+                            .fill(Color.blue)
+                            .frame(width: 30, height: 3)
+                            .transition(.scale.combined(with: .opacity))
+                    } else {
+                        Capsule()
+                            .fill(Color.clear)
+                            .frame(width: 30, height: 3)
+                    }
                 }
+                .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
         }
+    }
+    
+    var newPostButton: some View {
+        Button(action: {
+            HapticFeedback.impact(style: .medium)
+            showNewPostView = true
+        }) {
+            Image(systemName: "plus.circle.fill")
+                .font(.system(size: 56))
+                .foregroundColor(.blue)
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+        }
+        .padding(.trailing, 24)
+        .padding(.bottom, 24)
+        .sheet(isPresented: $showNewPostView) {
+            // Create post view would go here
+            Text("New Post")
+        }
+    }
+    
+    private func refreshData() async {
+        isRefreshing = true
+        // Simulate network request
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        isRefreshing = false
     }
 }
 
-// MARK: - FilterPill
+// MARK: - Filter Pill View
 struct FilterPill: View {
     let title: String
     let isSelected: Bool
@@ -599,7 +587,7 @@ struct FilterPill: View {
                             isSelected ?
                                 AnyShapeStyle(
                                     LinearGradient(
-                                        gradient: Gradient(colors: [.blue, .purple]),
+                                        gradient: Gradient(colors: [Color.blue, Color.purple]),
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
@@ -614,7 +602,7 @@ struct FilterPill: View {
     }
 }
 
-// MARK: - ScaleButtonStyle
+// MARK: - Button Style
 struct ScaleButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -623,7 +611,7 @@ struct ScaleButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - HapticFeedback
+// MARK: - Haptic Feedback
 struct HapticFeedback {
     static func impact(style: UIImpactFeedbackGenerator.FeedbackStyle) {
         let generator = UIImpactFeedbackGenerator(style: style)

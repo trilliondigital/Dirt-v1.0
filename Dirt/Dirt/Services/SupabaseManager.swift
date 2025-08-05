@@ -1,28 +1,38 @@
 import Foundation
 import Supabase
+import Combine
 
 @MainActor
 class SupabaseManager: ObservableObject {
     static let shared = SupabaseManager()
     
     private let client: SupabaseClient
+    private var authStateChangeTask: Task<Void, Never>?
     
     @Published private(set) var session: Session?
     @Published var todos: [Todo] = []
+    @Published var errorMessage: String?
     
     private init() {
         let supabaseURL = URL(string: "https://xruvwnrxatkgmncefozs.supabase.co")!
         let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhydXZ3bnJ4YXRrZ21uY2Vmb3pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQxNzk0NTEsImV4cCI6MjA2OTc1NTQ1MX0.Ux7QgWRAcDviV5niUtDztu3PQ0m2_Fw3gwiTRlA_fPY"
         
-        client = SupabaseClient(
-            supabaseURL: supabaseURL,
-            supabaseKey: supabaseAnonKey
-        )
+        // Initialize the Supabase client with URL and key
+        client = SupabaseClient(supabaseURL: supabaseURL, supabaseKey: supabaseAnonKey)
         
-        Task {
+        // Setup auth state change listener
+        authStateChangeTask = Task {
             await setupAuthListener()
-            await fetchTodos()
         }
+        
+        // Try to restore session on init
+        Task {
+            await restoreSession()
+        }
+    }
+    
+    deinit {
+        authStateChangeTask?.cancel()
     }
     
     private func setupAuthListener() {
@@ -51,34 +61,85 @@ class SupabaseManager: ObservableObject {
     
     // MARK: - Auth Methods
     
+    private func restoreSession() async {
+        do {
+            let session = try await client.auth.session
+            await MainActor.run {
+                self.session = session
+                self.errorMessage = nil
+            }
+            await fetchTodos()
+        } catch {
+            await MainActor.run {
+                self.session = nil
+                self.todos = []
+                self.errorMessage = "Failed to restore session: \(error.localizedDescription)"
+            }
+        }
+    }
+    
     func signIn(email: String, password: String) async throws {
-        let session = try await client.auth.signIn(
-            email: email,
-            password: password
-        )
-        
-        await MainActor.run {
-            self.session = session
+        do {
+            let session = try await client.auth.signIn(
+                email: email,
+                password: password
+            )
+            
+            await MainActor.run {
+                self.session = session
+                self.errorMessage = nil
+            }
+            
+            await fetchTodos()
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Sign in failed: \(error.localizedDescription)"
+            }
+            throw error
         }
     }
     
     func signUp(email: String, password: String) async throws {
-        let response = try await client.auth.signUp(
-            email: email,
-            password: password
-        )
-        
-        await MainActor.run {
-            self.session = response.session
+        do {
+            let response = try await client.auth.signUp(
+                email: email,
+                password: password
+            )
+            
+            if let session = response.session {
+                await MainActor.run {
+                    self.session = session
+                    self.errorMessage = nil
+                }
+                await fetchTodos()
+            } else {
+                // Email confirmation required
+                await MainActor.run {
+                    self.errorMessage = "Please check your email to confirm your account."
+                }
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Sign up failed: \(error.localizedDescription)"
+            }
+            throw error
         }
     }
     
     func signOut() async throws {
-        try await client.auth.signOut()
-        
-        await MainActor.run {
-            self.session = nil
-            self.todos = []
+        do {
+            try await client.auth.signOut()
+            
+            await MainActor.run {
+                self.session = nil
+                self.todos = []
+                self.errorMessage = nil
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "Sign out failed: \(error.localizedDescription)"
+            }
+            throw error
         }
     }
     
