@@ -15,6 +15,7 @@ struct BlurView: UIViewRepresentable {
     }
 }
 
+// MARK: - Post Model
 struct Post: Identifiable {
     let id = UUID()
     let username: String
@@ -80,6 +81,7 @@ struct Post: Identifiable {
     ]
 }
 
+// MARK: - FeedView
 struct FeedView: View {
     @State private var posts: [Post] = Post.samplePosts
     @State private var selectedFilter = "Latest"
@@ -213,66 +215,76 @@ struct FeedView: View {
                             }
                             .padding(.horizontal)
                         }
-                    
-                    // Posts
-                    LazyVStack(spacing: 16) {
-                        ForEach(posts) { post in
-                            PostCard(post: post)
-                                .padding(.horizontal)
-                                .transition(.opacity.combined(with: .move(edge: .top)))
-                        }
                         
-                        // End of feed message
-                        VStack(spacing: 16) {
-                            Image(systemName: "checkmark.shield.fill")
-                                .font(.title2)
-                                .foregroundColor(.blue)
-                            Text("You're all caught up!")
-                                .font(.headline)
-                            Text("New posts will appear here")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                        // Posts
+                        LazyVStack(spacing: 16) {
+                            ForEach(posts) { post in
+                                PostCard(post: post)
+                                    .padding(.horizontal)
+                                    .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
+                            
+                            // End of feed message
+                            VStack(spacing: 16) {
+                                Image(systemName: "checkmark.shield.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.blue)
+                                Text("You're all caught up!")
+                                    .font(.headline)
+                                Text("New posts will appear here")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 32)
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 32)
+                        .padding(.vertical, 16)
                     }
-                    .padding(.vertical, 16)
+                    .padding(.top, 8)
                 }
-                .padding(.top, 8)
-            }
-            .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
-            .navigationBarHidden(true)
-            .refreshable {
-                await refreshData()
-            }
-            .overlay(
-                VStack {
-                    Spacer()
-                    HStack {
+                .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
+                .navigationBarHidden(true)
+                .refreshable {
+                    await refreshData()
+                }
+                .overlay(
+                    VStack {
                         Spacer()
-                        Button(action: {
-                            showNewPostView = true
-                        }) {
-                            Image(systemName: "plus")
-                                .font(.title2.weight(.bold))
-                                .foregroundColor(.white)
-                                .frame(width: 56, height: 56)
-                                .background(LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing))
-                                .clipShape(Circle())
-                                .shadow(radius: 5)
-                                .padding()
+                        HStack {
+                            Spacer()
+                            Button(action: {
+                                showNewPostView = true
+                            }) {
+                                Image(systemName: "plus")
+                                    .font(.title2.weight(.bold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 56, height: 56)
+                                    .background(LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                                    .clipShape(Circle())
+                                    .shadow(radius: 5)
+                                    .padding()
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
+            .navigationBarHidden(true)
+            .sheet(isPresented: $showNewPostView) {
+                // Create post view would go here
+                Text("New Post")
+            }
         }
-        .navigationBarHidden(true)
-        .sheet(isPresented: $showNewPostView) {
-            CreatePostView()
-        }
+    }
+    
+    private func refreshData() async {
+        isRefreshing = true
+        // Simulate network request
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        isRefreshing = false
     }
 }
 
+// MARK: - PostCard
 struct PostCard: View {
     let post: Post
     @State private var isLiked: Bool
@@ -280,16 +292,16 @@ struct PostCard: View {
     @State private var showComments = false
     @State private var isExpanded = false
     @State private var isImageExpanded = false
-    @State private var isLongPressing = false
+    @GestureState private var isLongPressing = false
+    @State private var currentScale: CGFloat = 1.0
+    
+    private let animationDuration = 0.2
     
     init(post: Post) {
         self.post = post
         _isLiked = State(initialValue: post.isLiked)
         _isBookmarked = State(initialValue: post.isBookmarked)
     }
-    @State private var currentScale: CGFloat = 1.0
-    
-    private let animationDuration = 0.2
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -368,6 +380,8 @@ struct PostCard: View {
                         .foregroundColor(.blue)
                     }
                 }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
             }
             
             // Post Image if available
@@ -395,9 +409,9 @@ struct PostCard: View {
                         )
                         .simultaneousGesture(
                             LongPressGesture(minimumDuration: 0.5)
-                                .updating($isLongPressing) { currentState, gestureState, _ in
-                                    gestureState = currentState
-                                    if gestureState {
+                                .updating($isLongPressing) { currentState, state, _ in
+                                    state = currentState
+                                    if currentState {
                                         HapticFeedback.impact(style: .medium)
                                     }
                                 }
@@ -511,63 +525,61 @@ struct PostCard: View {
         }
     }
     
-    // TabButton view for the tab bar
-    struct TabButton: View {
-        let title: String
-        let isSelected: Bool
-        let action: () -> Void
+    private func formatNumber(_ number: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 1
         
-        var body: some View {
-            Button(action: action) {
-                VStack(spacing: 4) {
-                    Text(title)
-                        .font(.subheadline)
-                        .fontWeight(isSelected ? .semibold : .regular)
-                        .foregroundColor(isSelected ? .primary : .secondary)
-                    
-                    if isSelected {
-                        Capsule()
-                            .fill(Color.blue)
-                            .frame(width: 30, height: 3)
-                            .transition(.scale.combined(with: .opacity))
-                    } else {
-                        Capsule()
-                            .fill(Color.clear)
-                            .frame(width: 30, height: 3)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-            }
+        if number >= 1000 {
+            let formatted = Double(number) / 1000.0
+            return "\(formatter.string(from: NSNumber(value: formatted)) ?? "")\\k"
+        } else {
+            return "\(number)"
         }
     }
     
-    var newPostButton: some View {
-        Button(action: {
-            HapticFeedback.impact(style: .medium)
-            showNewPostView = true
-        }) {
-            Image(systemName: "plus.circle.fill")
-                .font(.system(size: 56))
-                .foregroundColor(.blue)
-                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-        }
-        .padding(.trailing, 24)
-        .padding(.bottom, 24)
-        .sheet(isPresented: $showNewPostView) {
-            // Create post view would go here
-            Text("New Post")
-        }
-    }
-    
-    private func refreshData() async {
-        isRefreshing = true
-        // Simulate network request
-        try? await Task.sleep(nanoseconds: 1_500_000_000)
-        isRefreshing = false
+    private func needsTruncation(text: String) -> Bool {
+        let textView = UITextView()
+        textView.text = text
+        textView.font = UIFont.preferredFont(forTextStyle: .body)
+        let size = textView.sizeThatFits(CGSize(width: UIScreen.main.bounds.width - 32, height: .greatestFiniteMagnitude))
+        let lineHeight = textView.font?.lineHeight ?? 0
+        let maxHeight = lineHeight * 5 // 5 lines
+        return size.height > maxHeight
     }
 }
 
-// MARK: - Filter Pill View
+// MARK: - TabButton
+struct TabButton: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(isSelected ? .semibold : .regular)
+                    .foregroundColor(isSelected ? .primary : .secondary)
+                
+                if isSelected {
+                    Capsule()
+                        .fill(Color.blue)
+                        .frame(width: 30, height: 3)
+                        .transition(.scale.combined(with: .opacity))
+                } else {
+                    Capsule()
+                        .fill(Color.clear)
+                        .frame(width: 30, height: 3)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+}
+
+// MARK: - FilterPill
 struct FilterPill: View {
     let title: String
     let isSelected: Bool
@@ -587,7 +599,7 @@ struct FilterPill: View {
                             isSelected ?
                                 AnyShapeStyle(
                                     LinearGradient(
-                                        gradient: Gradient(colors: [Color.blue, Color.purple]),
+                                        gradient: Gradient(colors: [.blue, .purple]),
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
@@ -602,7 +614,7 @@ struct FilterPill: View {
     }
 }
 
-// MARK: - Button Style
+// MARK: - ScaleButtonStyle
 struct ScaleButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -611,7 +623,7 @@ struct ScaleButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - Haptic Feedback
+// MARK: - HapticFeedback
 struct HapticFeedback {
     static func impact(style: UIImpactFeedbackGenerator.FeedbackStyle) {
         let generator = UIImpactFeedbackGenerator(style: style)

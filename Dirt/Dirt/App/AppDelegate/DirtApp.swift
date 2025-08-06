@@ -8,6 +8,7 @@ struct DirtApp: App {
 
     var body: some Scene {
         WindowGroup {
+            // Using the correct path to HomeView
             HomeView()
                 .environmentObject(supabaseManager)
         }
