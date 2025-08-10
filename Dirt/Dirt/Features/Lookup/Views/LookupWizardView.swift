@@ -64,13 +64,13 @@ struct LookupWizardView: View {
             
             Section(header: Text("Details")) {
                 NavigationLink(destination: Text("Public Profiles")) {
-                    HStack { Text("Public profiles"); Spacer(); Image(systemName: "chevron.right").foregroundColor(.tertiaryLabel) }
+                    HStack { Text("Public profiles"); Spacer(); Image(systemName: "chevron.right").foregroundColor(.secondary) }
                 }
                 NavigationLink(destination: Text("Mentions in Posts")) {
-                    HStack { Text("Mentions in posts"); Spacer(); Image(systemName: "chevron.right").foregroundColor(.tertiaryLabel) }
+                    HStack { Text("Mentions in posts"); Spacer(); Image(systemName: "chevron.right").foregroundColor(.secondary) }
                 }
                 NavigationLink(destination: Text("Community Flags")) {
-                    HStack { Text("Community flags"); Spacer(); Image(systemName: "chevron.right").foregroundColor(.tertiaryLabel) }
+                    HStack { Text("Community flags"); Spacer(); Image(systemName: "chevron.right").foregroundColor(.secondary) }
                 }
             }
             
