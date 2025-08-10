@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct PostDetailView: View {
+    let postId: UUID
     let username: String
     let userInitial: String
     let userColor: Color
@@ -119,8 +120,7 @@ struct PostDetailView: View {
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Submit") {
                             if let reason = selectedReport {
-                                // TODO: Pass the real post id once available in this view
-                                ReportService.submitReport(postId: UUID(), reason: reason)
+                                ReportService.submitReport(postId: postId, reason: reason)
                             }
                             isSoftHidden = true
                             showReportSheet = false
@@ -179,6 +179,7 @@ struct PostDetailView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             PostDetailView(
+                postId: UUID(),
                 username: "Alex Johnson",
                 userInitial: "AJ",
                 userColor: .blue,

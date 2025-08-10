@@ -275,6 +275,7 @@ struct FeedView: View {
                             ForEach(filteredAndSortedPosts()) { post in
                                 NavigationLink(
                                     destination: PostDetailView(
+                                        postId: post.id,
                                         username: post.username,
                                         userInitial: post.userInitial,
                                         userColor: post.userColor,
