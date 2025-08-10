@@ -596,6 +596,9 @@ struct PostCard: View {
                     }
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Submit") {
+                            if let reason = selectedReport {
+                                ReportService.submitReport(postId: post.id, reason: reason)
+                            }
                             // Soft-hide locally after report
                             isSoftHidden = true
                             showReportSheet = false

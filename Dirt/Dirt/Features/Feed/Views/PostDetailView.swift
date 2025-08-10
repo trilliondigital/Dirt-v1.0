@@ -118,6 +118,10 @@ struct PostDetailView: View {
                     }
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Submit") {
+                            if let reason = selectedReport {
+                                // TODO: Pass the real post id once available in this view
+                                ReportService.submitReport(postId: UUID(), reason: reason)
+                            }
                             isSoftHidden = true
                             showReportSheet = false
                         }.disabled(selectedReport == nil)
