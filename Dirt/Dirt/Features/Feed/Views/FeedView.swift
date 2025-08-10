@@ -540,9 +540,7 @@ struct PostCard: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
         }
-        .background(Color(.systemBackground))
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 2)
+        .cardBackground()
         .padding(.horizontal, 8)
         .padding(.vertical, 8)
         .opacity(isSoftHidden ? 0.4 : 1.0)
