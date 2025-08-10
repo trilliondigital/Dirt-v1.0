@@ -13,9 +13,12 @@ struct PostDetailView: View {
     let comments: Int
     let shares: Int
     
-    @State private var liked: Bool = false
+    @State private var helpful: Bool = false
     @State private var bookmarked: Bool = false
     @State private var showComments: Bool = false
+    @State private var showReportSheet: Bool = false
+    @State private var selectedReport: ReportReason? = nil
+    @State private var isSoftHidden: Bool = false
     
     var body: some View {
         ScrollView {
@@ -67,14 +70,17 @@ struct PostDetailView: View {
                 
                 // Actions
                 HStack(spacing: 16) {
-                    Button { liked.toggle() } label: {
-                        Label("\(upvotes)", systemImage: liked ? "hand.thumbsup.fill" : "hand.thumbsup")
+                    Button { helpful.toggle() } label: {
+                        Label("\(upvotes)", systemImage: helpful ? "hand.thumbsup.fill" : "hand.thumbsup")
                     }
                     Button { showComments = true } label: {
                         Label("\(comments)", systemImage: "bubble.left")
                     }
                     Button { /* share */ } label: {
                         Label("\(shares)", systemImage: "arrowshape.turn.up.right")
+                    }
+                    Button { showReportSheet = true } label: {
+                        Label("Report", systemImage: "flag")
                     }
                     Spacer()
                     Button { bookmarked.toggle() } label: {
@@ -84,10 +90,40 @@ struct PostDetailView: View {
                 .padding(.horizontal)
                 .padding(.bottom)
             }
+            .opacity(isSoftHidden ? 0.4 : 1.0)
         }
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showComments) {
             NavigationView { Text("Comments").navigationTitle("Comments") }
+        }
+        .sheet(isPresented: $showReportSheet) {
+            NavigationView {
+                List {
+                    Section("Report reason") {
+                        ForEach(ReportReason.allCases) { reason in
+                            HStack {
+                                Text(reason.rawValue)
+                                Spacer()
+                                if selectedReport == reason { Image(systemName: "checkmark").foregroundColor(.blue) }
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture { selectedReport = reason }
+                        }
+                    }
+                }
+                .navigationTitle("Report Post")
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") { showReportSheet = false }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Submit") {
+                            isSoftHidden = true
+                            showReportSheet = false
+                        }.disabled(selectedReport == nil)
+                    }
+                }
+            }
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
     }

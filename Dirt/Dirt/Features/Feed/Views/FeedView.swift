@@ -323,19 +323,22 @@ struct FeedView: View {
 // MARK: - PostCard
 struct PostCard: View {
     let post: Post
-    @State private var isLiked: Bool
+    @State private var isHelpful: Bool
     @State private var isBookmarked: Bool
     @State private var showComments = false
     @State private var isExpanded = false
     @State private var isImageExpanded = false
     @GestureState private var isLongPressing = false
     @State private var currentScale: CGFloat = 1.0
+    @State private var showReportSheet = false
+    @State private var selectedReport: ReportReason? = nil
+    @State private var isSoftHidden = false
     
     private let animationDuration = 0.2
     
     init(post: Post) {
         self.post = post
-        _isLiked = State(initialValue: post.isLiked)
+        _isHelpful = State(initialValue: post.isLiked)
         _isBookmarked = State(initialValue: post.isBookmarked)
     }
     
@@ -431,7 +434,7 @@ struct PostCard: View {
                         .animation(.spring(), value: isImageExpanded)
                         .onTapGesture(count: 2) {
                             withAnimation {
-                                isLiked.toggle()
+                                isHelpful.toggle()
                                 HapticFeedback.impact(style: .medium)
                             }
                         }
@@ -465,18 +468,17 @@ struct PostCard: View {
             HStack(spacing: 20) {
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        isLiked.toggle()
+                        isHelpful.toggle()
                         HapticFeedback.impact(style: .light)
                     }
                 }) {
                     HStack(spacing: 4) {
-                        Image(systemName: isLiked ? "heart.fill" : "heart")
-                            .symbolEffect(.bounce, value: isLiked)
+                        Image(systemName: isHelpful ? "hand.thumbsup.fill" : "hand.thumbsup")
+                            .symbolEffect(.bounce, value: isHelpful)
                             .font(.title3)
-                            .foregroundColor(isLiked ? .red : .primary)
-                        Text(formatNumber(post.upvotes + (isLiked ? 1 : 0)))
+                            .foregroundColor(isHelpful ? .blue : .primary)
+                        Text(formatNumber(post.upvotes))
                             .font(.subheadline)
-                            .foregroundColor(isLiked ? .red : .primary)
                     }
                 }
                 
@@ -500,6 +502,18 @@ struct PostCard: View {
                         Image(systemName: "arrowshape.turn.up.right")
                             .font(.title3)
                         Text("Share")
+                            .font(.subheadline)
+                    }
+                }
+
+                Button(action: {
+                    showReportSheet = true
+                    HapticFeedback.impact(style: .light)
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "flag")
+                            .font(.title3)
+                        Text("Report")
                             .font(.subheadline)
                     }
                 }
@@ -531,6 +545,7 @@ struct PostCard: View {
         .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 2)
         .padding(.horizontal, 8)
         .padding(.vertical, 8)
+        .opacity(isSoftHidden ? 0.4 : 1.0)
         .contextMenu {
             Button(action: {
                 isBookmarked.toggle()
@@ -558,6 +573,37 @@ struct PostCard: View {
         .sheet(isPresented: $showComments) {
             // Comments view would go here
             Text("Comments")
+        }
+        .sheet(isPresented: $showReportSheet) {
+            NavigationView {
+                List {
+                    Section("Report reason") {
+                        ForEach(ReportReason.allCases) { reason in
+                            HStack {
+                                Text(reason.rawValue)
+                                Spacer()
+                                if selectedReport == reason { Image(systemName: "checkmark").foregroundColor(.blue) }
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture { selectedReport = reason }
+                        }
+                    }
+                }
+                .navigationTitle("Report Post")
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") { showReportSheet = false }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Submit") {
+                            // Soft-hide locally after report
+                            isSoftHidden = true
+                            showReportSheet = false
+                            HapticFeedback.notification(type: .success)
+                        }.disabled(selectedReport == nil)
+                    }
+                }
+            }
         }
     }
     
