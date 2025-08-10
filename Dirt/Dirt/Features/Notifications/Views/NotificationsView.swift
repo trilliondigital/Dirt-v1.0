@@ -5,7 +5,7 @@ struct Notification: Identifiable {
     let username: String
     let action: String
     let timeAgo: String
-    let isRead: Bool
+    var isRead: Bool
     let imageName: String?
 }
 
@@ -17,6 +17,13 @@ struct NotificationsView: View {
             timeAgo: "5m ago",
             isRead: false,
             imageName: "heart.fill"
+        ),
+        Notification(
+            username: "User222",
+            action: "mentioned you in a comment",
+            timeAgo: "20m ago",
+            isRead: false,
+            imageName: "at"
         ),
         Notification(
             username: "User789",
@@ -31,6 +38,13 @@ struct NotificationsView: View {
             timeAgo: "3h ago",
             isRead: true,
             imageName: "eye"
+        ),
+        Notification(
+            username: "Moderation",
+            action: "A report was filed on your post (review pending)",
+            timeAgo: "6h ago",
+            isRead: true,
+            imageName: "flag"
         ),
         Notification(
             username: "User123",
@@ -62,10 +76,22 @@ struct NotificationsView: View {
                 if selectedTab == 0 {
                     // Activity list
                     List {
-                        ForEach(notifications) { notification in
-                            NotificationRow(notification: notification)
+                        ForEach(notifications.indices, id: \.self) { idx in
+                            NotificationRow(notification: notifications[idx])
                                 .listRowInsets(EdgeInsets())
                                 .listRowSeparator(.hidden)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    if notifications[idx].isRead {
+                                        Button("Unread") { notifications[idx].isRead = false }
+                                            .tint(.blue)
+                                    } else {
+                                        Button("Read") { notifications[idx].isRead = true }
+                                            .tint(.green)
+                                    }
+                                    Button(role: .destructive) {
+                                        notifications.remove(at: idx)
+                                    } label: { Text("Delete") }
+                                }
                         }
                         .onDelete { indexSet in
                             notifications.remove(atOffsets: indexSet)
@@ -106,9 +132,7 @@ struct NotificationsView: View {
             .toolbar {
                 if selectedTab == 0 {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("Mark all as read") {
-                            // Mark all as read action
-                        }
+                        Button("Mark all as read") { notifications = notifications.map { n in var n = n; n.isRead = true; return n } }
                     }
                 }
             }

@@ -6,6 +6,10 @@ struct SearchView: View {
     let filters = ["Recent", "Popular", "Nearby", "Trending"]
     @State private var savedSearches: [String] = ["#ghosting", "#redflag", "near: Austin", "@alex", "green flag"]
     private var tagSuggestions: [String] { TagCatalog.all.map { $0.rawValue } }
+    @State private var results: [SearchResult] = []
+    @State private var isLoading: Bool = false
+    @State private var errorMessage: String?
+    @State private var searchTask: Task<Void, Never>? = nil
     
     var body: some View {
         NavigationView {
@@ -68,6 +72,7 @@ struct SearchView: View {
                         ForEach(filters, id: \.self) { filter in
                             Button(action: {
                                 selectedFilter = filter
+                                triggerSearch()
                             }) {
                                 Text(filter)
                                     .font(.subheadline)
@@ -191,34 +196,36 @@ struct SearchView: View {
                     }
                 } else {
                     // Search Results
-                    ScrollView {
-                        VStack(spacing: 16) {
-                            // In a real app, these would be actual search results
-                            ForEach(0..<5) { _ in
-                                HStack {
-                                    Circle()
-                                        .fill(Color.gray.opacity(0.2))
-                                        .frame(width: 50, height: 50)
-                                    
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("Search Result")
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                        
-                                        Text("This is a sample search result that would match your query.")
-                                            .font(.caption)
-                                            .foregroundColor(.gray)
-                                            .lineLimit(2)
+                    Group {
+                        if let errorMessage = errorMessage {
+                            VStack(spacing: 8) {
+                                Image(systemName: "exclamationmark.triangle").foregroundColor(.orange)
+                                Text(errorMessage).font(.subheadline)
+                                Button("Retry") { triggerSearch(immediate: true) }
+                                    .buttonStyle(.bordered)
+                            }
+                            .padding(.top, 24)
+                        } else if isLoading {
+                            ProgressView().padding(.top, 24)
+                        } else if results.isEmpty {
+                            VStack(spacing: 8) {
+                                Image(systemName: "magnifyingglass").foregroundColor(.gray)
+                                Text("No results for \"\(searchText)\"")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            }
+                            .padding(.top, 24)
+                        } else {
+                            ScrollView {
+                                VStack(spacing: 12) {
+                                    ForEach(results) { r in
+                                        SearchResultRow(result: r)
+                                            .padding(.horizontal)
                                     }
-                                    
-                                    Spacer()
                                 }
-                                .padding()
-                                .cardBackground()
-                                .padding(.horizontal)
+                                .padding(.top)
                             }
                         }
-                        .padding(.top)
                     }
                 }
             }
@@ -237,7 +244,87 @@ struct SearchView: View {
                 }
             }
             .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
+            .onChange(of: searchText) { _ in triggerSearch() }
         }
+    }
+}
+
+// MARK: - Behaviors
+extension SearchView {
+    private func triggerSearch(immediate: Bool = false) {
+        // cancel previous task
+        searchTask?.cancel()
+        let q = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !q.isEmpty else {
+            results = []
+            errorMessage = nil
+            isLoading = false
+            return
+        }
+        isLoading = true
+        errorMessage = nil
+        searchTask = Task {
+            if !immediate {
+                try? await Task.sleep(nanoseconds: 350_000_000)
+            }
+            guard !Task.isCancelled else { return }
+            do {
+                let sort: SearchSort
+                switch selectedFilter {
+                case "Popular": sort = .popular
+                case "Nearby": sort = .nearby
+                case "Trending": sort = .trending
+                default: sort = .recent
+                }
+                let res = try await SearchService.shared.search(query: q, tags: [], sort: sort)
+                if !Task.isCancelled {
+                    results = res
+                    isLoading = false
+                }
+            } catch {
+                if !Task.isCancelled {
+                    errorMessage = "Search failed. Please try again."
+                    isLoading = false
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Result Row
+struct SearchResultRow: View {
+    let result: SearchResult
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(result.title)
+                    .font(.subheadline).fontWeight(.semibold)
+                Spacer()
+                Text(String(format: "%.0f", result.score * 100))
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            Text(result.snippet)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .lineLimit(3)
+            if !result.tags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(result.tags, id: \.self) { t in
+                            Text(t)
+                                .font(.caption2)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color(.systemGray6))
+                                .cornerRadius(10)
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .cardBackground()
     }
 }
 
