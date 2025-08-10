@@ -20,9 +20,14 @@ struct ModerationQueueView: View {
             }
 
             ForEach(reports) { report in
-                ReportRow(report: report, onAction: { status in
-                    Task { await update(reportId: report.id, status: status) }
-                })
+                NavigationLink(destination: PostDetailLoaderView(postId: report.postId)) {
+                    ReportRow(report: report, onAction: { status in
+                        HapticFeedback.impact(style: .light)
+                        Task { await update(reportId: report.id, status: status) }
+                    })
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
             }
         }
         .overlay {
@@ -96,6 +101,9 @@ private struct ReportRow: View {
                 Button("Dismiss") { onAction(.dismissed) }
             }
         }
+        .padding()
+        .cardBackground()
+        .padding(.horizontal)
         .padding(.vertical, 6)
     }
 }
