@@ -5,7 +5,7 @@ struct CreatePostView: View {
     @State private var postText: String = ""
     @State private var selectedImage: UIImage?
     @State private var isImagePickerPresented = false
-    @State private var selectedTags: Set<String> = []
+    @State private var selectedTags: Set<ControlledTag> = []
     @State private var isAnonymous = false
     @State private var selectedFlag: FlagCategory? = nil
     
@@ -17,10 +17,7 @@ struct CreatePostView: View {
         var id: String { rawValue }
     }
     
-    let tagOptions = [
-        "🚩 Red Flag", "✅ Green Flag", "👻 Ghosting", 
-        "💬 Great Conversation", "💑 Second Date", "❌ Avoid"
-    ]
+    // Controlled tags are defined in `ControlledTags.swift`
     
     var body: some View {
         NavigationView {
@@ -119,7 +116,7 @@ struct CreatePostView: View {
                     
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
-                            ForEach(tagOptions, id: \.self) { tag in
+                            ForEach(TagCatalog.all) { tag in
                                 Button(action: {
                                     if selectedTags.contains(tag) {
                                         selectedTags.remove(tag)
@@ -127,28 +124,19 @@ struct CreatePostView: View {
                                         selectedTags.insert(tag)
                                     }
                                 }) {
-                                    Text(tag)
+                                    Text(tag.rawValue)
                                         .font(.subheadline)
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 8)
                                         .background(
                                             selectedTags.contains(tag) ? 
-                                                (tag.contains("🚩") || tag.contains("❌") ? 
-                                                    Color.red.opacity(0.2) : 
-                                                    Color.green.opacity(0.2)) : 
+                                                Color.blue.opacity(0.15) : 
                                                 Color.gray.opacity(0.1)
                                         )
                                         .cornerRadius(20)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 20)
-                                                .stroke(
-                                                    selectedTags.contains(tag) ? 
-                                                        (tag.contains("🚩") || tag.contains("❌") ? 
-                                                            Color.red.opacity(0.5) : 
-                                                            Color.green.opacity(0.5)) : 
-                                                        Color.clear,
-                                                    lineWidth: 1
-                                                )
+                                                .stroke(selectedTags.contains(tag) ? Color.blue.opacity(0.6) : Color.clear, lineWidth: 1)
                                         )
                                 }
                                 .buttonStyle(PlainButtonStyle())

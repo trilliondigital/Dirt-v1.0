@@ -41,25 +41,75 @@ struct NotificationsView: View {
         )
     ]
     
+    @State private var selectedTab: Int = 0 // 0 Activity, 1 Keywords
+    @State private var keywordAlerts: [String: Bool] = [
+        "ghosting": true,
+        "red flag": true,
+        "Austin": false
+    ]
+    
     var body: some View {
         NavigationView {
-            List {
-                ForEach(notifications) { notification in
-                    NotificationRow(notification: notification)
-                        .listRowInsets(EdgeInsets())
-                        .listRowSeparator(.hidden)
-                        .background(notification.isRead ? Color(.systemBackground) : Color.blue.opacity(0.05))
+            VStack(spacing: 0) {
+                // Segmented control
+                Picker("", selection: $selectedTab) {
+                    Text("Activity").tag(0)
+                    Text("Keyword Alerts").tag(1)
                 }
-                .onDelete { indexSet in
-                    notifications.remove(atOffsets: indexSet)
+                .pickerStyle(SegmentedPickerStyle())
+                .padding()
+                
+                if selectedTab == 0 {
+                    // Activity list
+                    List {
+                        ForEach(notifications) { notification in
+                            NotificationRow(notification: notification)
+                                .listRowInsets(EdgeInsets())
+                                .listRowSeparator(.hidden)
+                                .background(notification.isRead ? Color(.systemBackground) : Color.blue.opacity(0.05))
+                        }
+                        .onDelete { indexSet in
+                            notifications.remove(atOffsets: indexSet)
+                        }
+                    }
+                    .listStyle(PlainListStyle())
+                } else {
+                    // Keyword alerts management
+                    List {
+                        Section(footer: Text("Get notified when new posts mention your saved keywords.")) {
+                            ForEach(keywordAlerts.keys.sorted(), id: \.self) { key in
+                                Toggle(isOn: Binding(
+                                    get: { keywordAlerts[key, default: false] },
+                                    set: { keywordAlerts[key] = $0 }
+                                )) {
+                                    Text(key)
+                                }
+                            }
+                            .onDelete { indexSet in
+                                let keys = keywordAlerts.keys.sorted()
+                                for index in indexSet { keywordAlerts.removeValue(forKey: keys[index]) }
+                            }
+                            Button(action: {
+                                // Add a sample new keyword (stub)
+                                keywordAlerts["new keyword \(Int.random(in: 1...99))"] = true
+                            }) {
+                                HStack {
+                                    Image(systemName: "plus.circle.fill").foregroundColor(.blue)
+                                    Text("Add keyword alert")
+                                }
+                            }
+                        }
+                    }
+                    .listStyle(InsetGroupedListStyle())
                 }
             }
-            .listStyle(PlainListStyle())
-            .navigationBarTitle("Notifications", displayMode: .inline)
+            .navigationBarTitle("Alerts", displayMode: .inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Mark all as read") {
-                        // Mark all as read action
+                if selectedTab == 0 {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Mark all as read") {
+                            // Mark all as read action
+                        }
                     }
                 }
             }

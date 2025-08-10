@@ -4,6 +4,7 @@ struct SearchView: View {
     @State private var searchText = ""
     @State private var selectedFilter = "Recent"
     let filters = ["Recent", "Popular", "Nearby", "Trending"]
+    @State private var savedSearches: [String] = ["#ghosting", "#redflag", "near: Austin", "@alex", "green flag"]
     
     var body: some View {
         NavigationView {
@@ -90,6 +91,47 @@ struct SearchView: View {
                             .font(.headline)
                             .foregroundColor(.gray)
                         
+                        // Saved Searches
+                        if !savedSearches.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Text("Saved searches")
+                                        .font(.subheadline).bold()
+                                        .foregroundColor(.primary)
+                                    Spacer()
+                                }
+                                .padding(.horizontal)
+                                
+                                ForEach(savedSearches, id: \.self) { item in
+                                    HStack {
+                                        Button(action: { searchText = item }) {
+                                            HStack(spacing: 8) {
+                                                Image(systemName: "bookmark")
+                                                    .foregroundColor(.blue)
+                                                Text(item)
+                                                    .foregroundColor(.primary)
+                                                    .lineLimit(1)
+                                                Spacer()
+                                            }
+                                            .padding()
+                                            .background(Color(.systemBackground))
+                                            .cornerRadius(12)
+                                        }
+                                    }
+                                    .padding(.horizontal)
+                                    .contextMenu {
+                                        Button(role: .destructive) {
+                                            if let idx = savedSearches.firstIndex(of: item) {
+                                                savedSearches.remove(at: idx)
+                                            }
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Try searching for:")
                                 .font(.subheadline)
@@ -154,6 +196,19 @@ struct SearchView: View {
                 }
             }
             .navigationBarTitle("Search", displayMode: .inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if !searchText.isEmpty {
+                        Button("Save") {
+                            let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+                            guard !trimmed.isEmpty else { return }
+                            if !savedSearches.contains(trimmed) {
+                                savedSearches.insert(trimmed, at: 0)
+                            }
+                        }
+                    }
+                }
+            }
             .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
         }
     }
