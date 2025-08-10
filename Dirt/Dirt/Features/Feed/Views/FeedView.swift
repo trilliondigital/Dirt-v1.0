@@ -85,6 +85,8 @@ struct Post: Identifiable {
 struct FeedView: View {
     @State private var posts: [Post] = Post.samplePosts
     @State private var selectedFilter = "Latest"
+    @State private var selectedSort = 0 // 0 Latest, 1 Trending
+    @State private var activeTagFilters: Set<ControlledTag> = []
     @State private var showNewPostView = false
     @State private var isRefreshing = false
     @State private var showProfile = false
@@ -116,6 +118,38 @@ struct FeedView: View {
                 // Main Content
                 ScrollView {
                     VStack(spacing: 16) {
+                        // Sort control
+                        Picker("Sort", selection: $selectedSort) {
+                            Text("Latest").tag(0)
+                            Text("Trending").tag(1)
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+
+                        // Tag filters
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(TagCatalog.all) { tag in
+                                    let isOn = activeTagFilters.contains(tag)
+                                    Button(action: {
+                                        if isOn { activeTagFilters.remove(tag) } else { activeTagFilters.insert(tag) }
+                                    }) {
+                                        HStack(spacing: 6) {
+                                            Text(tag.rawValue)
+                                                .font(.caption)
+                                                .lineLimit(1)
+                                        }
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(isOn ? Color.blue.opacity(0.15) : Color(.systemGray6))
+                                        .cornerRadius(16)
+                                    }
+                                    .buttonStyle(ScaleButtonStyle())
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
                         // Header with Search
                         HStack {
                             // Profile Button
@@ -238,7 +272,7 @@ struct FeedView: View {
                         
                         // Posts
                         LazyVStack(spacing: 16) {
-                            ForEach(posts) { post in
+                            ForEach(filteredAndSortedPosts()) { post in
                                 NavigationLink(
                                     destination: PostDetailView(
                                         username: post.username,
@@ -328,6 +362,7 @@ struct PostCard: View {
     @State private var showComments = false
     @State private var isExpanded = false
     @State private var isImageExpanded = false
+    @State private var isImageRevealed = false
     @GestureState private var isLongPressing = false
     @State private var currentScale: CGFloat = 1.0
     @State private var showReportSheet = false
@@ -356,113 +391,12 @@ struct PostCard: View {
                                 Text(post.userInitial)
                                     .font(.headline)
                                     .foregroundColor(post.userColor)
-                            )
-                    }
-                    .contentShape(Circle())
                 }
-                .buttonStyle(ScaleButtonStyle())
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 4) {
-                        Text(post.username)
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                        
-                        if post.isVerified {
-                            Image(systemName: "checkmark.seal.fill")
-                                .foregroundColor(.blue)
-                                .font(.caption)
-                        }
-                    }
-                    
-                    Text(post.timestamp)
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                // More options button
-                Menu {
-                    Button(action: { isBookmarked.toggle() }) {
-                        Label(isBookmarked ? "Remove from Saved" : "Save Post", 
-                              systemImage: isBookmarked ? "bookmark.fill" : "bookmark")
-                    }
-                    
-                    Button(action: {}) {
-                        Label("Share Post", systemImage: "square.and.arrow.up")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .foregroundColor(.primary)
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
-            .padding(.bottom, 8)
-            
-            // Post Content
-            if !post.content.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(post.content)
-                        .font(.body)
-                        .lineLimit(isExpanded ? nil : 5)
-                        .fixedSize(horizontal: false, vertical: true)
-                    
-                    if needsTruncation(text: post.content) && !isExpanded {
-                        Button("Read more") {
-                            withAnimation {
-                                isExpanded = true
-                            }
-                        }
-                        .font(.caption)
-                        .foregroundColor(.blue)
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 8)
-            }
-            
-            // Post Image if available
-            if let imageName = post.imageName {
-                ZStack(alignment: .bottomTrailing) {
-                    Image(imageName)
-                        .resizable()
-                        .scaledToFit()
-                        .cornerRadius(12)
-                        .scaleEffect(isImageExpanded ? 1.5 : 1.0)
-                        .animation(.spring(), value: isImageExpanded)
-                        .onTapGesture(count: 2) {
-                            withAnimation {
-                                isHelpful.toggle()
-                                HapticFeedback.impact(style: .medium)
-                            }
-                        }
-                        .gesture(
-                            TapGesture(count: 1)
-                                .onEnded {
-                                    withAnimation(.spring()) {
-                                        isImageExpanded.toggle()
-                                    }
-                                }
-                        )
-                        .simultaneousGesture(
-                            LongPressGesture(minimumDuration: 0.5)
-                                .updating($isLongPressing) { currentState, state, _ in
-                                    state = currentState
-                                    if currentState {
-                                        HapticFeedback.impact(style: .medium)
-                                    }
-                                }
-                        )
-                    
-                    if isLongPressing {
-                        // Add long press action here
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-            }
+            })
+        }
+    }
+    .padding(.horizontal)
+}
             
             // Action Buttons
             HStack(spacing: 20) {
@@ -608,6 +542,21 @@ struct PostCard: View {
         }
     }
     
+    private func filteredAndSortedPosts() -> [Post] {
+        var list = posts
+        if !activeTagFilters.isEmpty {
+            let keys = activeTagFilters.map { $0.rawValue.lowercased() }
+            list = list.filter { post in
+                let tagString = post.tags.joined(separator: " ").lowercased()
+                return keys.allSatisfy { tagString.contains($0.replacingOccurrences(of: " ", with: "")) || tagString.contains($0) }
+            }
+        }
+        if selectedSort == 1 {
+            list = list.sorted { $0.upvotes > $1.upvotes }
+        }
+        return list
+    }
+
     private func formatNumber(_ number: Int) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal

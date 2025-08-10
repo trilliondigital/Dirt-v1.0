@@ -4,6 +4,7 @@ struct CreatePostView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var postText: String = ""
     @State private var selectedImage: UIImage?
+    @State private var isImageRevealed: Bool = false
     @State private var isImagePickerPresented = false
     @State private var selectedTags: Set<ControlledTag> = []
     @State private var isAnonymous = false
@@ -89,15 +90,26 @@ struct CreatePostView: View {
                 
                 // Selected Image Preview
                 if let selectedImage = selectedImage {
-                    Image(uiImage: selectedImage)
+                    Image(uiImage: isImageRevealed ? selectedImage : ImageProcessing.blurForUpload(selectedImage))
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 200)
                         .cornerRadius(12)
-                        .padding(.horizontal)
+                        .padding()
+                        .onTapGesture { withAnimation { isImageRevealed.toggle() } }
+                        .overlay(
+                            Group {
+                                if !isImageRevealed {
+                                    Text("Tap to reveal")
+                                        .font(.caption).bold()
+                                        .padding(6)
+                                        .background(.ultraThinMaterial, in: Capsule())
+                                        .padding(10)
+                                }
+                            }, alignment: .bottomTrailing
+                        )
                         .overlay(
                             Button(action: {
-                                self.selectedImage = nil
+                                withAnimation { self.selectedImage = nil }
                             }) {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundColor(.white)
@@ -207,7 +219,11 @@ struct CreatePostView: View {
                 // For this demo, we'll just simulate image selection
                 Button("Select Image") {
                     // Simulate image selection
-                    self.selectedImage = UIImage(systemName: "photo")
+                    if let raw = UIImage(systemName: "photo") {
+                        let stripped = ImageProcessing.stripEXIF(raw)
+                        self.selectedImage = stripped
+                        self.isImageRevealed = false
+                    }
                     isImagePickerPresented = false
                 }
                 .padding()

@@ -5,6 +5,7 @@ struct SearchView: View {
     @State private var selectedFilter = "Recent"
     let filters = ["Recent", "Popular", "Nearby", "Trending"]
     @State private var savedSearches: [String] = ["#ghosting", "#redflag", "near: Austin", "@alex", "green flag"]
+    private var tagSuggestions: [String] { TagCatalog.all.map { $0.rawValue } }
     
     var body: some View {
         NavigationView {
@@ -32,6 +33,35 @@ struct SearchView: View {
                 .padding(.horizontal)
                 .padding(.top, 8)
                 
+                // Typeahead Suggestions
+                if !searchText.isEmpty {
+                    let q = searchText.lowercased()
+                    let matches = (tagSuggestions + savedSearches)
+                        .filter { $0.lowercased().contains(q) }
+                        .prefix(5)
+                    if !matches.isEmpty {
+                        VStack(spacing: 0) {
+                            ForEach(Array(matches), id: \.self) { item in
+                                Button(action: { searchText = item }) {
+                                    HStack {
+                                        Image(systemName: "text.magnifyingglass")
+                                            .foregroundColor(.gray)
+                                        Text(item)
+                                            .foregroundColor(.primary)
+                                        Spacer()
+                                    }
+                                    .padding(10)
+                                }
+                                Divider()
+                            }
+                        }
+                        .background(Color(.systemBackground))
+                        .cornerRadius(10)
+                        .padding(.horizontal)
+                        .padding(.top, 6)
+                    }
+                }
+
                 // Filter Tabs
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {

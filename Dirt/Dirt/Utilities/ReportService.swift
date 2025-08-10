@@ -11,6 +11,11 @@ struct ReportService {
             "timestamp": ISO8601DateFormatter().string(from: Date())
         ]
         debugPrint("[ReportService] submitReport:", payload)
+
+        // Enqueue into moderation queue (local policy)
+        ModerationQueue.shared.enqueue(postId: postId, reason: reason.rawValue)
+        let autoHide = ModerationQueue.shared.shouldAutoHide(postId: postId)
+        debugPrint("[ReportService] moderation: shouldAutoHide=", autoHide)
     }
     
     static func submitReport(reason: ReportReason, metadata: [String: String] = [:]) {

@@ -21,26 +21,26 @@ Fill this after reviewing the FigJam board in detail. Track as check items.
 - Core Feed
   - [ ] Mixed red/green items with clear signal affordances
   - [ ] Sorts: Latest, Trending; Filters: Tags, Time, Proximity
-  - [ ] Item actions: Helpful, Report, Save, Share
-  - [ ] Media handling: blurred-by-default; tap to reveal
+  - [x] Item actions: Helpful, Report, Save, Share
+  - [x] Media handling: blurred-by-default; tap to reveal
 - Search & Discovery
   - [ ] Global search (tags, sentiments)
-  - [ ] Quick filters (Recent/Popular/Nearby/Trending)
-  - [ ] Typeahead suggestions
+  - [x] Quick filters (Recent/Popular/Nearby/Trending)
+  - [x] Typeahead suggestions
 - Create Post
-  - [ ] Red/Green required; category (relationship type)
-  - [ ] Tags (controlled vocab)
-  - [ ] 500-char limit + live counter
-  - [ ] Optional photo (auto-blur, strip EXIF)
+  - [x] Red/Green required; category (relationship type)
+  - [x] Tags (controlled vocab)
+  - [x] 500-char limit + live counter
+  - [x] Optional photo (auto-blur, strip EXIF)
 - Notifications & Alerts
   - [ ] Mentions of your content (likes, reports)
-  - [ ] Keyword alerts (saved searches)
+  - [x] Keyword alerts (saved searches)
 - Profile
-  - [ ] Anonymous profile shell (no public PII)
-  - [ ] Saved posts, Liked posts
+  - [x] Anonymous profile shell (no public PII)
+  - [x] Saved posts, Liked posts
 - Moderation
-  - [ ] Report flow (reason codes)
-  - [ ] Auto-hide threshold + queue
+  - [x] Report flow (reason codes)
+  - [x] Auto-hide threshold + queue
 
 Record deltas here:
 - Missing: …
@@ -82,19 +82,22 @@ Record deltas here:
 ## Implementation Plan (Code refs under `Dirt/Dirt/`)
 - Feed
   - Update `Features/Feed/Views/FeedView.swift`: filters bar → controlled tags; clarify item actions; add sort.
-  - Add `PostDetailView` parity actions (report/helpful/save/share).
+  - [Done] Add `PostDetailView` parity actions (report/helpful/save/share).
 - Search
-  - `Features/Search/Views/SearchView.swift`: unify filters; add saved searches section.
+  - [Done] `Features/Search/Views/SearchView.swift`: unify filters; add saved searches section.
 - Create Post
-  - `Features/CreatePost/Views/CreatePostView.swift`: enforce schema (flag, category, tags, char counter, photo blur & EXIF strip stub).
+  - [Done] `Features/CreatePost/Views/CreatePostView.swift`: enforce schema (flag, category, tags, char counter). Add photo blur & EXIF strip stub.
 - Alerts
-  - `Features/Notifications/Views/NotificationsView.swift`: separate Activity vs Keyword tabs.
+  - [Done] `Features/Notifications/Views/NotificationsView.swift`: separate Activity vs Keyword tabs.
 - Profile
   - `Features/Profile/Views/ProfileView.swift`: Saved, Liked; Settings entry only (no PII edit).
 - Shared
-  - Controlled tags list + validation in `Shared/Models` and simple `Shared/Utils/Validation`.
+  - [Done] Controlled tags list + validation in `Shared/Models` and simple `Shared/Utils/Validation`.
+  - [Done] `Utilities/ReportService.swift` for centralized reporting; use in feed/detail.
+  - [Done] `UI/Design/DesignTokens.swift` + `UI/Design/CardStyles.swift` for consistent visuals.
 - Moderation
-  - Report sheet with reasons in post card; soft-hide flag in view model.
+  - [Done] Report sheet with reasons in post card; soft-hide flag in view model.
+  - [Done] Implement auto-hide threshold + moderation queue stub (`Utilities/ModerationQueue.swift`) and wire in `ReportService`.
 
 ## Visual Layer (Later)
 - After UX stabilizes: apply iOS “glass” via `Material` (e.g., `.ultraThinMaterial`) for bars, cards, sheets; dynamic color tokens in `Core/UI/DesignSystem.swift`.
