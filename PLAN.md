@@ -15,9 +15,9 @@
 Fill this after reviewing the FigJam board in detail. Track as check items.
 
 - Onboarding
-  - [ ] Purpose + community rules screen
-  - [ ] Auth: Apple Sign-In (anon token), email fallback
-  - [ ] Initial interests/tags (optional) to seed feed
+  - [x] Purpose + community rules screen
+  - [x] Auth: Apple Sign-In (anon token), email fallback (stubs)
+  - [x] Initial interests/tags (optional) to seed feed
 - Core Feed
   - [ ] Mixed red/green items with clear signal affordances
   - [ ] Sorts: Latest, Trending; Filters: Tags, Time, Proximity

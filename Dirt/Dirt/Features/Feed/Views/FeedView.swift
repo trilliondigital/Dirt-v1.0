@@ -1,6 +1,7 @@
 import SwiftUI
 import Combine
 import UIKit
+import CoreLocation
 
 // MARK: - BlurView
 struct BlurView: UIViewRepresentable {
@@ -31,6 +32,8 @@ struct Post: Identifiable {
     let shares: Int
     let isLiked: Bool
     let isBookmarked: Bool
+    let createdAt: Date
+    let coordinate: CLLocationCoordinate2D?
     
     static let samplePosts: [Post] = [
         Post(
@@ -46,7 +49,9 @@ struct Post: Identifiable {
             comments: 24,
             shares: 8,
             isLiked: false,
-            isBookmarked: true
+            isBookmarked: true,
+            createdAt: Date(timeIntervalSinceNow: -2 * 60 * 60),
+            coordinate: CLLocationCoordinate2D(latitude: 30.2672, longitude: -97.7431) // Austin
         ),
         Post(
             username: "Taylor Smith",
@@ -61,7 +66,9 @@ struct Post: Identifiable {
             comments: 42,
             shares: 15,
             isLiked: true,
-            isBookmarked: false
+            isBookmarked: false,
+            createdAt: Date(timeIntervalSinceNow: -5 * 60 * 60),
+            coordinate: CLLocationCoordinate2D(latitude: 30.2710, longitude: -97.7437)
         ),
         Post(
             username: "Jordan Lee",
@@ -76,7 +83,8 @@ struct Post: Identifiable {
             comments: 31,
             shares: 12,
             isLiked: false,
-            isBookmarked: true
+            isBookmarked: true,
+            createdAt: Date(timeIntervalSinceNow: -24 * 60 * 60)
         )
     ]
 }
@@ -92,8 +100,13 @@ struct FeedView: View {
     @State private var showProfile = false
     @State private var showSearch = false
     @State private var selectedTab = 0
+    @State private var selectedTimeFilter = "Anytime"
+    @State private var selectedRadius = "Any"
+    @StateObject private var locationManager = LocationManager.shared
     
     let filters = ["Latest", "Trending", "Following", "Nearby"]
+    let timeFilters = ["Anytime", "24h", "7d", "30d"]
+    let radiusOptions = ["Any", "5 mi", "10 mi", "25 mi", "50 mi"]
     private let refreshPublisher = PassthroughSubject<Void, Never>()
     
     var body: some View {
@@ -137,9 +150,14 @@ struct FeedView: View {
                                     }) {
                                         HStack(spacing: 6) {
                                             Text(tag.rawValue)
-                                                .font(.caption)
-                                                .lineLimit(1)
+                                            if tag == .redFlag {
+                                                Image(systemName: "flag.fill").foregroundColor(.red)
+                                            } else if tag == .greenFlag {
+                                                Image(systemName: "flag.fill").foregroundColor(.green)
+                                            }
                                         }
+                                        .font(.footnote.weight(.medium))
+                                        .foregroundColor(isOn ? .blue : .primary)
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
                                         .background(isOn ? Color.blue.opacity(0.15) : Color(.systemGray6))
@@ -150,6 +168,47 @@ struct FeedView: View {
                             }
                             .padding(.horizontal)
                         }
+
+                        // Time filter
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                ForEach(timeFilters, id: \.self) { tf in
+                                    FilterPill(title: tf, isSelected: selectedTimeFilter == tf) {
+                                        withAnimation(.spring()) {
+                                            selectedTimeFilter = tf
+                                            HapticFeedback.impact(style: .light)
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+
+                        // Proximity filter
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                ForEach(radiusOptions, id: \.self) { option in
+                                    FilterPill(title: option, isSelected: selectedRadius == option) {
+                                        withAnimation(.spring()) {
+                                            selectedRadius = option
+                                            HapticFeedback.impact(style: .light)
+                                        }
+                                    }
+                                }
+                                if selectedRadius != "Any" && (locationManager.authorizationStatus == .denied || locationManager.authorizationStatus == .notDetermined) {
+                                    Button(action: { locationManager.requestWhenInUse() }) {
+                                        Label("Enable Location", systemImage: "location")
+                                            .font(.subheadline)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(Color(.systemGray6))
+                                            .cornerRadius(16)
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+
                         // Header with Search
                         HStack {
                             // Profile Button
@@ -545,6 +604,7 @@ struct PostCard: View {
     
     private func filteredAndSortedPosts() -> [Post] {
         var list = posts
+        // Tag filters
         if !activeTagFilters.isEmpty {
             let keys = activeTagFilters.map { $0.rawValue.lowercased() }
             list = list.filter { post in
@@ -552,6 +612,36 @@ struct PostCard: View {
                 return keys.allSatisfy { tagString.contains($0.replacingOccurrences(of: " ", with: "")) || tagString.contains($0) }
             }
         }
+
+        // Time filter
+        if selectedTimeFilter != "Anytime" {
+            let now = Date()
+            let cutoff: Date = {
+                switch selectedTimeFilter {
+                case "24h": return Calendar.current.date(byAdding: .hour, value: -24, to: now) ?? now
+                case "7d": return Calendar.current.date(byAdding: .day, value: -7, to: now) ?? now
+                case "30d": return Calendar.current.date(byAdding: .day, value: -30, to: now) ?? now
+                default: return Date.distantPast
+                }
+            }()
+            list = list.filter { $0.createdAt >= cutoff }
+        }
+
+        // Proximity filter
+        if selectedRadius != "Any", let userLoc = locationManager.currentLocation {
+            let meters: Double = {
+                let comps = selectedRadius.split(separator: " ")
+                if let miles = Double(comps.first ?? "0") { return miles * 1609.34 }
+                return .greatestFiniteMagnitude
+            }()
+            list = list.filter { post in
+                guard let coord = post.coordinate else { return false }
+                let postLoc = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
+                return postLoc.distance(from: userLoc) <= meters
+            }
+        }
+
+        // Sort
         if selectedSort == 1 {
             list = list.sorted { $0.upvotes > $1.upvotes }
         }
