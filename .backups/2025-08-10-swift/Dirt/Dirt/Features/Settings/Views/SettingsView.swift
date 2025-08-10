@@ -52,10 +52,6 @@ struct SettingsView: View {
                         SettingsRow(icon: "questionmark.circle.fill", title: "Help Center", color: .orange)
                     }
                     
-                    NavigationLink(destination: InviteView()) {
-                        SettingsRow(icon: "person.2.fill", title: "Invite Friends", color: .blue)
-                    }
-                    
                     NavigationLink(destination: ContactUsView()) {
                         SettingsRow(icon: "envelope.fill", title: "Contact Us", color: .green)
                     }

@@ -216,48 +216,12 @@ struct FeedView: View {
                             .padding(.horizontal)
                         }
                         
-                        // Browse Topics entry
-                        HStack {
-                            NavigationLink(destination: TopicsView()) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "square.grid.2x2")
-                                        .foregroundColor(.blue)
-                                    Text("Browse Topics")
-                                        .font(.subheadline).bold()
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                                .padding(10)
-                                .background(Color(.systemGray6))
-                                .cornerRadius(10)
-                            }
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        
                         // Posts
                         LazyVStack(spacing: 16) {
                             ForEach(posts) { post in
-                                NavigationLink(
-                                    destination: PostDetailView(
-                                        username: post.username,
-                                        userInitial: post.userInitial,
-                                        userColor: post.userColor,
-                                        timestamp: post.timestamp,
-                                        content: post.content,
-                                        imageName: post.imageName,
-                                        isVerified: post.isVerified,
-                                        tags: post.tags,
-                                        upvotes: post.upvotes,
-                                        comments: post.comments,
-                                        shares: post.shares
-                                    )
-                                ) {
-                                    PostCard(post: post)
-                                        .padding(.horizontal)
-                                        .transition(.opacity.combined(with: .move(edge: .top)))
-                                }
+                                PostCard(post: post)
+                                    .padding(.horizontal)
+                                    .transition(.opacity.combined(with: .move(edge: .top)))
                             }
                             
                             // End of feed message

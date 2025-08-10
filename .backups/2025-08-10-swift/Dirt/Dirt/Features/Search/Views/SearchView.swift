@@ -57,26 +57,6 @@ struct SearchView: View {
                     .padding(.vertical, 8)
                 }
                 
-                // Lookup entry
-                HStack {
-                    NavigationLink(destination: LookupWizardView()) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "person.text.rectangle")
-                                .foregroundColor(.blue)
-                            Text("Start a Lookup")
-                                .font(.subheadline).bold()
-                            Image(systemName: "chevron.right")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(10)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                    }
-                    Spacer()
-                }
-                .padding(.horizontal)
-                
                 // Search Results or Placeholder
                 if searchText.isEmpty {
                     VStack(spacing: 20) {
