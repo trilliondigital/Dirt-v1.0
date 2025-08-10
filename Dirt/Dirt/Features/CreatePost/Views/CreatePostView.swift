@@ -7,6 +7,15 @@ struct CreatePostView: View {
     @State private var isImagePickerPresented = false
     @State private var selectedTags: Set<String> = []
     @State private var isAnonymous = false
+    @State private var selectedFlag: FlagCategory? = nil
+    
+    private let maxCharacters: Int = 500
+    
+    enum FlagCategory: String, CaseIterable, Identifiable {
+        case red = "Red Flag"
+        case green = "Green Flag"
+        var id: String { rawValue }
+    }
     
     let tagOptions = [
         "🚩 Red Flag", "✅ Green Flag", "👻 Ghosting", 
@@ -32,6 +41,54 @@ struct CreatePostView: View {
                                 .allowsHitTesting(false) : nil,
                         alignment: .topLeading
                     )
+                    .onChange(of: postText) { _, newValue in
+                        if newValue.count > maxCharacters {
+                            postText = String(newValue.prefix(maxCharacters))
+                        }
+                    }
+                
+                // Character Counter
+                HStack {
+                    Spacer()
+                    Text("\(postText.count)/\(maxCharacters)")
+                        .font(.caption)
+                        .foregroundColor(postText.count > maxCharacters - 20 ? .red : .secondary)
+                        .padding(.trailing)
+                }
+                .padding(.bottom, 4)
+                
+                // Required Flag Selection
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Flag")
+                        .font(.headline)
+                        .padding(.horizontal)
+                    HStack(spacing: 12) {
+                        ForEach(FlagCategory.allCases) { flag in
+                            Button(action: {
+                                selectedFlag = flag
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: flag == .red ? "flag.fill" : "checkmark.seal.fill")
+                                    Text(flag.rawValue)
+                                        .font(.subheadline)
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 10)
+                                .background(
+                                    (selectedFlag == flag ? (flag == .red ? Color.red.opacity(0.15) : Color.green.opacity(0.15)) : Color.gray.opacity(0.1))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(selectedFlag == flag ? (flag == .red ? Color.red.opacity(0.5) : Color.green.opacity(0.5)) : Color.clear, lineWidth: 1)
+                                )
+                                .cornerRadius(10)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.bottom, 8)
                 
                 // Selected Image Preview
                 if let selectedImage = selectedImage {
@@ -142,11 +199,11 @@ struct CreatePostView: View {
                         Text("Post")
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(postText.isEmpty ? Color.gray.opacity(0.3) : Color.blue)
+                            .background(canPost ? Color.blue : Color.gray.opacity(0.3))
                             .foregroundColor(.white)
                             .cornerRadius(12)
                     }
-                    .disabled(postText.isEmpty)
+                    .disabled(!canPost)
                 }
                 .padding()
             }
@@ -168,6 +225,11 @@ struct CreatePostView: View {
                 .padding()
             }
         }
+    }
+    
+    private var canPost: Bool {
+        let trimmed = postText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !trimmed.isEmpty && trimmed.count <= maxCharacters && selectedFlag != nil
     }
 }
 
