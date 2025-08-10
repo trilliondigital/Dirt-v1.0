@@ -5,12 +5,18 @@ import Supabase
 struct DirtApp: App {
     // Configure Supabase client once for the entire app
     @StateObject private var supabaseManager = SupabaseManager.shared
+    @AppStorage("onboardingCompleted") private var onboardingCompleted = false
 
     var body: some Scene {
         WindowGroup {
-            // Using the correct path to HomeView
-            HomeView()
-                .environmentObject(supabaseManager)
+            Group {
+                if onboardingCompleted {
+                    HomeView()
+                } else {
+                    OnboardingView()
+                }
+            }
+            .environmentObject(supabaseManager)
         }
     }
 }

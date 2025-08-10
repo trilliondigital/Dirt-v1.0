@@ -6,6 +6,7 @@ struct OnboardingView: View {
     @State private var email: String = ""
     @State private var showDone = false
     @State private var selectedInterests: Set<ControlledTag> = []
+    @AppStorage("onboardingCompleted") private var onboardingCompleted = false
 
     var onComplete: (() -> Void)?
 
@@ -32,6 +33,7 @@ struct OnboardingView: View {
                             withAnimation { page += 1 }
                         } else {
                             showDone = true
+                            onboardingCompleted = true
                             onComplete?()
                         }
                     }
@@ -40,6 +42,16 @@ struct OnboardingView: View {
                 .padding()
             }
             .navigationTitle("Welcome")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if page < 2 {
+                        Button("Skip") {
+                            onboardingCompleted = true
+                            onComplete?()
+                        }
+                    }
+                }
+            }
             .alert("Welcome to Dirt", isPresented: $showDone) {
                 Button("OK", role: .cancel) {}
             } message: {
