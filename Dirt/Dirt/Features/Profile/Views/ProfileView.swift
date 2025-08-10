@@ -3,6 +3,7 @@ import SwiftUI
 struct ProfileView: View {
     @State private var selectedTab = 0
     @State private var isSettingsPresented = false
+    @AppStorage("moderationBackendEnabled") private var moderationBackendEnabled = false
     
     var body: some View {
         NavigationView {
@@ -251,6 +252,21 @@ struct ProfileView: View {
                                 Label("Push Notifications", systemImage: "bell")
                             }
                             
+                            Toggle(isOn: Binding(
+                                get: { moderationBackendEnabled },
+                                set: { newValue in
+                                    moderationBackendEnabled = newValue
+                                    ReportService.backendEnabled = newValue
+                                }
+                            )) {
+                                Label("Moderation Backend", systemImage: "shield.lefthalf.filled")
+                            }
+                            
+                            NavigationLink(destination: ModerationQueueView()
+                                .navigationTitle("Moderation Queue")) {
+                                Label("Open Moderation Queue", systemImage: "tray.full")
+                            }
+                            
                             NavigationLink(destination: Text("Help & Support")) {
                                 Label("Help & Support", systemImage: "questionmark.circle")
                             }
@@ -280,6 +296,7 @@ struct ProfileView: View {
                     })
                 }
             }
+            .onAppear { ReportService.backendEnabled = moderationBackendEnabled }
         }
     }
 }
