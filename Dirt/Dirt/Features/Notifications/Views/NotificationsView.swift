@@ -66,7 +66,6 @@ struct NotificationsView: View {
                             NotificationRow(notification: notification)
                                 .listRowInsets(EdgeInsets())
                                 .listRowSeparator(.hidden)
-                                .background(notification.isRead ? Color(.systemBackground) : Color.blue.opacity(0.05))
                         }
                         .onDelete { indexSet in
                             notifications.remove(atOffsets: indexSet)
@@ -121,41 +120,45 @@ struct NotificationRow: View {
     let notification: Notification
     
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            // Notification Icon
-            ZStack {
-                Circle()
-                    .fill(notification.isRead ? Color.gray.opacity(0.2) : Color.blue.opacity(0.2))
-                    .frame(width: 44, height: 44)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .top, spacing: 12) {
+                // Notification Icon
+                ZStack {
+                    Circle()
+                        .fill(notification.isRead ? Color.gray.opacity(0.2) : Color.blue.opacity(0.2))
+                        .frame(width: 44, height: 44)
+                    
+                    if let imageName = notification.imageName {
+                        Image(systemName: imageName)
+                            .foregroundColor(notification.isRead ? .blue : .white)
+                            .imageScale(.small)
+                    }
+                }
                 
-                if let imageName = notification.imageName {
-                    Image(systemName: imageName)
-                        .foregroundColor(notification.isRead ? .blue : .white)
-                        .imageScale(.small)
+                // Notification Content
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("\(notification.username) \(notification.action)")
+                        .font(.subheadline)
+                        .foregroundColor(notification.isRead ? .gray : .primary)
+                    
+                    Text(notification.timeAgo)
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                .padding(.vertical, 12)
+                
+                Spacer()
+                
+                // Unread indicator
+                if !notification.isRead {
+                    Circle()
+                        .fill(Color.blue)
+                        .frame(width: 8, height: 8)
                 }
             }
-            
-            // Notification Content
-            VStack(alignment: .leading, spacing: 4) {
-                Text("\(notification.username) \(notification.action)")
-                    .font(.subheadline)
-                    .foregroundColor(notification.isRead ? .gray : .primary)
-                
-                Text(notification.timeAgo)
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
-            .padding(.vertical, 12)
-            
-            Spacer()
-            
-            // Unread indicator
-            if !notification.isRead {
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: 8, height: 8)
-            }
+            .padding()
         }
+        .cardBackground()
         .padding(.horizontal)
     }
 }

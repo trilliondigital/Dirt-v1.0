@@ -114,8 +114,7 @@ struct SearchView: View {
                                                 Spacer()
                                             }
                                             .padding()
-                                            .background(Color(.systemBackground))
-                                            .cornerRadius(12)
+                                            .cardBackground()
                                         }
                                     }
                                     .padding(.horizontal)
@@ -151,8 +150,7 @@ struct SearchView: View {
                                             .foregroundColor(.gray)
                                     }
                                     .padding()
-                                    .background(Color(.systemBackground))
-                                    .cornerRadius(12)
+                                    .cardBackground()
                                     .padding(.horizontal)
                                 }
                             }
@@ -186,8 +184,7 @@ struct SearchView: View {
                                     Spacer()
                                 }
                                 .padding()
-                                .background(Color(.systemBackground))
-                                .cornerRadius(12)
+                                .cardBackground()
                                 .padding(.horizontal)
                             }
                         }
