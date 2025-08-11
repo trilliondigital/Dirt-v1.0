@@ -3,7 +3,7 @@ import Supabase
 import Combine
 
 @MainActor
-class SupabaseManager: ObservableObject {
+final class SupabaseManager: ObservableObject {
     static let shared = SupabaseManager()
     
     private let client: SupabaseClient
@@ -14,6 +14,8 @@ class SupabaseManager: ObservableObject {
     @Published private(set) var session: Session?
     @Published var todos: [Todo] = []
     @Published var errorMessage: String?
+    @Published var userId: String?
+    @Published var isAuthenticated: Bool = false
     
     private init() {
         let info = Bundle.main.infoDictionary ?? [:]
@@ -214,20 +216,95 @@ class SupabaseManager: ObservableObject {
             .execute()
             .value as Todo
         
+        
+        await MainActor.run {
+            self.session = session
+            self.errorMessage = nil
+        }
+        
+        await fetchTodos()
+    } catch {
+        await MainActor.run {
+            self.errorMessage = "Sign in failed: \(error.localizedDescription)"
+        }
+        throw error
+    }
+    // MARK: - Todo Methods
+    func fetchTodos() async {
+        guard let userId = session?.user.id else { return }
+        do {
+            let todos: [Todo] = try await client
+                .from("todos")
+                .select()
+                .eq("user_id", value: userId.uuidString)
+                .order("created_at", ascending: false)
+                .execute()
+                .value
+            await MainActor.run { self.todos = todos }
+        } catch {
+            print("Error fetching todos: \(error)")
+        }
+    }
+
+    func addTodo(title: String) async throws {
+        guard let userId = session?.user.id else { throw NSError(domain: "com.yourapp.error", code: -1, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"]) }
+        let newTodo = Todo(title: title, isComplete: false, userId: userId)
+        _ = try await client
+            .from("todos")
+            .insert(newTodo)
+            .select()
+            .single()
+            .execute()
+            .value as Todo
         await fetchTodos()
     }
-    
+
+    func toggleTodoComplete(_ todo: Todo) async throws {
+        guard let todoId = todo.id else { return }
+        let updatedTodo = Todo(
+            id: todo.id,
+            title: todo.title,
+            isComplete: !todo.isComplete,
+            userId: todo.userId,
+            createdAt: todo.createdAt,
+            updatedAt: todo.updatedAt
+        )
+        _ = try await client
+            .from("todos")
+            .update(updatedTodo)
+            .eq("id", value: todoId)
+            .select()
+            .single()
+            .execute()
+            .value as Todo
+        await fetchTodos()
+    }
+
     func deleteTodo(_ todo: Todo) async throws {
         guard let todoId = todo.id else { return }
-        
         _ = try await client
             .from("todos")
             .delete()
             .eq("id", value: todoId)
             .execute()
             .value
-        
         await fetchTodos()
+    }
+
+    // MARK: - Additional Auth Helpers
+    @MainActor
+    func signInWithApple(idToken: String, nonce: String? = nil) async throws {
+        let response = try await client.auth.signInWithIdToken(
+            credentials: .init(provider: .apple, idToken: idToken, nonce: nonce)
+        )
+        self.session = response.session
+        self.userId = response.user?.id.uuidString
+        self.isAuthenticated = (response.user != nil)
+    }
+
+    @MainActor
+    func signInWithEmailMagicLink(email: String) async throws {
+        try await client.auth.signInWithOTP(email: email)
     }
 
     // MARK: - Edge Functions

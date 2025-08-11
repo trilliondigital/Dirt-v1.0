@@ -1,12 +1,17 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+interface SaveInterestsBody {
+  interests: string[];
+}
+
 Deno.serve(async (req: Request) => {
   try {
-    const { id } = await req.json();
-    if (!id || typeof id !== "string") {
-      return new Response(JSON.stringify({ error: "Missing id" }), { status: 400 });
+    const body = (await req.json()) as SaveInterestsBody;
+    if (!Array.isArray(body.interests)) {
+      return new Response(JSON.stringify({ error: "interests must be an array" }), { status: 400 });
     }
+    const interests = body.interests.map((s) => String(s)).filter((s) => s.trim().length > 0).slice(0, 50);
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -19,10 +24,13 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 
-    const { error } = await supabase
-      .from("saved_searches")
-      .delete()
-      .eq("id", id);
+    if (interests.length === 0) {
+      return new Response(JSON.stringify({ ok: true }), { headers: { "Content-Type": "application/json" } });
+    }
+
+    // Temporary persistence: store as saved_searches with a special prefix
+    const rows = interests.map((i) => ({ user_id: userRes.user.id, query: `interest:${i}`, tags: [] as string[] }));
+    const { error } = await supabase.from("saved_searches").insert(rows);
     if (error) {
       return new Response(JSON.stringify({ error: error.message }), { status: 500 });
     }

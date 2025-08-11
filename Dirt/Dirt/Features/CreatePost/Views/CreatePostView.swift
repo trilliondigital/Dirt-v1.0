@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CreatePostView: View {
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject private var toastCenter: ToastCenter
     @State private var postText: String = ""
     @State private var selectedImage: UIImage?
     @State private var isImageRevealed: Bool = false
@@ -193,8 +194,20 @@ struct CreatePostView: View {
                     }
                     
                     Button(action: {
-                        // Post action
-                        presentationMode.wrappedValue.dismiss()
+                        let trimmed = postText.trimmingCharacters(in: .whitespacesAndNewlines)
+                        let flag = selectedFlag == .red ? "red" : "green"
+                        let tags = selectedTags.map { $0.rawValue }
+                        Task {
+                            do {
+                                try await PostSubmissionService.shared.createPost(content: trimmed, flag: flag, tags: tags, anonymous: isAnonymous)
+                                HapticFeedback.notification(type: .success)
+                                toastCenter.show(.success, "Posted")
+                                presentationMode.wrappedValue.dismiss()
+                            } catch {
+                                HapticFeedback.notification(type: .error)
+                                toastCenter.show(.error, "Failed to post")
+                            }
+                        }
                     }) {
                         Text("Post")
                             .frame(maxWidth: .infinity)

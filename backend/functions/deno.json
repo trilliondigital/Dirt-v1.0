@@ -1,0 +1,16 @@
+{
+  "imports": {
+    "@supabase/supabase-js": "jsr:@supabase/supabase-js@2"
+  },
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM"],
+    "strict": true
+  },
+  "tasks": {},
+  "lint": {
+    "rules": {
+      "tags": ["recommended"],
+      "include": ["recommended"]
+    }
+  }
+}

@@ -2,6 +2,8 @@ import SwiftUI
 import AuthenticationServices
 
 struct OnboardingView: View {
+    @EnvironmentObject private var supabase: SupabaseManager
+    @EnvironmentObject private var toastCenter: ToastCenter
     @State private var page = 0
     @State private var email: String = ""
     @State private var showDone = false
@@ -32,9 +34,18 @@ struct OnboardingView: View {
                         if page < 2 {
                             withAnimation { page += 1 }
                         } else {
-                            showDone = true
-                            onboardingCompleted = true
-                            onComplete?()
+                            Task {
+                                do {
+                                    try await InterestsService.shared.save(interests: Array(selectedInterests).map { $0.rawValue })
+                                } catch {
+                                    // non-fatal
+                                }
+                                showDone = true
+                                onboardingCompleted = true
+                                onComplete?()
+                                HapticFeedback.notification(type: .success)
+                                toastCenter.show(.success, "You're set!")
+                            }
                         }
                     }
                     .buttonStyle(.borderedProminent)
@@ -93,11 +104,33 @@ struct OnboardingView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
-            // Apple Sign In (stub)
+            // Apple Sign In
             SignInWithAppleButton(.continue) { request in
                 // Configure request scopes if needed
             } onCompletion: { result in
-                // Handle success/failure (stub)
+                switch result {
+                case .success(let auth):
+                    if let credential = auth.credential as? ASAuthorizationAppleIDCredential,
+                       let tokenData = credential.identityToken,
+                       let token = String(data: tokenData, encoding: .utf8) {
+                        Task { @MainActor in
+                            do {
+                                try await supabase.signInWithApple(idToken: token, nonce: nil)
+                                HapticFeedback.notification(type: .success)
+                                toastCenter.show(.success, "Signed in with Apple")
+                            } catch {
+                                HapticFeedback.notification(type: .error)
+                                toastCenter.show(.error, "Apple sign-in failed")
+                            }
+                        }
+                    } else {
+                        HapticFeedback.notification(type: .error)
+                        toastCenter.show(.error, "Apple sign-in failed")
+                    }
+                case .failure:
+                    HapticFeedback.notification(type: .error)
+                    toastCenter.show(.error, "Apple sign-in canceled")
+                }
             }
             .signInWithAppleButtonStyle(.black)
             .frame(height: 44)
@@ -111,7 +144,18 @@ struct OnboardingView: View {
                     .keyboardType(.emailAddress)
                     .textFieldStyle(.roundedBorder)
                 Button("Send Link") {
-                    // Stub: send magic link
+                    let e = email.trimmingCharacters(in: .whitespacesAndNewlines)
+                    guard !e.isEmpty else { return }
+                    Task { @MainActor in
+                        do {
+                            try await supabase.signInWithEmailMagicLink(email: e)
+                            HapticFeedback.impact(style: .light)
+                            toastCenter.show(.info, "Check your email for the link")
+                        } catch {
+                            HapticFeedback.notification(type: .error)
+                            toastCenter.show(.error, "Failed to send link")
+                        }
+                    }
                 }
                 .buttonStyle(.bordered)
             }
