@@ -7,6 +7,8 @@ class SupabaseManager: ObservableObject {
     static let shared = SupabaseManager()
     
     private let client: SupabaseClient
+    private let supabaseURL: URL
+    private let supabaseAnonKey: String
     private var authStateChangeTask: Task<Void, Never>?
     
     @Published private(set) var session: Session?
@@ -14,11 +16,11 @@ class SupabaseManager: ObservableObject {
     @Published var errorMessage: String?
     
     private init() {
-        let supabaseURL = URL(string: "https://xruvwnrxatkgmncefozs.supabase.co")!
-        let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhydXZ3bnJ4YXRrZ21uY2Vmb3pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQxNzk0NTEsImV4cCI6MjA2OTc1NTQ1MX0.Ux7QgWRAcDviV5niUtDztu3PQ0m2_Fw3gwiTRlA_fPY"
-        
+        self.supabaseURL = URL(string: "https://xruvwnrxatkgmncefozs.supabase.co")!
+        self.supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhydXZ3bnJ4YXRrZ21uY2Vmb3pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQxNzk0NTEsImV4cCI6MjA2OTc1NTQ1MX0.Ux7QgWRAcDviV5niUtDztu3PQ0m2_Fw3gwiTRlA_fPY"
+
         // Initialize the Supabase client with URL and key
-        client = SupabaseClient(supabaseURL: supabaseURL, supabaseKey: supabaseAnonKey)
+        client = SupabaseClient(supabaseURL: self.supabaseURL, supabaseKey: self.supabaseAnonKey)
         
         // Setup auth state change listener
         authStateChangeTask = Task {
@@ -220,5 +222,27 @@ class SupabaseManager: ObservableObject {
             .value
         
         await fetchTodos()
+    }
+
+    // MARK: - Edge Functions
+    func callEdgeFunction(name: String, json: [String: Any]) async throws -> Data {
+        let url = supabaseURL.appendingPathComponent("functions/v1/\(name)")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue(supabaseAnonKey, forHTTPHeaderField: "apikey")
+        if let accessToken = session?.accessToken {
+            request.addValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        } else {
+            request.addValue("Bearer \(supabaseAnonKey)", forHTTPHeaderField: "Authorization")
+        }
+        request.httpBody = try JSONSerialization.data(withJSONObject: json, options: [])
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+            let message = String(data: data, encoding: .utf8) ?? "Unknown error"
+            throw NSError(domain: "SupabaseFunction", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: message])
+        }
+        return data
     }
 }
