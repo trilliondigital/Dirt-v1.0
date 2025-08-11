@@ -169,10 +169,10 @@ struct SearchView: View {
                                                     try await SavedSearchService.shared.delete(query: item)
                                                     savedSearches.removeAll { $0 == item }
                                                     HapticFeedback.impact(style: .light)
-                                                    toastCenter.show(.success, "Deleted saved search")
+                                                    toastCenter.show(.success, NSLocalizedString("Deleted saved search", comment: ""))
                                                 } catch {
                                                     HapticFeedback.notification(type: .error)
-                                                    toastCenter.show(.error, "Failed to delete saved search")
+                                                    toastCenter.show(.error, ErrorPresenter.message(for: error))
                                                 }
                                             }
                                         }
@@ -257,10 +257,10 @@ struct SearchView: View {
                                     // refresh list
                                     savedSearches = try await SavedSearchService.shared.list()
                                     HapticFeedback.notification(type: .success)
-                                    toastCenter.show(.success, "Saved search")
+                                    toastCenter.show(.success, NSLocalizedString("Saved search", comment: ""))
                                 } catch {
                                     HapticFeedback.notification(type: .error)
-                                    toastCenter.show(.error, "Failed to save search")
+                                    toastCenter.show(.error, ErrorPresenter.message(for: error))
                                 }
                             }
                         }

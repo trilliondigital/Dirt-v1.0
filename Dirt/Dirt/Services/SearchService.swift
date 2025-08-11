@@ -20,10 +20,37 @@ final class SearchService {
     static let shared = SearchService()
     private init() {}
 
+    // Simple in-memory LRU cache to reduce duplicate backend calls
+    private struct CacheKey: Hashable { let q: String; let tags: [String]; let sort: SearchSort }
+    private var cache: [CacheKey: [SearchResult]] = [:]
+    private var order: [CacheKey] = []
+    private let maxCacheItems = 50
+    private func cacheGet(_ key: CacheKey) -> [SearchResult]? {
+        if let val = cache[key] {
+            // move to front
+            order.removeAll { $0 == key }
+            order.insert(key, at: 0)
+            return val
+        }
+        return nil
+    }
+    private func cacheSet(_ key: CacheKey, _ value: [SearchResult]) {
+        cache[key] = value
+        order.removeAll { $0 == key }
+        order.insert(key, at: 0)
+        if order.count > maxCacheItems, let last = order.last {
+            cache.removeValue(forKey: last)
+            order.removeLast()
+        }
+    }
+
     // Backend search via Edge Function with fallback to mock
     func search(query: String, tags: [String] = [], sort: SearchSort = .recent) async throws -> [SearchResult] {
         let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !q.isEmpty else { return [] }
+
+        let key = CacheKey(q: q.lowercased(), tags: tags.map { $0.lowercased() }, sort: sort)
+        if let cached = cacheGet(key) { return cached }
 
         // Attempt backend call
         do {
@@ -34,7 +61,9 @@ final class SearchService {
             ]
             let data = try await SupabaseManager.shared.callEdgeFunction(name: "search-global", json: payload)
             let decoder = JSONDecoder()
-            return try decoder.decode([SearchResult].self, from: data)
+            let results = try decoder.decode([SearchResult].self, from: data)
+            cacheSet(key, results)
+            return results
         } catch {
             // Fallback to mock data if backend not available
             let corpus: [SearchResult] = [
@@ -58,6 +87,7 @@ final class SearchService {
             case .nearby:
                 results = results.shuffled()
             }
+            cacheSet(key, results)
             return results
         }
     }

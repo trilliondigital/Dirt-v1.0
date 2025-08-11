@@ -1,0 +1,32 @@
+/* General */
+"Moderation Queue" = "Moderation Queue";
+"Queue updated" = "Queue updated";
+"No reports in queue" = "No reports in queue";
+"Loading preview…" = "Loading preview…";
+
+/* Filters */
+"Status" = "Status";
+"All" = "All";
+"Pending" = "Pending";
+"Reviewed" = "Reviewed";
+"Actioned" = "Actioned";
+"Dismissed" = "Dismissed";
+"Retry" = "Retry";
+
+/* Toasts */
+"Marked %@" = "Marked %@";
+"Posted" = "Posted";
+"Post" = "Post";
+"Saved search" = "Saved search";
+"Deleted saved search" = "Deleted saved search";
+
+/* Error messages */
+"Network issue. Check your connection and try again." = "Network issue. Check your connection and try again.";
+"Too many requests. Please wait a moment and try again." = "Too many requests. Please wait a moment and try again.";
+"Server is having trouble. We’re on it—try again shortly." = "Server is having trouble. We’re on it—try again shortly.";
+"Something went wrong. Please try again." = "Something went wrong. Please try again.";
+
+/* Notifications */
+"Turn on alerts" = "Turn on alerts";
+"Get notified about mentions and keyword matches." = "Get notified about mentions and keyword matches.";
+"Enable" = "Enable";

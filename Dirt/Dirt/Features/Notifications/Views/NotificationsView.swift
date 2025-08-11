@@ -61,10 +61,40 @@ struct NotificationsView: View {
         "red flag": true,
         "Austin": false
     ]
+    @State private var alertsStatus: AlertsService.AuthorizationStatus = .notDetermined
     
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
+                // Enable alerts banner
+                if alertsStatus != .authorized {
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: "bell.badge")
+                            .font(.title3)
+                            .foregroundColor(.accentColor)
+                            .accessibilityHidden(true)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(NSLocalizedString("Turn on alerts", comment: ""))
+                                .font(.headline)
+                            Text(NSLocalizedString("Get notified about mentions and keyword matches.", comment: ""))
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Button(NSLocalizedString("Enable", comment: "")) {
+                            Task { alertsStatus = await AlertsService.shared.requestAuthorization() }
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.blue.opacity(0.15))
+                        .foregroundColor(.blue)
+                        .cornerRadius(8)
+                        .accessibilityLabel(Text(NSLocalizedString("Enable", comment: "")))
+                    }
+                    .padding()
+                    .cardBackground()
+                    .padding([.horizontal, .top])
+                }
                 // Segmented control
                 Picker("", selection: $selectedTab) {
                     Text("Activity").tag(0)
@@ -135,6 +165,9 @@ struct NotificationsView: View {
                         Button("Mark all as read") { notifications = notifications.map { n in var n = n; n.isRead = true; return n } }
                     }
                 }
+            }
+            .task {
+                alertsStatus = await AlertsService.shared.currentStatus()
             }
         }
     }

@@ -120,7 +120,7 @@ struct OnboardingView: View {
                                 toastCenter.show(.success, "Signed in with Apple")
                             } catch {
                                 HapticFeedback.notification(type: .error)
-                                toastCenter.show(.error, "Apple sign-in failed")
+                                toastCenter.show(.error, NSLocalizedString("Something went wrong. Please try again.", comment: ""))
                             }
                         }
                     } else {
@@ -129,7 +129,7 @@ struct OnboardingView: View {
                     }
                 case .failure:
                     HapticFeedback.notification(type: .error)
-                    toastCenter.show(.error, "Apple sign-in canceled")
+                    toastCenter.show(.error, NSLocalizedString("Something went wrong. Please try again.", comment: ""))
                 }
             }
             .signInWithAppleButtonStyle(.black)
@@ -153,7 +153,7 @@ struct OnboardingView: View {
                             toastCenter.show(.info, "Check your email for the link")
                         } catch {
                             HapticFeedback.notification(type: .error)
-                            toastCenter.show(.error, "Failed to send link")
+                            toastCenter.show(.error, NSLocalizedString("Something went wrong. Please try again.", comment: ""))
                         }
                     }
                 }

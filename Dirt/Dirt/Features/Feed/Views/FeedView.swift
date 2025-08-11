@@ -109,6 +109,12 @@ struct FeedView: View {
     let radiusOptions = ["Any", "5 mi", "10 mi", "25 mi", "50 mi"]
     private let refreshPublisher = PassthroughSubject<Void, Never>()
     
+    // Location + Nearby helpers
+    private var isLocationAuthorized: Bool {
+        locationManager.authorizationStatus == .authorizedWhenInUse || locationManager.authorizationStatus == .authorizedAlways
+    }
+    private var isNearbyActive: Bool { selectedFilter == "Nearby" }
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -184,21 +190,31 @@ struct FeedView: View {
                             .padding(.horizontal)
                         }
 
-                        // Proximity filter
+                        // Proximity filter (disabled unless Nearby + authorized)
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 12) {
                                 ForEach(radiusOptions, id: \.self) { option in
                                     FilterPill(title: option, isSelected: selectedRadius == option) {
+                                        guard isNearbyActive && isLocationAuthorized else { return }
                                         withAnimation(.spring()) {
                                             selectedRadius = option
                                             HapticFeedback.impact(style: .light)
                                         }
                                     }
+                                    .opacity(isNearbyActive && isLocationAuthorized ? 1.0 : 0.5)
+                                    .overlay(
+                                        Group {
+                                            if !(isNearbyActive && isLocationAuthorized) {
+                                                RoundedRectangle(cornerRadius: 16).stroke(Color.gray.opacity(0.2))
+                                            }
+                                        }
+                                    )
                                 }
-                                if selectedRadius != "Any" && (locationManager.authorizationStatus == .denied || locationManager.authorizationStatus == .notDetermined) {
+                                // Prompt to enable location when Nearby selected but not authorized
+                                if isNearbyActive && !isLocationAuthorized {
                                     Button(action: { locationManager.requestWhenInUse() }) {
                                         Label("Enable Location", systemImage: "location")
-                                            .font(.subheadline)
+                                            .font(.subheadline.weight(.semibold))
                                             .padding(.horizontal, 12)
                                             .padding(.vertical, 8)
                                             .background(Color(.systemGray6))
@@ -464,6 +480,10 @@ struct PostCard: View {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         isHelpful.toggle()
                         HapticFeedback.impact(style: .light)
+                        AnalyticsService.shared.log("helpful_toggled", [
+                            "post_id": post.id.uuidString,
+                            "value": isHelpful ? "1" : "0"
+                        ])
                     }
                 }) {
                     HStack(spacing: 4) {
@@ -627,8 +647,8 @@ struct PostCard: View {
             list = list.filter { $0.createdAt >= cutoff }
         }
 
-        // Proximity filter
-        if selectedRadius != "Any", let userLoc = locationManager.currentLocation {
+        // Proximity filter (only when Nearby tab is active and authorized)
+        if isNearbyActive, isLocationAuthorized, selectedRadius != "Any", let userLoc = locationManager.currentLocation {
             let meters: Double = {
                 let comps = selectedRadius.split(separator: " ")
                 if let miles = Double(comps.first ?? "0") { return miles * 1609.34 }

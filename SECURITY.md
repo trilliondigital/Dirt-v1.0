@@ -15,6 +15,23 @@
 - Media privacy: images are blurred by default in Feed/Post until the user taps to reveal.
 - Content validation: Create Post enforces max 500 characters and requires selecting Red/Green; tags must come from the controlled list.
 
+## Backend Security
+- Edge Functions (e.g., `posts-create`, moderation/search/saved-searches, `mentions-process`, `media-process`) must enforce auth via Supabase JWT. Validate inputs and reject anonymous access where appropriate.
+- Database RLS: All tables (Posts, Reports, SavedSearches, Tags, Sentiments) must have explicit, least-privilege policies. Review migrations for policy diffs.
+- Storage: Serve media via signed URLs with short expirations. Avoid public buckets for private content.
+
+## Secrets Management
+- Supabase URL and anon key are supplied via Xcode build settings/xcconfig. Do not hardcode in source.
+- For CI, use repository secrets. Never print secrets in logs.
+
+## Error Handling & Telemetry
+- User-facing errors are produced by `ErrorPresenter.message(for:)` to avoid leaking internal details.
+- Analytics via `AnalyticsService` only captures coarse event names and non-PII parameters (e.g., post IDs, counters, timings). Do not log content or user identifiers in analytics.
+
+## Media Pipeline
+- `media-process` Edge Function computes a content hash for deduplication and will eventually strip EXIF server-side. Keep client EXIF stripping until server pipeline is verified.
+- Ensure images are processed server-side before being made retrievable; prefer immutable storage paths + hashed filenames.
+
 ## Responsible Disclosure
 - Please provide a clear description, impacted components, and reproduction steps.
 - Do not test on production users. Use test accounts and non-destructive methods.

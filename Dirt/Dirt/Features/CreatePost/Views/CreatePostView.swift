@@ -201,15 +201,15 @@ struct CreatePostView: View {
                             do {
                                 try await PostSubmissionService.shared.createPost(content: trimmed, flag: flag, tags: tags, anonymous: isAnonymous)
                                 HapticFeedback.notification(type: .success)
-                                toastCenter.show(.success, "Posted")
+                                toastCenter.show(.success, NSLocalizedString("Posted", comment: ""))
                                 presentationMode.wrappedValue.dismiss()
                             } catch {
                                 HapticFeedback.notification(type: .error)
-                                toastCenter.show(.error, "Failed to post")
+                                toastCenter.show(.error, ErrorPresenter.message(for: error))
                             }
                         }
                     }) {
-                        Text("Post")
+                        Text(NSLocalizedString("Post", comment: ""))
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(canPost ? Color.blue : Color.gray.opacity(0.3))
