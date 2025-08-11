@@ -429,8 +429,7 @@ struct FeedView: View {
         try? await Task.sleep(nanoseconds: 1_500_000_000)
         isRefreshing = false
     }
-}
-
+    
     private func filteredAndSortedPosts() -> [Post] {
         var list = posts
         // Tag filters
@@ -476,6 +475,8 @@ struct FeedView: View {
         }
         return list
     }
+}
+ 
 
 // MARK: - PostCard
 struct PostCard: View {
