@@ -216,18 +216,7 @@ final class SupabaseManager: ObservableObject {
             .execute()
             .value as Todo
         
-        
-        await MainActor.run {
-            self.session = session
-            self.errorMessage = nil
-        }
-        
         await fetchTodos()
-    } catch {
-        await MainActor.run {
-            self.errorMessage = "Sign in failed: \(error.localizedDescription)"
-        }
-        throw error
     }
     // MARK: - Todo Methods
     func fetchTodos() async {

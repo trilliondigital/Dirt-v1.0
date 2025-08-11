@@ -44,7 +44,7 @@ final class MentionsService {
 
     // Basic regex: @username (alnum, underscore, dot), 2-30 chars
     func extractMentions(from text: String) -> [String] {
-        let pattern = "@([A-Za-z0-9_\.]{2,30})"
+        let pattern = #"@([A-Za-z0-9_.]{2,30})"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
         let range = NSRange(text.startIndex..., in: text)
         let matches = regex.matches(in: text, range: range)

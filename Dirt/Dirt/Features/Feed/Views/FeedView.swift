@@ -467,12 +467,11 @@ struct PostCard: View {
                                 Text(post.userInitial)
                                     .font(.headline)
                                     .foregroundColor(post.userColor)
+                            )
+                    }
                 }
-            })
-        }
-    }
-    .padding(.horizontal)
-}
+            }
+            .padding(.horizontal)
             
             // Action Buttons
             HStack(spacing: 20) {
