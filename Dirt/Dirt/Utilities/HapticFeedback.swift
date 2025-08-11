@@ -12,4 +12,13 @@ enum HapticFeedback {
         gen.prepare()
         gen.notificationOccurred(type)
     }
+    
+     // Compatibility aliases used across the app
+     static func notification(_ type: UINotificationFeedbackGenerator.FeedbackType) {
+         notify(type)
+     }
+     
+     static func notification(type: UINotificationFeedbackGenerator.FeedbackType) {
+         notify(type)
+     }
 }
