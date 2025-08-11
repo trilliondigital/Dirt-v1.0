@@ -16,6 +16,31 @@ struct BlurView: UIViewRepresentable {
     }
 }
 
+// MARK: - PostRowLink
+private struct PostRowLink: View {
+    let post: Post
+    var body: some View {
+        NavigationLink {
+            PostDetailView(
+                postId: post.id,
+                username: post.username,
+                userInitial: post.userInitial,
+                userColor: post.userColor,
+                timestamp: post.timestamp,
+                content: post.content,
+                imageName: post.imageName,
+                isVerified: post.isVerified,
+                tags: post.tags,
+                upvotes: post.upvotes,
+                comments: post.comments,
+                shares: post.shares
+            )
+        } label: {
+            PostCard(post: post)
+        }
+    }
+}
+
 // MARK: - Post Model
 struct Post: Identifiable {
     let id = UUID()
@@ -115,6 +140,7 @@ struct FeedView: View {
         locationManager.authorizationStatus == .authorizedWhenInUse || locationManager.authorizationStatus == .authorizedAlways
     }
     private var isNearbyActive: Bool { selectedFilter == "Nearby" }
+    private var visiblePosts: [Post] { filteredAndSortedPosts() }
     
     var body: some View {
         NavigationView {
@@ -148,83 +174,42 @@ struct FeedView: View {
                         .padding(.top, 8)
 
                         // Tag filters
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 8) {
-                                ForEach(TagCatalog.all) { tag in
-                                    let isOn = activeTagFilters.contains(tag)
-                                    Button(action: {
-                                        if isOn { activeTagFilters.remove(tag) } else { activeTagFilters.insert(tag) }
-                                    }) {
-                                        HStack(spacing: 6) {
-                                            Text(tag.rawValue)
-                                            if tag == .redFlag {
-                                                Image(systemName: "flag.fill").foregroundColor(.red)
-                                            } else if tag == .greenFlag {
-                                                Image(systemName: "flag.fill").foregroundColor(.green)
-                                            }
-                                        }
-                                        .font(.footnote.weight(.medium))
-                                        .foregroundColor(isOn ? .blue : .primary)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 8)
-                                        .background(isOn ? Color.blue.opacity(0.15) : Color(.systemGray6))
-                                        .cornerRadius(16)
-                                    }
-                                    .buttonStyle(ScaleButtonStyle())
-                                }
+                        TagFiltersRow(
+                            tags: TagCatalog.all,
+                            isSelected: { tag in activeTagFilters.contains(tag) },
+                            onToggle: { tag in
+                                if activeTagFilters.contains(tag) { activeTagFilters.remove(tag) } else { activeTagFilters.insert(tag) }
+                                HapticFeedback.impact(style: .light)
                             }
-                            .padding(.horizontal)
-                        }
+                        )
 
                         // Time filter
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(timeFilters, id: \.self) { tf in
-                                    FilterPill(title: tf, isSelected: selectedTimeFilter == tf) {
-                                        withAnimation(.spring()) {
-                                            selectedTimeFilter = tf
-                                            HapticFeedback.impact(style: .light)
-                                        }
-                                    }
+                        TimeFiltersRow(
+                            filters: timeFilters,
+                            selected: selectedTimeFilter,
+                            onSelect: { tf in
+                                withAnimation(.spring()) {
+                                    selectedTimeFilter = tf
+                                    HapticFeedback.impact(style: .light)
                                 }
                             }
-                            .padding(.horizontal)
-                        }
+                        )
 
                         // Proximity filter (disabled unless Nearby + authorized)
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(radiusOptions, id: \.self) { option in
-                                    FilterPill(title: option, isSelected: selectedRadius == option) {
-                                        guard isNearbyActive && isLocationAuthorized else { return }
-                                        withAnimation(.spring()) {
-                                            selectedRadius = option
-                                            HapticFeedback.impact(style: .light)
-                                        }
-                                    }
-                                    .opacity(isNearbyActive && isLocationAuthorized ? 1.0 : 0.5)
-                                    .overlay(
-                                        Group {
-                                            if !(isNearbyActive && isLocationAuthorized) {
-                                                RoundedRectangle(cornerRadius: 16).stroke(Color.gray.opacity(0.2))
-                                            }
-                                        }
-                                    )
+                        RadiusFiltersRow(
+                            options: radiusOptions,
+                            isNearbyActive: isNearbyActive,
+                            isLocationAuthorized: isLocationAuthorized,
+                            selected: selectedRadius,
+                            onSelect: { option in
+                                guard isNearbyActive && isLocationAuthorized else { return }
+                                withAnimation(.spring()) {
+                                    selectedRadius = option
+                                    HapticFeedback.impact(style: .light)
                                 }
-                                // Prompt to enable location when Nearby selected but not authorized
-                                if isNearbyActive && !isLocationAuthorized {
-                                    Button(action: { locationManager.requestWhenInUse() }) {
-                                        Label("Enable Location", systemImage: "location")
-                                            .font(.subheadline.weight(.semibold))
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 8)
-                                            .background(Color(.systemGray6))
-                                            .cornerRadius(16)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
+                            },
+                            onRequestLocation: { locationManager.requestWhenInUse() }
+                        )
 
                         // Header with Search
                         HStack {
@@ -345,32 +330,14 @@ struct FeedView: View {
                             Spacer()
                         }
                         .padding(.horizontal)
-                        
+
                         // Posts
                         LazyVStack(spacing: 16) {
-                            ForEach(filteredAndSortedPosts()) { post in
-                                NavigationLink(
-                                    destination: PostDetailView(
-                                        postId: post.id,
-                                        username: post.username,
-                                        userInitial: post.userInitial,
-                                        userColor: post.userColor,
-                                        timestamp: post.timestamp,
-                                        content: post.content,
-                                        imageName: post.imageName,
-                                        isVerified: post.isVerified,
-                                        tags: post.tags,
-                                        upvotes: post.upvotes,
-                                        comments: post.comments,
-                                        shares: post.shares
-                                    )
-                                ) {
-                                    PostCard(post: post)
-                                        .padding(.horizontal)
-                                        .transition(.opacity.combined(with: .move(edge: .top)))
-                                }
+                            ForEach(visiblePosts) { post in
+                                PostRowLink(post: post)
+                                    .padding(.horizontal)
                             }
-                            
+
                             // End of feed message
                             VStack(spacing: 16) {
                                 Image(systemName: "checkmark.shield.fill")
@@ -691,6 +658,105 @@ struct PostCard: View {
         let lineHeight = textView.font?.lineHeight ?? 0
         let maxHeight = lineHeight * 5 // 5 lines
         return size.height > maxHeight
+    }
+}
+
+// MARK: - Lightweight filter rows
+private struct TagFiltersRow: View {
+    let tags: [ControlledTag]
+    let isSelected: (ControlledTag) -> Bool
+    let onToggle: (ControlledTag) -> Void
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(tags, id: \.self) { tag in
+                    let on = isSelected(tag)
+                    let accent: Color? = (tag == .redFlag) ? .red : ((tag == .greenFlag) ? .green : nil)
+                    Button(action: { onToggle(tag) }) {
+                        TagPill(title: tag.rawValue, on: on, accent: accent)
+                    }
+                    .buttonStyle(ScaleButtonStyle())
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+}
+
+private struct TagPill: View {
+    let title: String
+    let on: Bool
+    let accent: Color?
+    var body: some View {
+        HStack(spacing: 6) {
+            Text(title)
+            if let accentColor = accent {
+                Image(systemName: "flag.fill").foregroundColor(accentColor)
+            }
+        }
+        .font(.footnote.weight(.medium))
+        .foregroundColor(on ? .blue : .primary)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(on ? Color.blue.opacity(0.15) : Color(.systemGray6))
+        .cornerRadius(16)
+    }
+}
+
+private struct TimeFiltersRow: View {
+    let filters: [String]
+    let selected: String
+    let onSelect: (String) -> Void
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(filters, id: \.self) { tf in
+                    FilterPill(title: tf, isSelected: selected == tf) {
+                        onSelect(tf)
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+}
+
+private struct RadiusFiltersRow: View {
+    let options: [String]
+    let isNearbyActive: Bool
+    let isLocationAuthorized: Bool
+    let selected: String
+    let onSelect: (String) -> Void
+    let onRequestLocation: () -> Void
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(options, id: \.self) { option in
+                    FilterPill(title: option, isSelected: selected == option) {
+                        onSelect(option)
+                    }
+                    .opacity(isNearbyActive && isLocationAuthorized ? 1.0 : 0.5)
+                    .overlay(
+                        Group {
+                            if !(isNearbyActive && isLocationAuthorized) {
+                                RoundedRectangle(cornerRadius: 16).stroke(Color.gray.opacity(0.2))
+                            }
+                        }
+                    )
+                }
+                if isNearbyActive && !isLocationAuthorized {
+                    Button(action: { onRequestLocation() }) {
+                        Label("Enable Location", systemImage: "location")
+                            .font(.subheadline.weight(.semibold))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(16)
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
     }
 }
 
