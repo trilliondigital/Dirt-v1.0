@@ -238,12 +238,12 @@ final class SupabaseManager: ObservableObject {
     // MARK: - Additional Auth Helpers
     @MainActor
     func signInWithApple(idToken: String, nonce: String? = nil) async throws {
-        let response = try await client.auth.signInWithIdToken(
+        let session = try await client.auth.signInWithIdToken(
             credentials: .init(provider: .apple, idToken: idToken, nonce: nonce)
         )
-        self.session = response.session
-        self.userId = response.user?.id.uuidString
-        self.isAuthenticated = (response.user != nil)
+        self.session = session
+        self.userId = session.user.id.uuidString
+        self.isAuthenticated = true
     }
 
     @MainActor
