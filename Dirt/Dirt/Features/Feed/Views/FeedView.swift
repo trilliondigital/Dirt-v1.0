@@ -431,6 +431,52 @@ struct FeedView: View {
     }
 }
 
+    private func filteredAndSortedPosts() -> [Post] {
+        var list = posts
+        // Tag filters
+        if !activeTagFilters.isEmpty {
+            let keys = activeTagFilters.map { $0.rawValue.lowercased() }
+            list = list.filter { post in
+                let tagString = post.tags.joined(separator: " ").lowercased()
+                return keys.allSatisfy { tagString.contains($0.replacingOccurrences(of: " ", with: "")) || tagString.contains($0) }
+            }
+        }
+
+        // Time filter
+        if selectedTimeFilter != "Anytime" {
+            let now = Date()
+            let cutoff: Date = {
+                switch selectedTimeFilter {
+                case "24h": return Calendar.current.date(byAdding: .hour, value: -24, to: now) ?? now
+                case "7d": return Calendar.current.date(byAdding: .day, value: -7, to: now) ?? now
+                case "30d": return Calendar.current.date(byAdding: .day, value: -30, to: now) ?? now
+                default: return Date.distantPast
+                }
+            }()
+            list = list.filter { $0.createdAt >= cutoff }
+        }
+
+        // Proximity filter (only when Nearby tab is active and authorized)
+        if isNearbyActive, isLocationAuthorized, selectedRadius != "Any", let userLoc = locationManager.currentLocation {
+            let meters: Double = {
+                let comps = selectedRadius.split(separator: " ")
+                if let miles = Double(comps.first ?? "0") { return miles * 1609.34 }
+                return .greatestFiniteMagnitude
+            }()
+            list = list.filter { post in
+                guard let coord = post.coordinate else { return false }
+                let postLoc = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
+                return postLoc.distance(from: userLoc) <= meters
+            }
+        }
+
+        // Sort
+        if selectedSort == 1 {
+            list = list.sorted { $0.upvotes > $1.upvotes }
+        }
+        return list
+    }
+
 // MARK: - PostCard
 struct PostCard: View {
     let post: Post
@@ -622,51 +668,6 @@ struct PostCard: View {
         }
     }
     
-    private func filteredAndSortedPosts() -> [Post] {
-        var list = posts
-        // Tag filters
-        if !activeTagFilters.isEmpty {
-            let keys = activeTagFilters.map { $0.rawValue.lowercased() }
-            list = list.filter { post in
-                let tagString = post.tags.joined(separator: " ").lowercased()
-                return keys.allSatisfy { tagString.contains($0.replacingOccurrences(of: " ", with: "")) || tagString.contains($0) }
-            }
-        }
-
-        // Time filter
-        if selectedTimeFilter != "Anytime" {
-            let now = Date()
-            let cutoff: Date = {
-                switch selectedTimeFilter {
-                case "24h": return Calendar.current.date(byAdding: .hour, value: -24, to: now) ?? now
-                case "7d": return Calendar.current.date(byAdding: .day, value: -7, to: now) ?? now
-                case "30d": return Calendar.current.date(byAdding: .day, value: -30, to: now) ?? now
-                default: return Date.distantPast
-                }
-            }()
-            list = list.filter { $0.createdAt >= cutoff }
-        }
-
-        // Proximity filter (only when Nearby tab is active and authorized)
-        if isNearbyActive, isLocationAuthorized, selectedRadius != "Any", let userLoc = locationManager.currentLocation {
-            let meters: Double = {
-                let comps = selectedRadius.split(separator: " ")
-                if let miles = Double(comps.first ?? "0") { return miles * 1609.34 }
-                return .greatestFiniteMagnitude
-            }()
-            list = list.filter { post in
-                guard let coord = post.coordinate else { return false }
-                let postLoc = CLLocation(latitude: coord.latitude, longitude: coord.longitude)
-                return postLoc.distance(from: userLoc) <= meters
-            }
-        }
-
-        // Sort
-        if selectedSort == 1 {
-            list = list.sorted { $0.upvotes > $1.upvotes }
-        }
-        return list
-    }
 
     private func formatNumber(_ number: Int) -> String {
         let formatter = NumberFormatter()
