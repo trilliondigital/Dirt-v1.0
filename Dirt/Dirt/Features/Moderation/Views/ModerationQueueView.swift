@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ModerationQueueView: View {
+    @EnvironmentObject private var toastCenter: ToastCenter
     @State private var reports: [ReportRecord] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -52,9 +53,12 @@ struct ModerationQueueView: View {
         do {
             reports = try await ModerationService.shared.fetchQueue(page: 1, pageSize: 25)
             isLoading = false
+            toastCenter.show(.info, "Queue updated")
         } catch {
             errorMessage = "Failed to fetch queue"
             isLoading = false
+            HapticFeedback.notification(type: .error)
+            toastCenter.show(.error, "Failed to fetch queue")
         }
     }
 
@@ -65,8 +69,12 @@ struct ModerationQueueView: View {
             if let idx = reports.firstIndex(where: { $0.id == reportId }) {
                 reports[idx] = updated
             }
+            HapticFeedback.notification(type: .success)
+            toastCenter.show(.success, "Marked \(status.rawValue)")
         } catch {
             errorMessage = "Failed to update status"
+            HapticFeedback.notification(type: .error)
+            toastCenter.show(.error, "Failed to update status")
         }
     }
 }

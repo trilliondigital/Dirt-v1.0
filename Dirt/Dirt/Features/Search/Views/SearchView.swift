@@ -1,10 +1,11 @@
 import SwiftUI
 
 struct SearchView: View {
+    @EnvironmentObject private var toastCenter: ToastCenter
     @State private var searchText = ""
     @State private var selectedFilter = "Recent"
     let filters = ["Recent", "Popular", "Nearby", "Trending"]
-    @State private var savedSearches: [String] = ["#ghosting", "#redflag", "near: Austin", "@alex", "green flag"]
+    @State private var savedSearches: [String] = []
     private var tagSuggestions: [String] { TagCatalog.all.map { $0.rawValue } }
     @State private var results: [SearchResult] = []
     @State private var isLoading: Bool = false
@@ -161,6 +162,20 @@ struct SearchView: View {
                                         } label: {
                                             Label("Delete", systemImage: "trash")
                                         }
+                                        .tint(.red)
+                                        .onTapGesture {
+                                            Task {
+                                                do {
+                                                    try await SavedSearchService.shared.delete(query: item)
+                                                    savedSearches.removeAll { $0 == item }
+                                                    HapticFeedback.impact(style: .light)
+                                                    toastCenter.show(.success, "Deleted saved search")
+                                                } catch {
+                                                    HapticFeedback.notification(type: .error)
+                                                    toastCenter.show(.error, "Failed to delete saved search")
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -236,8 +251,17 @@ struct SearchView: View {
                         Button("Save") {
                             let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
                             guard !trimmed.isEmpty else { return }
-                            if !savedSearches.contains(trimmed) {
-                                savedSearches.insert(trimmed, at: 0)
+                            Task {
+                                do {
+                                    try await SavedSearchService.shared.save(query: trimmed)
+                                    // refresh list
+                                    savedSearches = try await SavedSearchService.shared.list()
+                                    HapticFeedback.notification(type: .success)
+                                    toastCenter.show(.success, "Saved search")
+                                } catch {
+                                    HapticFeedback.notification(type: .error)
+                                    toastCenter.show(.error, "Failed to save search")
+                                }
                             }
                         }
                     }
@@ -245,6 +269,10 @@ struct SearchView: View {
             }
             .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
             .onChange(of: searchText) { _ in triggerSearch() }
+            .task {
+                // Load saved searches on first appear
+                do { savedSearches = try await SavedSearchService.shared.list() } catch { }
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ import Supabase
 struct DirtApp: App {
     // Configure Supabase client once for the entire app
     @StateObject private var supabaseManager = SupabaseManager.shared
+    @StateObject private var toastCenter = ToastCenter()
     @AppStorage("onboardingCompleted") private var onboardingCompleted = false
 
     var body: some Scene {
@@ -17,6 +18,7 @@ struct DirtApp: App {
                 }
             }
             .environmentObject(supabaseManager)
+            .withToasts(toastCenter)
         }
     }
 }

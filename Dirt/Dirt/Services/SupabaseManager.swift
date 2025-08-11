@@ -16,8 +16,14 @@ class SupabaseManager: ObservableObject {
     @Published var errorMessage: String?
     
     private init() {
-        self.supabaseURL = URL(string: "https://xruvwnrxatkgmncefozs.supabase.co")!
-        self.supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhydXZ3bnJ4YXRrZ21uY2Vmb3pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQxNzk0NTEsImV4cCI6MjA2OTc1NTQ1MX0.Ux7QgWRAcDviV5niUtDztu3PQ0m2_Fw3gwiTRlA_fPY"
+        let info = Bundle.main.infoDictionary ?? [:]
+        let urlString = (info["SUPABASE_URL"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let keyString = (info["SUPABASE_ANON_KEY"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let fallbackURL = "https://xruvwnrxatkgmncefozs.supabase.co"
+        let fallbackKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhydXZ3bnJ4YXRrZ21uY2Vmb3pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQxNzk0NTEsImV4cCI6MjA2OTc1NTQ1MX0.Ux7QgWRAcDviV5niUtDztu3PQ0m2_Fw3gwiTRlA_fPY"
+
+        self.supabaseURL = URL(string: urlString?.isEmpty == false ? urlString! : fallbackURL)!
+        self.supabaseAnonKey = (keyString?.isEmpty == false ? keyString! : fallbackKey)
 
         // Initialize the Supabase client with URL and key
         client = SupabaseClient(supabaseURL: self.supabaseURL, supabaseKey: self.supabaseAnonKey)
