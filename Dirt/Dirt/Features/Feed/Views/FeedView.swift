@@ -669,9 +669,15 @@ private struct TagFiltersRow: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                ForEach(tags, id: \.self) { tag in
+                ForEach(tags, id: \.id) { tag in
                     let on = isSelected(tag)
-                    let accent: Color? = (tag == .redFlag) ? .red : ((tag == .greenFlag) ? .green : nil)
+                    let accent: Color? = {
+                        switch tag {
+                        case .avoid: return .red
+                        case .greatConversation: return .green
+                        default: return nil
+                        }
+                    }()
                     Button(action: { onToggle(tag) }) {
                         TagPill(title: tag.rawValue, on: on, accent: accent)
                     }

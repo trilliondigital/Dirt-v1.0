@@ -29,7 +29,7 @@ final class PostSubmissionService {
         ]
         // Retry on transient failures (network, 5xx)
         func isTransient(_ error: Error) -> Bool {
-            if let urlError = error as? URLError { return true }
+            if error is URLError { return true }
             let ns = error as NSError
             if ns.domain == "SupabaseFunction" {
                 // Retry server errors and rate limit

@@ -268,7 +268,7 @@ struct SearchView: View {
                 }
             }
             .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
-            .onChange(of: searchText) { _ in triggerSearch() }
+            .onChange(of: searchText) { triggerSearch() }
             .task {
                 // Load saved searches on first appear
                 do { savedSearches = try await SavedSearchService.shared.list() } catch { }
