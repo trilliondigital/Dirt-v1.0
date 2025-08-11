@@ -84,7 +84,8 @@ struct Post: Identifiable {
             shares: 12,
             isLiked: false,
             isBookmarked: true,
-            createdAt: Date(timeIntervalSinceNow: -24 * 60 * 60)
+            createdAt: Date(timeIntervalSinceNow: -24 * 60 * 60),
+            coordinate: nil
         )
     ]
 }
@@ -765,18 +766,7 @@ struct ScaleButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - HapticFeedback
-struct HapticFeedback {
-    static func impact(style: UIImpactFeedbackGenerator.FeedbackStyle) {
-        let generator = UIImpactFeedbackGenerator(style: style)
-        generator.impactOccurred()
-    }
-    
-    static func notification(type: UINotificationFeedbackGenerator.FeedbackType) {
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(type)
-    }
-}
+// Haptics provided by shared utility in `Dirt/Dirt/Utilities/HapticFeedback.swift`
 
 // MARK: - Preview
 struct FeedView_Previews: PreviewProvider {
