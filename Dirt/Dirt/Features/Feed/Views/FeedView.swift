@@ -274,11 +274,7 @@ struct FeedView: View {
                                                 .stroke(LinearGradient(gradient: Gradient(colors: [.red, .orange, .pink]), startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 2)
                                                 .frame(width: 70, height: 70)
                                                 .overlay(
-                                                    Image("user\(i)")
-                                                        .resizable()
-                                                        .scaledToFill()
-                                                        .frame(width: 64, height: 64)
-                                                        .clipShape(Circle())
+                                                    AvatarView(index: i - 1, size: 64)
                                                 )
                                         }
                                         Text("User \(i)")
