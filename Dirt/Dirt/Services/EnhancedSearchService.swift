@@ -2,6 +2,100 @@ import Foundation
 import Combine
 import SwiftUI
 
+// MARK: - Legacy SearchService Compatibility
+
+struct SearchResult: Identifiable, Equatable, Codable {
+    let id: UUID
+    let title: String
+    let snippet: String
+    let tags: [String]
+    let score: Double
+}
+
+enum SearchSort: String {
+    case recent
+    case popular
+    case nearby
+    case trending
+}
+
+final class SearchService {
+    static let shared = SearchService()
+    private init() {}
+
+    // Simple in-memory LRU cache to reduce duplicate backend calls
+    private struct CacheKey: Hashable { let q: String; let tags: [String]; let sort: SearchSort }
+    private var cache: [CacheKey: [SearchResult]] = [:]
+    private var order: [CacheKey] = []
+    private let maxCacheItems = 50
+    private func cacheGet(_ key: CacheKey) -> [SearchResult]? {
+        if let val = cache[key] {
+            // move to front
+            order.removeAll { $0 == key }
+            order.insert(key, at: 0)
+            return val
+        }
+        return nil
+    }
+    private func cacheSet(_ key: CacheKey, _ value: [SearchResult]) {
+        cache[key] = value
+        order.removeAll { $0 == key }
+        order.insert(key, at: 0)
+        if order.count > maxCacheItems, let last = order.last {
+            cache.removeValue(forKey: last)
+            order.removeLast()
+        }
+    }
+
+    // Backend search via Edge Function with fallback to mock
+    func search(query: String, tags: [String] = [], sort: SearchSort = .recent) async throws -> [SearchResult] {
+        let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !q.isEmpty else { return [] }
+
+        let key = CacheKey(q: q.lowercased(), tags: tags.map { $0.lowercased() }, sort: sort)
+        if let cached = cacheGet(key) { return cached }
+
+        // Attempt backend call
+        do {
+            let payload: [String: Any] = [
+                "query": q,
+                "tags": tags,
+                "sort": sort.rawValue
+            ]
+            let data = try await SupabaseManager.shared.callEdgeFunction(name: "search-global", json: payload)
+            let decoder = JSONDecoder()
+            let results = try decoder.decode([SearchResult].self, from: data)
+            cacheSet(key, results)
+            return results
+        } catch {
+            // Fallback to mock data if backend not available
+            let corpus: [SearchResult] = [
+                .init(id: UUID(), title: "Ghosting after three dates", snippet: "Be cautious. Ghosted after three amazing dates...", tags: ["red flag", "ghosting"], score: 0.91),
+                .init(id: UUID(), title: "Great conversation, second date planned", snippet: "Amazing first date, talked for hours...", tags: ["green flag", "great conversation"], score: 0.88),
+                .init(id: UUID(), title: "Shared interests: booklover", snippet: "Found someone who reads the same books...", tags: ["green flag", "shared interests"], score: 0.84),
+                .init(id: UUID(), title: "Mixed signals in Austin", snippet: "Confusing communication patterns observed...", tags: ["mixed signals", "Austin"], score: 0.76)
+            ]
+            var results = corpus.filter { r in
+                r.title.localizedCaseInsensitiveContains(q) || r.snippet.localizedCaseInsensitiveContains(q) || r.tags.contains { $0.localizedCaseInsensitiveContains(q) }
+            }
+            if !tags.isEmpty {
+                let tset = Set(tags.map { $0.lowercased() })
+                results = results.filter { r in !tset.isDisjoint(with: r.tags.map { $0.lowercased() }) }
+            }
+            switch sort {
+            case .recent:
+                results = results.shuffled()
+            case .popular, .trending:
+                results = results.sorted { $0.score > $1.score }
+            case .nearby:
+                results = results.shuffled()
+            }
+            cacheSet(key, results)
+            return results
+        }
+    }
+}
+
 // MARK: - Search Types
 
 enum SearchScope: String, CaseIterable {
@@ -128,9 +222,9 @@ struct SearchFilter {
     }
 }
 
-// MARK: - Search Results
+// MARK: - Enhanced Search Results
 
-struct SearchResult: Identifiable, Codable {
+struct EnhancedSearchResult: Identifiable, Codable {
     let id: String
     let type: SearchScope
     let title: String
@@ -152,7 +246,7 @@ class EnhancedSearchService: ObservableObject {
     @Published var searchScope: SearchScope = .all
     @Published var sortOption: SortOption = .relevance
     @Published var searchFilter = SearchFilter()
-    @Published var results: [SearchResult] = []
+    @Published var results: [EnhancedSearchResult] = []
     @Published var isSearching = false
     @Published var hasMoreResults = true
     @Published var recentSearches: [String] = []
@@ -248,7 +342,7 @@ class EnhancedSearchService: ObservableObject {
         filter: SearchFilter,
         page: Int,
         pageSize: Int
-    ) async throws -> [SearchResult] {
+    ) async throws -> [EnhancedSearchResult] {
         // Simulate API call delay
         try await Task.sleep(nanoseconds: 500_000_000)
         
@@ -257,11 +351,11 @@ class EnhancedSearchService: ObservableObject {
         return mockResults
     }
     
-    private func generateMockResults(for query: String, scope: SearchScope, count: Int) -> [SearchResult] {
-        var results: [SearchResult] = []
+    private func generateMockResults(for query: String, scope: SearchScope, count: Int) -> [EnhancedSearchResult] {
+        var results: [EnhancedSearchResult] = []
         
         for i in 0..<count {
-            let result = SearchResult(
+            let result = EnhancedSearchResult(
                 id: UUID().uuidString,
                 type: scope == .all ? SearchScope.allCases.randomElement()! : scope,
                 title: "Result \(i + 1) for '\(query)'",
@@ -544,7 +638,7 @@ struct SearchFiltersView: View {
 }
 
 struct SearchResultRow: View {
-    let result: SearchResult
+    let result: EnhancedSearchResult
     
     var body: some View {
         HStack(spacing: 12) {

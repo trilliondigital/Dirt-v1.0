@@ -1,6 +1,43 @@
 import UIKit
 import SwiftUI
 
+// MARK: - Legacy HapticFeedback Compatibility
+
+enum HapticFeedback {
+    static func impact(style: UIImpactFeedbackGenerator.FeedbackStyle = .medium) {
+        let feedbackType: HapticFeedbackType
+        switch style {
+        case .light: feedbackType = .light
+        case .medium: feedbackType = .medium
+        case .heavy: feedbackType = .heavy
+        case .soft: feedbackType = .soft
+        case .rigid: feedbackType = .rigid
+        @unknown default: feedbackType = .medium
+        }
+        EnhancedHapticFeedback.shared.trigger(feedbackType)
+    }
+    
+    static func notify(_ type: UINotificationFeedbackGenerator.FeedbackType) {
+        let feedbackType: HapticFeedbackType
+        switch type {
+        case .success: feedbackType = .success
+        case .warning: feedbackType = .warning
+        case .error: feedbackType = .error
+        @unknown default: feedbackType = .error
+        }
+        EnhancedHapticFeedback.shared.trigger(feedbackType)
+    }
+    
+     // Compatibility aliases used across the app
+     static func notification(_ type: UINotificationFeedbackGenerator.FeedbackType) {
+         notify(type)
+     }
+     
+     static func notification(type: UINotificationFeedbackGenerator.FeedbackType) {
+         notify(type)
+     }
+}
+
 // MARK: - Haptic Feedback Types
 
 enum HapticFeedbackType {
