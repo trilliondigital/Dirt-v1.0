@@ -3,10 +3,15 @@ import Supabase
 
 @main
 struct DirtApp: App {
-    // Configure Supabase client once for the entire app
-    @StateObject private var supabaseManager = SupabaseManager.shared
+    // Service container for dependency injection
+    @StateObject private var serviceContainer = ServiceContainer.shared
     @StateObject private var toastCenter = ToastCenter()
     @AppStorage("onboardingCompleted") private var onboardingCompleted = false
+
+    init() {
+        // Initialize critical services early
+        ServiceContainer.shared.initializeCriticalServices()
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -17,7 +22,8 @@ struct DirtApp: App {
                     OnboardingView()
                 }
             }
-            .environmentObject(supabaseManager)
+            .serviceContainer(serviceContainer)
+            .environmentObject(serviceContainer.supabaseManager)
             .withToasts(toastCenter)
         }
     }

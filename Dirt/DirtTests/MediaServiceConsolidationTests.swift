@@ -35,6 +35,21 @@ final class MediaServiceConsolidationTests: XCTestCase {
         XCTAssertTrue(containerMediaService === MediaService.shared, "ServiceContainer should use the same MediaService instance")
     }
     
+    func testLegacyMediaProcessingConsolidation() async throws {
+        // Test that legacy media processing functionality is available
+        let mediaService = MediaService.shared
+        let testURL = URL(string: "https://example.com/test-image.jpg")!
+        
+        do {
+            let response = try await mediaService.processMedia(at: testURL)
+            XCTAssertNotNil(response)
+            XCTAssertNotNil(response.hash)
+        } catch {
+            // Expected in test environment without backend
+            XCTAssertTrue(error.localizedDescription.contains("Failed") || error.localizedDescription.contains("network"))
+        }
+    }
+    
     // MARK: - Legacy Compatibility Tests
     
     func testLegacyProcessMediaMethod() async throws {

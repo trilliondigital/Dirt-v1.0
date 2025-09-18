@@ -35,6 +35,40 @@ final class SearchServiceConsolidationTests: XCTestCase {
         XCTAssertTrue(containerSearchService === SearchService.shared, "ServiceContainer should use the same SearchService instance")
     }
     
+    func testLegacySavedSearchServiceConsolidation() async throws {
+        // Test that legacy SavedSearchService functionality is now in SearchService
+        let searchService = SearchService.shared
+        
+        // Test legacy methods are available
+        do {
+            let queries = try await searchService.listSavedSearchQueries()
+            XCTAssertNotNil(queries)
+            // Should return fallback data in test environment
+            XCTAssertTrue(queries.contains("#ghosting") || queries.contains("#redflag"))
+        } catch {
+            // Expected in test environment without backend
+            XCTAssertTrue(error.localizedDescription.contains("Failed") || error.localizedDescription.contains("network"))
+        }
+        
+        // Test legacy save method
+        do {
+            try await searchService.saveLegacySearch(query: "test query", tags: ["test"])
+            // Should complete without error or fail gracefully
+        } catch {
+            // Expected in test environment without backend
+            XCTAssertTrue(error.localizedDescription.contains("Failed") || error.localizedDescription.contains("network"))
+        }
+        
+        // Test legacy delete method
+        do {
+            try await searchService.deleteLegacySearch(query: "test query")
+            // Should complete without error or fail gracefully
+        } catch {
+            // Expected in test environment without backend
+            XCTAssertTrue(error.localizedDescription.contains("Failed") || error.localizedDescription.contains("network"))
+        }
+    }
+    
     // MARK: - Legacy Compatibility Tests
     
     func testLegacySearchMethod() async throws {

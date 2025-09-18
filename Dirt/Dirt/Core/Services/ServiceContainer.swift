@@ -75,9 +75,6 @@ class ServiceContainer: ObservableObject {
     /// Confirmation code generation and validation
     lazy var confirmationCodeService = ConfirmationCodeService()
     
-    /// Saved search management
-    lazy var savedSearchService = SavedSearchService.shared
-    
     /// Error recovery service
     lazy var errorRecoveryService = ErrorRecoveryService.shared
     

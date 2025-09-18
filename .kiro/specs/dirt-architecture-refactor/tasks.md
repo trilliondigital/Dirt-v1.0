@@ -29,14 +29,14 @@
   - Write unit tests for design system components
   - _Requirements: 2.1, 2.2, 2.3_
 
-- [ ] 4. Consolidate duplicate services
+- [x] 4. Consolidate duplicate services
   - Merge `MediaService` and `EnhancedMediaService` into single `MediaService`
   - Merge `SearchService` and `EnhancedSearchService` into single `SearchService`
   - Update all references to use consolidated services
   - Write integration tests to verify service consolidation works correctly
   - _Requirements: 6.1, 6.3_
 
-- [ ] 5. Implement service dependency injection
+- [-] 5. Implement service dependency injection
   - Create `ServiceContainer` class with lazy-loaded service instances
   - Implement environment key pattern for service injection throughout the app
   - Update existing view models to use injected services instead of direct instantiation

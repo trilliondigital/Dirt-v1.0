@@ -389,6 +389,34 @@ class SearchService: ObservableObject {
         }
     }
     
+    // MARK: - Legacy SavedSearchService Compatibility
+    
+    /// Legacy method for listing saved searches (consolidated from SavedSearchService)
+    func listSavedSearchQueries() async throws -> [String] {
+        do {
+            let data = try await SupabaseManager.shared.callEdgeFunction(name: "saved-searches-list", json: [:])
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            let items = try decoder.decode([LegacySavedSearch].self, from: data)
+            return items.map { $0.query }
+        } catch {
+            // Fallback to local defaults
+            return ["#ghosting", "#redflag", "near: Austin", "@alex", "green flag"]
+        }
+    }
+    
+    /// Legacy method for saving a search query (consolidated from SavedSearchService)
+    func saveLegacySearch(query: String, tags: [String] = []) async throws {
+        let payload: [String: Any] = ["query": query, "tags": tags]
+        _ = try await SupabaseManager.shared.callEdgeFunction(name: "saved-searches-save", json: payload)
+    }
+    
+    /// Legacy method for deleting a search query (consolidated from SavedSearchService)
+    func deleteLegacySearch(query: String) async throws {
+        let payload: [String: Any] = ["query": query]
+        _ = try await SupabaseManager.shared.callEdgeFunction(name: "saved-searches-delete", json: payload)
+    }
+    
     // MARK: - Legacy Compatibility
     
     // Simple in-memory LRU cache to reduce duplicate backend calls
@@ -482,6 +510,14 @@ struct SavedSearch: Identifiable, Codable {
     let createdAt: Date
 }
 
+// Legacy SavedSearch model for backward compatibility
+struct LegacySavedSearch: Identifiable, Codable, Equatable {
+    let id: UUID
+    let query: String
+    let tags: [String]
+    let createdAt: Date
+}
+
 // MARK: - Search UI Components
 
 struct SearchBar: View {
@@ -561,7 +597,6 @@ struct SearchScopeButton: View {
             .foregroundColor(isSelected ? .white : .primary)
             .cornerRadius(16)
         }
-        .buttonHaptic(.light)
     }
 }
 

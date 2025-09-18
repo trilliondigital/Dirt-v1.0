@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ModerationQueueView: View {
     @EnvironmentObject private var toastCenter: ToastCenter
+    @Environment(\.services) private var services
     @State private var reports: [ReportRecord] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -70,16 +71,16 @@ struct ModerationQueueView: View {
         isLoading = true
         errorMessage = nil
         do {
-            reports = try await ModerationService.shared.fetchQueue(page: 1, pageSize: 25)
+            reports = try await services.moderationService.fetchQueue(page: 1, pageSize: 25)
             isLoading = false
             toastCenter.show(.info, NSLocalizedString("Queue updated", comment: ""))
-            AnalyticsService.shared.log("moderation_queue_loaded", ["count": "\(reports.count)"])
+            services.analyticsService.log("moderation_queue_loaded", ["count": "\(reports.count)"])
         } catch {
-            errorMessage = ErrorPresenter.message(for: error)
+            errorMessage = services.errorPresenter.message(for: error)
             isLoading = false
             HapticFeedback.notification(type: .error)
             toastCenter.show(.error, errorMessage ?? NSLocalizedString("Something went wrong. Please try again.", comment: ""))
-            AnalyticsService.shared.log("moderation_queue_load_failed")
+            services.analyticsService.log("moderation_queue_load_failed")
         }
     }
 
@@ -90,18 +91,18 @@ struct ModerationQueueView: View {
         let original = reports[idx]
         reports[idx].status = status
         do {
-            let server = try await ModerationService.shared.updateReportStatus(reportId: reportId, status: status)
+            let server = try await services.moderationService.updateReportStatus(reportId: reportId, status: status)
             reports[idx] = server
             HapticFeedback.notification(type: .success)
             let msg = String(format: NSLocalizedString("Marked %@", comment: ""), status.rawValue)
             toastCenter.show(.success, msg)
-            AnalyticsService.shared.log("moderation_update_success", ["status": status.rawValue])
+            services.analyticsService.log("moderation_update_success", ["status": status.rawValue])
         } catch {
             reports[idx] = original
-            errorMessage = ErrorPresenter.message(for: error)
+            errorMessage = services.errorPresenter.message(for: error)
             HapticFeedback.notification(type: .error)
             toastCenter.show(.error, errorMessage ?? NSLocalizedString("Something went wrong. Please try again.", comment: ""))
-            AnalyticsService.shared.log("moderation_update_failed", ["status": status.rawValue])
+            services.analyticsService.log("moderation_update_failed", ["status": status.rawValue])
         }
     }
 
@@ -115,6 +116,7 @@ struct ModerationQueueView: View {
 private struct ReportRow: View {
     let report: ReportRecord
     var onAction: (ReportStatus) -> Void
+    @Environment(\.services) private var services
     @State private var preview: PostDetailData?
 
     var body: some View {
@@ -159,7 +161,7 @@ private struct ReportRow: View {
         .padding(.vertical, 6)
         .task {
             if preview == nil {
-                preview = try? await PostService.shared.fetchPost(by: report.postId)
+                preview = try? await services.postService.fetchPost(by: report.postId)
             }
         }
         .accessibilityElement(children: .combine)
