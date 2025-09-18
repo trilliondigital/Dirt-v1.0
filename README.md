@@ -8,11 +8,34 @@ Dirt is a male-focused, privacy-first dating feedback app (SwiftUI + Supabase). 
 - `docs/` — Whitepaper, reference assets, and docs index
 - `.backups/` — Timestamped backups (code-safety only; excluded from VCS)
 
-## iOS App
-- Entry: `Dirt/Dirt/`
-- Features in `Dirt/Dirt/Features/`
-- Shared models/services/utils in `Dirt/Shared/`
-- Core subsystems in `Dirt/Core/`
+## iOS App Architecture
+
+The iOS app follows a clean, modular architecture with clear separation of concerns:
+
+### Directory Structure
+```
+Dirt/Dirt/
+├── App/                    # App lifecycle and configuration
+├── Core/                   # Foundational systems
+│   ├── Design/            # Material Glass design system
+│   ├── Navigation/        # Navigation coordination
+│   └── Services/          # Core infrastructure services
+├── Features/              # Feature modules
+│   ├── Feed/              # Main content feed
+│   ├── Search/            # Global search functionality
+│   ├── CreatePost/        # Post creation
+│   └── [other features]/
+├── Shared/                # Cross-feature shared components
+│   ├── Models/            # Common data models
+│   └── Utilities/         # Shared utility functions
+└── Resources/             # Assets and localizations
+```
+
+### Key Architectural Principles
+- **Feature Boundaries**: Clear module boundaries with minimal inter-feature dependencies
+- **Service Container**: Centralized dependency injection for all services
+- **Material Glass Design**: iOS 18+ Material Glass design system throughout
+- **Accessibility First**: WCAG 2.1 AA compliance across all components
 
 ### Implemented UX (v1)
 - Feed/Post actions: Helpful (👍), Save, Share, Report with reason sheet and soft-hide
@@ -21,9 +44,14 @@ Dirt is a male-focused, privacy-first dating feedback app (SwiftUI + Supabase). 
 - Notifications: Activity and Keyword Alerts tabs
 - Profile: Anonymous shell with Saved and Liked placeholders
 
-### Design System
-- Tokens: `Dirt/Dirt/UI/Design/DesignTokens.swift`
-- Card style: `Dirt/Dirt/UI/Design/CardStyles.swift`
+### Material Glass Design System
+- **Core System**: `Dirt/Dirt/Core/Design/MaterialDesignSystem.swift`
+- **Glass Components**: `Dirt/Dirt/Core/Design/GlassComponents.swift`
+- **Design Tokens**: `Dirt/Dirt/Core/Design/DesignTokens.swift`
+- **Motion System**: `Dirt/Dirt/Core/Design/MotionSystem.swift`
+- **Accessibility**: `Dirt/Dirt/Core/Design/AccessibilitySystem.swift`
+
+The design system provides Material Glass effects with proper accessibility support and dark mode compatibility.
 
 ### Utilities & Moderation
 - Validation + ReportReason: `Dirt/Dirt/Utilities/Validation.swift`
@@ -78,5 +106,35 @@ See `backend/README.md` for setup, env, migrations, RLS, and security. Key Edge 
 3) Deploy Edge Functions: from `backend/functions/`, deploy required functions (`posts-create`, moderation/search/saved-searches, `mentions-process`, `media-process`).
 4) Configure secrets: set Supabase URL and anon key via build settings or xcconfig. Do not commit actual secrets.
 
+## Architecture Documentation
+
+Comprehensive architecture documentation is available in the `docs/` directory:
+
+- **[Coding Standards](docs/CODING_STANDARDS.md)** - Development guidelines and best practices
+- **[Architecture Decisions](docs/architecture/)** - ADRs documenting major design choices
+- **[Dependency Diagrams](docs/architecture/DEPENDENCY_DIAGRAMS.md)** - Visual module relationships
+
+### Component Documentation
+- **[Core Systems](Dirt/Dirt/Core/README.md)** - Service container and core infrastructure
+- **[Design System](Dirt/Dirt/Core/Design/README.md)** - Material Glass components and guidelines
+- **[Navigation](Dirt/Dirt/Core/Navigation/README.md)** - Navigation coordination and routing
+- **[Features](Dirt/Dirt/Features/README.md)** - Feature module organization and patterns
+- **[Shared Components](Dirt/Dirt/Shared/README.md)** - Cross-feature utilities and models
+
 ## Contributing
-PRs welcome. Please keep changes small and documented. Add/update READMEs when creating new modules.
+
+PRs welcome! Please follow our development guidelines:
+
+1. **Read the [Coding Standards](docs/CODING_STANDARDS.md)** before contributing
+2. **Follow feature boundaries** - don't create cross-feature dependencies
+3. **Use Material Glass components** from the design system
+4. **Include accessibility support** in all UI changes
+5. **Add comprehensive tests** for new functionality
+6. **Update documentation** when making architectural changes
+
+### Code Review Checklist
+- [ ] Follows coding standards and architecture patterns
+- [ ] Includes proper Material Glass implementation
+- [ ] Has accessibility support (VoiceOver, Dynamic Type, etc.)
+- [ ] Includes unit tests and integration tests
+- [ ] Updates relevant documentation

@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#endif
 
 struct InviteView: View {
     @State private var referralCode: String = "DIRT-8J2X"

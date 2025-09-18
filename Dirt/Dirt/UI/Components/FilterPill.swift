@@ -15,13 +15,9 @@ struct FilterPill: View {
                 .padding(.horizontal, UISpacing.md)
                 .padding(.vertical, UISpacing.xs)
                 .background(
-                    Group {
-                        if isSelected {
-                            UIGradients.primary
-                        } else {
-                            MaterialDesignSystem.Glass.ultraThin
-                        }
-                    },
+                    isSelected ? 
+                        AnyShapeStyle(UIGradients.primary) : 
+                        AnyShapeStyle(MaterialDesignSystem.Glass.ultraThin),
                     in: Capsule()
                 )
                 .overlay(

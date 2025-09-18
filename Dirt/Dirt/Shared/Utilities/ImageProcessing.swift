@@ -1,4 +1,6 @@
+#if canImport(UIKit)
 import UIKit
+#endif
 import CoreImage
 
 // MARK: - ImageProcessing Utilities

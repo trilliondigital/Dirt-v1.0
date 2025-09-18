@@ -8,31 +8,59 @@ import Combine
 class ServiceContainer: ObservableObject {
     static let shared = ServiceContainer()
     
+    // Track service initialization for performance monitoring
+    private var serviceInitializationTimes: [String: TimeInterval] = [:]
+    private var initializedServices: Set<String> = []
+    
     private init() {}
     
     // MARK: - Core Services
     
     /// Supabase database and authentication manager
-    lazy var supabaseManager = SupabaseManager.shared
+    lazy var supabaseManager: SupabaseManager = {
+        trackServiceInitialization("SupabaseManager")
+        return SupabaseManager.shared
+    }()
     
     /// Error handling and presentation service
-    lazy var errorPresenter = ErrorPresenter.self
+    lazy var errorPresenter: ErrorPresenter.Type = {
+        trackServiceInitialization("ErrorPresenter")
+        return ErrorPresenter.self
+    }()
     
     /// Performance monitoring and caching
-    lazy var performanceService = PerformanceCacheService.shared
+    lazy var performanceService: PerformanceCacheService = {
+        trackServiceInitialization("PerformanceCacheService")
+        return PerformanceCacheService.shared
+    }()
+    
+    /// Performance optimization for Material Glass components
+    lazy var performanceOptimizationService: PerformanceOptimizationService = {
+        trackServiceInitialization("PerformanceOptimizationService")
+        return PerformanceOptimizationService.shared
+    }()
     
     /// Analytics and user behavior tracking
-    lazy var analyticsService = AnalyticsService()
+    lazy var analyticsService: AnalyticsService = {
+        trackServiceInitialization("AnalyticsService")
+        return AnalyticsService()
+    }()
     
     // MARK: - Media Services
     
     /// Media upload and processing service (consolidated from EnhancedMediaService)
-    lazy var mediaService: MediaService = MediaService.shared
+    lazy var mediaService: MediaService = {
+        trackServiceInitialization("MediaService")
+        return MediaService.shared
+    }()
     
     // MARK: - Search Services
     
     /// Search functionality with filtering and caching (consolidated from EnhancedSearchService)
-    lazy var searchService: SearchService = SearchService.shared
+    lazy var searchService: SearchService = {
+        trackServiceInitialization("SearchService")
+        return SearchService.shared
+    }()
     
     // MARK: - Content Services
     
@@ -81,9 +109,6 @@ class ServiceContainer: ObservableObject {
     /// Network monitoring
     lazy var networkMonitor = NetworkMonitor.shared
     
-    /// Network monitoring
-    lazy var networkMonitor = NetworkMonitor.shared
-    
     // MARK: - Service Registration
     
     /// Register a custom service instance
@@ -115,6 +140,7 @@ class ServiceContainer: ObservableObject {
         _ = supabaseManager
         _ = errorPresenter
         _ = performanceService
+        _ = performanceOptimizationService
         _ = analyticsService
     }
     
@@ -122,6 +148,37 @@ class ServiceContainer: ObservableObject {
     func cleanup() {
         // Perform any necessary cleanup
         // Services should handle their own cleanup in deinit
+    }
+    
+    // MARK: - Performance Tracking
+    
+    /// Track service initialization time for performance monitoring
+    private func trackServiceInitialization(_ serviceName: String) {
+        let startTime = CFAbsoluteTimeGetCurrent()
+        
+        // Mark as initialized
+        initializedServices.insert(serviceName)
+        
+        // Record initialization time (this will be updated when service is actually created)
+        DispatchQueue.main.async {
+            let endTime = CFAbsoluteTimeGetCurrent()
+            self.serviceInitializationTimes[serviceName] = endTime - startTime
+        }
+    }
+    
+    /// Get service initialization metrics
+    func getServiceInitializationMetrics() -> [String: TimeInterval] {
+        return serviceInitializationTimes
+    }
+    
+    /// Get list of initialized services
+    func getInitializedServices() -> Set<String> {
+        return initializedServices
+    }
+    
+    /// Get total initialization time for all services
+    func getTotalInitializationTime() -> TimeInterval {
+        return serviceInitializationTimes.values.reduce(0, +)
     }
 }
 

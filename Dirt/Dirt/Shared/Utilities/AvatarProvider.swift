@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#endif
 
 // Centralized helper for sample/filler avatars
 struct AvatarProvider {

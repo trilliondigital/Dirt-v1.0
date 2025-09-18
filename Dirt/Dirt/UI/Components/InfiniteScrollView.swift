@@ -220,15 +220,27 @@ struct SkeletonView: View {
         self.cornerRadius = cornerRadius
     }
     
+    private var shimmerColors: [Color] {
+        #if canImport(UIKit)
+        return [
+            Color(.systemGray5),
+            Color(.systemGray4),
+            Color(.systemGray5)
+        ]
+        #else
+        return [
+            Color.gray.opacity(0.3),
+            Color.gray.opacity(0.4),
+            Color.gray.opacity(0.3)
+        ]
+        #endif
+    }
+    
     var body: some View {
         Rectangle()
             .fill(
                 LinearGradient(
-                    colors: [
-                        Color(.systemGray5),
-                        Color(.systemGray4),
-                        Color(.systemGray5)
-                    ],
+                    colors: shimmerColors,
                     startPoint: .leading,
                     endPoint: .trailing
                 )
@@ -249,6 +261,14 @@ struct SkeletonView: View {
 }
 
 struct PostSkeletonView: View {
+    private var backgroundColor: Color {
+        #if canImport(UIKit)
+        return Color(.systemBackground)
+        #else
+        return Color(NSColor.windowBackgroundColor)
+        #endif
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -276,7 +296,7 @@ struct PostSkeletonView: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(backgroundColor)
         .cornerRadius(12)
     }
 }

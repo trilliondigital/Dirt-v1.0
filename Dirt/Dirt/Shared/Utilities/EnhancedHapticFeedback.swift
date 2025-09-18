@@ -1,4 +1,6 @@
+#if canImport(UIKit)
 import UIKit
+#endif
 import SwiftUI
 
 // MARK: - Legacy HapticFeedback Compatibility
