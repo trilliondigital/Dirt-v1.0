@@ -57,14 +57,14 @@
   - Write tests to verify feed functionality remains intact with new design
   - _Requirements: 2.2, 5.1, 5.3_
 
-- [-] 8. Update Search feature with Material Glass
+- [x] 8. Update Search feature with Material Glass
   - Refactor `SearchView.swift` to use Material Glass components
   - Update search results to use `GlassCard` components
   - Implement Material Glass search bar and filters
   - Write tests to verify search functionality works with consolidated `SearchService`
   - _Requirements: 2.2, 5.1, 5.3_
 
-- [ ] 9. Update CreatePost feature with Material Glass
+- [-] 9. Update CreatePost feature with Material Glass
   - Refactor `CreatePostView.swift` to use Material Glass components
   - Update form elements to use `GlassButton` and Material backgrounds
   - Implement Material Glass modal presentation
