@@ -7,21 +7,21 @@
   - Create database schema and migration files
   - _Requirements: 1.6, 2.1, 3.2, 4.1_
 
-- [ ] 2. Implement authentication and onboarding system
-  - [ ] 2.1 Create phone verification service
+- [x] 2. Implement authentication and onboarding system
+  - [x] 2.1 Create phone verification service
     - Implement phone number validation and SMS verification
     - Create secure phone number hashing for privacy
     - Write unit tests for phone verification flow
     - _Requirements: 1.2, 8.2_
 
-  - [ ] 2.2 Build onboarding flow UI components
+  - [x] 2.2 Build onboarding flow UI components
     - Create welcome screens with app explanation
     - Implement age verification interface (18+ requirement)
     - Build community guidelines acceptance screen
     - Create anonymous username generation system
     - _Requirements: 1.1, 1.3, 1.4, 1.6, 2.1_
 
-  - [ ] 2.3 Implement user session management
+  - [x] 2.3 Implement user session management
     - Create secure token-based authentication
     - Implement automatic session refresh
     - Add logout and account deletion functionality
