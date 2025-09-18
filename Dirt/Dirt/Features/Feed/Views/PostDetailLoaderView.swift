@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PostDetailLoaderView: View {
     let postId: UUID
+    @Environment(\.services) private var services
     @State private var data: PostDetailData?
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -45,7 +46,7 @@ struct PostDetailLoaderView: View {
         isLoading = true
         errorMessage = nil
         do {
-            data = try await PostService.shared.fetchPost(by: postId)
+            data = try await services.postService.fetchPost(by: postId)
             isLoading = false
         } catch {
             errorMessage = "Failed to load post."

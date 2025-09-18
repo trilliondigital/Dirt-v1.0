@@ -3,38 +3,12 @@ import Combine
 import UIKit
 import CoreLocation
 
-// MARK: - BlurView
-struct BlurView: UIViewRepresentable {
-    var style: UIBlurEffect.Style
-    
-    func makeUIView(context: Context) -> UIVisualEffectView {
-        return UIVisualEffectView(effect: UIBlurEffect(style: style))
-    }
-    
-    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
-        uiView.effect = UIBlurEffect(style: style)
-    }
-}
-
 // MARK: - PostRowLink
 private struct PostRowLink: View {
     let post: Post
     var body: some View {
         NavigationLink {
-            PostDetailView(
-                postId: post.id,
-                username: post.username,
-                userInitial: post.userInitial,
-                userColor: post.userColor,
-                timestamp: post.timestamp,
-                content: post.content,
-                imageName: post.imageName,
-                isVerified: post.isVerified,
-                tags: post.tags,
-                upvotes: post.upvotes,
-                comments: post.comments,
-                shares: post.shares
-            )
+            PostDetailLoaderView(postId: post.id)
         } label: {
             PostCard(post: post)
         }
@@ -128,6 +102,7 @@ struct FeedView: View {
     @State private var selectedTab = 0
     @State private var selectedTimeFilter = "Anytime"
     @State private var selectedRadius = "Any"
+    @Environment(\.services) private var services
     @StateObject private var locationManager = LocationManager.shared
     
     let filters = ["Latest", "Trending", "Following", "Nearby"]
@@ -145,21 +120,34 @@ struct FeedView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Custom Tab Bar
-                HStack(spacing: 0) {
-                    TabButton(title: "Feed", isSelected: selectedTab == 0) {
-                        withAnimation { selectedTab = 0 }
+                // Material Glass Navigation Bar
+                GlassNavigationBar(
+                    title: "Feed",
+                    leading: {
+                        Button(action: { showProfile = true }) {
+                            Image(systemName: "person.circle")
+                                .font(.title2)
+                                .foregroundColor(UIColors.label)
+                        }
+                    },
+                    trailing: {
+                        Button(action: { /* Show notifications */ }) {
+                            Image(systemName: "bell")
+                                .font(.title2)
+                                .foregroundColor(UIColors.label)
+                        }
                     }
-                    TabButton(title: "Discover", isSelected: selectedTab == 1) {
-                        withAnimation { selectedTab = 1 }
-                    }
-                    TabButton(title: "Activity", isSelected: selectedTab == 2) {
-                        withAnimation { selectedTab = 2 }
-                    }
-                }
-                .frame(height: 44)
-                .background(Color(.systemBackground))
-                .overlay(Divider(), alignment: .bottom)
+                )
+                
+                // Material Glass Tab Bar
+                GlassTabBar(
+                    selectedTab: $selectedTab,
+                    tabs: [
+                        GlassTabBar.TabItem(title: "Feed", systemImage: "house", selectedSystemImage: "house.fill"),
+                        GlassTabBar.TabItem(title: "Discover", systemImage: "safari", selectedSystemImage: "safari.fill"),
+                        GlassTabBar.TabItem(title: "Activity", systemImage: "bell", selectedSystemImage: "bell.fill")
+                    ]
+                )
                 
                 // Main Content
                 ScrollView {
@@ -211,82 +199,69 @@ struct FeedView: View {
                             onRequestLocation: { locationManager.requestWhenInUse() }
                         )
 
-                        // Header with Search
-                        HStack {
-                            // Profile Button
-                            Button(action: { showProfile = true }) {
-                                Image(systemName: "person.circle")
-                                    .font(.title2)
-                                    .foregroundColor(.primary)
-                            }
-                            
-                            // Search Bar
-                            HStack {
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundColor(.gray)
-                                Text("Search")
-                                    .foregroundColor(.gray)
-                                Spacer()
-                            }
-                            .padding(8)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(10)
-                            .onTapGesture {
+                        // Material Glass Search Bar
+                        GlassSearchBar(
+                            text: .constant(""),
+                            placeholder: "Search posts...",
+                            onSearchButtonClicked: {
                                 showSearch = true
                             }
-                            
-                            // Notifications
-                            Button(action: {
-                                // Show notifications
-                            }) {
-                                Image(systemName: "bell")
-                                    .font(.title2)
-                                    .foregroundColor(.primary)
+                        )
+                        .padding(.horizontal)
+                        .padding(.vertical, UISpacing.xs)
+                        .onTapGesture {
+                            showSearch = true
+                        }
+                        
+                        // Stories/Highlights with Material Glass
+                        GlassCard(
+                            material: MaterialDesignSystem.Glass.ultraThin,
+                            cornerRadius: UICornerRadius.lg,
+                            padding: UISpacing.sm
+                        ) {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: UISpacing.md) {
+                                    // Add Story Button
+                                    VStack(spacing: UISpacing.xs) {
+                                        ZStack(alignment: .bottomTrailing) {
+                                            Circle()
+                                                .fill(MaterialDesignSystem.GlassColors.neutral)
+                                                .frame(width: 70, height: 70)
+                                                .overlay(
+                                                    Image(systemName: "plus.circle.fill")
+                                                        .font(.title2)
+                                                        .foregroundColor(UIColors.accentPrimary)
+                                                )
+                                        }
+                                        Text("Add")
+                                            .font(.caption)
+                                            .foregroundColor(UIColors.label)
+                                    }
+                                    
+                                    // Sample Stories
+                                    ForEach(1...5, id: \.self) { i in
+                                        VStack(spacing: UISpacing.xs) {
+                                            ZStack {
+                                                Circle()
+                                                    .stroke(UIGradients.primary, lineWidth: 2)
+                                                    .frame(width: 70, height: 70)
+                                                    .overlay(
+                                                        AvatarView(index: i - 1, size: 64)
+                                                    )
+                                            }
+                                            Text("User \(i)")
+                                                .font(.caption)
+                                                .foregroundColor(UIColors.label)
+                                                .lineLimit(1)
+                                                .frame(width: 70)
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal, UISpacing.xs)
                             }
                         }
                         .padding(.horizontal)
-                        .padding(.vertical, 8)
-                        
-                        // Stories/Highlights
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 16) {
-                                // Add Story Button
-                                VStack(spacing: 8) {
-                                    ZStack(alignment: .bottomTrailing) {
-                                        Circle()
-                                            .fill(Color(.systemGray6))
-                                            .frame(width: 70, height: 70)
-                                            .overlay(
-                                                Image(systemName: "plus.circle.fill")
-                                                    .font(.title2)
-                                                    .foregroundColor(.blue)
-                                            )
-                                    }
-                                    Text("Add")
-                                        .font(.caption)
-                                }
-                                
-                                // Sample Stories
-                                ForEach(1...5, id: \.self) { i in
-                                    VStack(spacing: 8) {
-                                        ZStack {
-                                            Circle()
-                                                .stroke(LinearGradient(gradient: Gradient(colors: [.red, .orange, .pink]), startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 2)
-                                                .frame(width: 70, height: 70)
-                                                .overlay(
-                                                    AvatarView(index: i - 1, size: 64)
-                                                )
-                                        }
-                                        Text("User \(i)")
-                                            .font(.caption)
-                                            .lineLimit(1)
-                                            .frame(width: 70)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                        .padding(.bottom, 8)
+                        .padding(.bottom, UISpacing.xs)
                         
                         // Filter tabs
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -307,21 +282,27 @@ struct FeedView: View {
                             .padding(.horizontal)
                         }
                         
-                        // Browse Topics entry
+                        // Browse Topics entry with Material Glass
                         HStack {
                             NavigationLink(destination: TopicsView()) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "square.grid.2x2")
-                                        .foregroundColor(.blue)
-                                    Text("Browse Topics")
-                                        .font(.subheadline).bold()
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
+                                GlassCard(
+                                    material: MaterialDesignSystem.Glass.thin,
+                                    cornerRadius: UICornerRadius.md,
+                                    padding: UISpacing.sm
+                                ) {
+                                    HStack(spacing: UISpacing.xs) {
+                                        Image(systemName: "square.grid.2x2")
+                                            .foregroundColor(UIColors.accentPrimary)
+                                        Text("Browse Topics")
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(UIColors.label)
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundColor(UIColors.secondaryLabel)
+                                    }
                                 }
-                                .padding(10)
-                                .background(Color(.systemGray6))
-                                .cornerRadius(10)
                             }
                             Spacer()
                         }
@@ -364,14 +345,22 @@ struct FeedView: View {
                             Spacer()
                             Button(action: {
                                 showNewPostView = true
+                                HapticFeedback.impact(style: .medium)
                             }) {
                                 Image(systemName: "plus")
                                     .font(.title2.weight(.bold))
                                     .foregroundColor(.white)
                                     .frame(width: 56, height: 56)
-                                    .background(LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing))
-                                    .clipShape(Circle())
-                                    .shadow(radius: 5)
+                                    .background(MaterialDesignSystem.Context.floatingAction, in: Circle())
+                                    .overlay(
+                                        Circle()
+                                            .fill(UIGradients.primary)
+                                    )
+                                    .overlay(
+                                        Circle()
+                                            .stroke(MaterialDesignSystem.GlassBorders.prominent, lineWidth: 1)
+                                    )
+                                    .shadow(color: MaterialDesignSystem.GlassShadows.strong, radius: 12, x: 0, y: 6)
                                     .padding()
                             }
                         }
@@ -466,31 +455,106 @@ struct PostCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Header
-            HStack(alignment: .top, spacing: 12) {
-                // User Avatar with tap gesture for profile
+            // Header with Material Glass styling
+            HStack(alignment: .top, spacing: UISpacing.sm) {
+                // User Avatar with Material Glass effect
                 NavigationLink(destination: ProfileView()) {
                     ZStack {
                         Circle()
-                            .fill(post.userColor.opacity(0.2))
+                            .fill(MaterialDesignSystem.Glass.ultraThin)
+                            .overlay(
+                                Circle()
+                                    .fill(post.userColor.opacity(0.2))
+                            )
                             .frame(width: 42, height: 42)
                             .overlay(
                                 Text(post.userInitial)
                                     .font(.headline)
+                                    .fontWeight(.semibold)
                                     .foregroundColor(post.userColor)
+                            )
+                            .overlay(
+                                Circle()
+                                    .stroke(MaterialDesignSystem.GlassBorders.subtle, lineWidth: 1)
                             )
                     }
                 }
+                
+                // User info
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Text(post.username)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(UIColors.label)
+                        
+                        if post.isVerified {
+                            Image(systemName: "checkmark.seal.fill")
+                                .foregroundColor(UIColors.accentPrimary)
+                                .font(.caption)
+                        }
+                    }
+                    
+                    Text(post.timestamp)
+                        .font(.caption)
+                        .foregroundColor(UIColors.secondaryLabel)
+                }
+                
+                Spacer()
             }
-            .padding(.horizontal)
+            .padding(.horizontal, UISpacing.md)
+            .padding(.top, UISpacing.md)
             
-            // Action Buttons
-            HStack(spacing: 20) {
+            // Content
+            VStack(alignment: .leading, spacing: UISpacing.sm) {
+                Text(post.content)
+                    .font(.body)
+                    .foregroundColor(UIColors.label)
+                    .multilineTextAlignment(.leading)
+                
+                // Image if present
+                if let imageName = post.imageName {
+                    Image(imageName)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(maxHeight: 200)
+                        .clipped()
+                        .cornerRadius(UICornerRadius.md)
+                }
+                
+                // Tags with Material Glass styling
+                if !post.tags.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: UISpacing.xs) {
+                            ForEach(post.tags, id: \.self) { tag in
+                                Text(tag)
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(UIColors.label)
+                                    .padding(.horizontal, UISpacing.xs)
+                                    .padding(.vertical, 4)
+                                    .background(MaterialDesignSystem.Glass.ultraThin, in: Capsule())
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(MaterialDesignSystem.GlassBorders.subtle, lineWidth: 0.5)
+                                    )
+                            }
+                        }
+                        .padding(.horizontal, 2)
+                    }
+                }
+            }
+            .padding(.horizontal, UISpacing.md)
+            
+            // Action Buttons with Material Glass styling
+            HStack(spacing: UISpacing.md) {
+                // Like button
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         isHelpful.toggle()
                         HapticFeedback.impact(style: .light)
-                        AnalyticsService.shared.log("helpful_toggled", [
+                        services.analyticsService.trackUserAction("helpful_toggled", parameters: [
                             "post_id": post.id.uuidString,
                             "value": isHelpful ? "1" : "0"
                         ])
@@ -499,51 +563,74 @@ struct PostCard: View {
                     HStack(spacing: 4) {
                         Image(systemName: isHelpful ? "hand.thumbsup.fill" : "hand.thumbsup")
                             .symbolEffect(.bounce, value: isHelpful)
-                            .font(.title3)
-                            .foregroundColor(isHelpful ? .blue : .primary)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(isHelpful ? UIColors.accentPrimary : UIColors.label)
                         Text(formatNumber(post.upvotes))
                             .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(UIColors.label)
                     }
+                    .padding(.horizontal, UISpacing.sm)
+                    .padding(.vertical, UISpacing.xs)
+                    .background(
+                        isHelpful ? MaterialDesignSystem.GlassColors.primary : MaterialDesignSystem.Glass.ultraThin,
+                        in: Capsule()
+                    )
+                    .overlay(
+                        Capsule()
+                            .stroke(
+                                isHelpful ? MaterialDesignSystem.GlassBorders.accent : MaterialDesignSystem.GlassBorders.subtle,
+                                lineWidth: 1
+                            )
+                    )
                 }
                 
+                // Comments button
                 Button(action: {
                     showComments = true
                     HapticFeedback.impact(style: .light)
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "bubble.left")
-                            .font(.title3)
+                            .font(.system(size: 16, weight: .medium))
                         Text(formatNumber(post.comments))
                             .font(.subheadline)
+                            .fontWeight(.medium)
                     }
+                    .foregroundColor(UIColors.label)
+                    .padding(.horizontal, UISpacing.sm)
+                    .padding(.vertical, UISpacing.xs)
+                    .background(MaterialDesignSystem.Glass.ultraThin, in: Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(MaterialDesignSystem.GlassBorders.subtle, lineWidth: 1)
+                    )
                 }
                 
+                // Share button
                 Button(action: {
-                    // Share action
                     HapticFeedback.impact(style: .light)
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "arrowshape.turn.up.right")
-                            .font(.title3)
+                            .font(.system(size: 16, weight: .medium))
                         Text("Share")
                             .font(.subheadline)
+                            .fontWeight(.medium)
                     }
-                }
-
-                Button(action: {
-                    showReportSheet = true
-                    HapticFeedback.impact(style: .light)
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "flag")
-                            .font(.title3)
-                        Text("Report")
-                            .font(.subheadline)
-                    }
+                    .foregroundColor(UIColors.label)
+                    .padding(.horizontal, UISpacing.sm)
+                    .padding(.vertical, UISpacing.xs)
+                    .background(MaterialDesignSystem.Glass.ultraThin, in: Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(MaterialDesignSystem.GlassBorders.subtle, lineWidth: 1)
+                    )
                 }
                 
                 Spacer()
                 
+                // Bookmark button
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         isBookmarked.toggle()
@@ -552,21 +639,34 @@ struct PostCard: View {
                 }) {
                     Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                         .symbolEffect(.bounce, value: isBookmarked)
-                        .font(.title3)
-                        .foregroundColor(isBookmarked ? .blue : .primary)
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(isBookmarked ? UIColors.accentPrimary : UIColors.label)
+                        .frame(width: 32, height: 32)
+                        .background(
+                            isBookmarked ? MaterialDesignSystem.GlassColors.primary : MaterialDesignSystem.Glass.ultraThin,
+                            in: Circle()
+                        )
+                        .overlay(
+                            Circle()
+                                .stroke(
+                                    isBookmarked ? MaterialDesignSystem.GlassBorders.accent : MaterialDesignSystem.GlassBorders.subtle,
+                                    lineWidth: 1
+                                )
+                        )
                 }
-                .frame(width: 24, height: 24)
-                .padding(8)
-                .contentShape(Rectangle())
             }
-            .buttonStyle(ScaleButtonStyle())
-            .foregroundColor(.primary)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .buttonStyle(PlainButtonStyle())
+            .padding(.horizontal, UISpacing.md)
+            .padding(.bottom, UISpacing.md)
         }
-        .cardBackground()
-        .padding(.horizontal, 8)
-        .padding(.vertical, 8)
+        .glassCard(
+            material: MaterialDesignSystem.Context.card,
+            cornerRadius: UICornerRadius.lg,
+            shadowColor: MaterialDesignSystem.GlassShadows.soft,
+            shadowRadius: 8
+        )
+        .padding(.horizontal, UISpacing.xs)
+        .padding(.vertical, UISpacing.xs)
         .opacity(isSoftHidden ? 0.4 : 1.0)
         .contextMenu {
             Button(action: {
@@ -697,11 +797,20 @@ private struct TagPill: View {
             }
         }
         .font(.footnote.weight(.medium))
-        .foregroundColor(on ? .blue : .primary)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(on ? Color.blue.opacity(0.15) : Color(.systemGray6))
-        .cornerRadius(16)
+        .foregroundColor(on ? UIColors.accentPrimary : UIColors.label)
+        .padding(.horizontal, UISpacing.sm)
+        .padding(.vertical, UISpacing.xs)
+        .background(
+            on ? MaterialDesignSystem.GlassColors.primary : MaterialDesignSystem.Glass.ultraThin,
+            in: Capsule()
+        )
+        .overlay(
+            Capsule()
+                .stroke(
+                    on ? MaterialDesignSystem.GlassBorders.accent : MaterialDesignSystem.GlassBorders.subtle,
+                    lineWidth: 1
+                )
+        )
     }
 }
 
@@ -750,10 +859,14 @@ private struct RadiusFiltersRow: View {
                     Button(action: { onRequestLocation() }) {
                         Label("Enable Location", systemImage: "location")
                             .font(.subheadline.weight(.semibold))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(16)
+                            .foregroundColor(UIColors.accentPrimary)
+                            .padding(.horizontal, UISpacing.sm)
+                            .padding(.vertical, UISpacing.xs)
+                            .background(MaterialDesignSystem.Glass.thin, in: Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(MaterialDesignSystem.GlassBorders.accent, lineWidth: 1)
+                            )
                     }
                 }
             }
@@ -762,79 +875,7 @@ private struct RadiusFiltersRow: View {
     }
 }
 
-// MARK: - TabButton
-struct TabButton: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 4) {
-                Text(title)
-                    .font(.subheadline)
-                    .fontWeight(isSelected ? .semibold : .regular)
-                    .foregroundColor(isSelected ? .primary : .secondary)
-                
-                if isSelected {
-                    Capsule()
-                        .fill(Color.blue)
-                        .frame(width: 30, height: 3)
-                        .transition(.scale.combined(with: .opacity))
-                } else {
-                    Capsule()
-                        .fill(Color.clear)
-                        .frame(width: 30, height: 3)
-                }
-            }
-            .frame(maxWidth: .infinity)
-        }
-    }
-}
 
-// MARK: - FilterPill
-struct FilterPill: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(isSelected ? .white : .primary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            isSelected ?
-                                AnyShapeStyle(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [.blue, .purple]),
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                ) :
-                                AnyShapeStyle(Color(.systemGray6))
-                        )
-                )
-                .cornerRadius(20)
-                .animation(.easeInOut, value: isSelected)
-        }
-        .buttonStyle(ScaleButtonStyle())
-    }
-}
-
-// MARK: - ScaleButtonStyle
-struct ScaleButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: configuration.isPressed)
-    }
-}
 
 // Haptics provided by shared utility in `Dirt/Dirt/Utilities/HapticFeedback.swift`
 

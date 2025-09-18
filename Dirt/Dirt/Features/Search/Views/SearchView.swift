@@ -16,104 +16,116 @@ struct SearchView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Search Bar
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.gray)
-                    
-                    TextField("Search posts, tags, users...", text: $searchText)
-                        .textFieldStyle(PlainTextFieldStyle())
-                    
-                    if !searchText.isEmpty {
-                        Button(action: {
-                            searchText = ""
-                        }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.gray)
-                        }
+                // Material Glass Search Bar
+                GlassSearchBar(
+                    text: $searchText,
+                    placeholder: "Search posts, tags, users...",
+                    onSearchButtonClicked: {
+                        triggerSearch(immediate: true)
                     }
-                }
-                .padding(10)
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
-                .padding(.horizontal)
-                .padding(.top, 8)
+                )
+                .padding(.horizontal, UISpacing.md)
+                .padding(.top, UISpacing.sm)
                 
-                // Typeahead Suggestions
+                // Material Glass Typeahead Suggestions
                 if !searchText.isEmpty {
                     let q = searchText.lowercased()
                     let matches = (tagSuggestions + savedSearches)
                         .filter { $0.lowercased().contains(q) }
                         .prefix(5)
                     if !matches.isEmpty {
-                        VStack(spacing: 0) {
-                            ForEach(Array(matches), id: \.self) { item in
-                                Button(action: { searchText = item }) {
-                                    HStack {
-                                        Image(systemName: "text.magnifyingglass")
-                                            .foregroundColor(.gray)
-                                        Text(item)
-                                            .foregroundColor(.primary)
-                                        Spacer()
+                        GlassCard(
+                            material: MaterialDesignSystem.Glass.thin,
+                            cornerRadius: UICornerRadius.md,
+                            padding: 0
+                        ) {
+                            VStack(spacing: 0) {
+                                ForEach(Array(matches), id: \.self) { item in
+                                    Button(action: { 
+                                        searchText = item
+                                        triggerSearch(immediate: true)
+                                    }) {
+                                        HStack(spacing: UISpacing.sm) {
+                                            Image(systemName: "text.magnifyingglass")
+                                                .foregroundColor(UIColors.secondaryLabel)
+                                                .font(.system(size: 14))
+                                            Text(item)
+                                                .foregroundColor(UIColors.label)
+                                                .font(.system(size: 15))
+                                            Spacer()
+                                        }
+                                        .padding(.horizontal, UISpacing.md)
+                                        .padding(.vertical, UISpacing.sm)
                                     }
-                                    .padding(10)
+                                    .buttonStyle(PlainButtonStyle())
+                                    
+                                    if item != matches.last {
+                                        Divider()
+                                            .background(MaterialDesignSystem.GlassBorders.subtle)
+                                    }
                                 }
-                                Divider()
                             }
                         }
-                        .background(Color(.systemBackground))
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                        .padding(.top, 6)
+                        .padding(.horizontal, UISpacing.md)
+                        .padding(.top, UISpacing.xs)
                     }
                 }
 
-                // Filter Tabs
+                // Material Glass Filter Tabs
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 16) {
+                    HStack(spacing: UISpacing.sm) {
                         ForEach(filters, id: \.self) { filter in
                             Button(action: {
                                 selectedFilter = filter
                                 triggerSearch()
                             }) {
                                 Text(filter)
-                                    .font(.subheadline)
-                                    .fontWeight(selectedFilter == filter ? .semibold : .regular)
-                                    .foregroundColor(selectedFilter == filter ? .blue : .gray)
-                                    .padding(.vertical, 8)
-                                    .padding(.horizontal, 12)
-                                    .background(
-                                        selectedFilter == filter ?
-                                            Color.blue.opacity(0.1) :
-                                            Color.clear
-                                    )
-                                    .cornerRadius(12)
+                                    .font(.system(size: 14, weight: selectedFilter == filter ? .semibold : .medium))
+                                    .foregroundColor(selectedFilter == filter ? UIColors.accentPrimary : UIColors.secondaryLabel)
+                                    .padding(.vertical, UISpacing.xs)
+                                    .padding(.horizontal, UISpacing.sm)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .glassButton(
+                                material: selectedFilter == filter ? MaterialDesignSystem.Glass.regular : MaterialDesignSystem.Glass.ultraThin,
+                                cornerRadius: UICornerRadius.sm
+                            )
+                            .overlay(
+                                selectedFilter == filter ?
+                                    RoundedRectangle(cornerRadius: UICornerRadius.sm)
+                                        .fill(MaterialDesignSystem.GlassColors.primary) : nil
+                            )
+                        }
+                    }
+                    .padding(.horizontal, UISpacing.md)
+                    .padding(.vertical, UISpacing.sm)
+                }
+                
+                // Material Glass Lookup Entry
+                HStack {
+                    NavigationLink(destination: LookupWizardView()) {
+                        GlassCard(
+                            material: MaterialDesignSystem.Glass.thin,
+                            cornerRadius: UICornerRadius.md,
+                            padding: UISpacing.sm
+                        ) {
+                            HStack(spacing: UISpacing.xs) {
+                                Image(systemName: "person.text.rectangle")
+                                    .foregroundColor(UIColors.accentPrimary)
+                                    .font(.system(size: 16, weight: .medium))
+                                Text("Start a Lookup")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(UIColors.label)
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(UIColors.secondaryLabel)
                             }
                         }
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                }
-                
-                // Lookup entry
-                HStack {
-                    NavigationLink(destination: LookupWizardView()) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "person.text.rectangle")
-                                .foregroundColor(.blue)
-                            Text("Start a Lookup")
-                                .font(.subheadline).bold()
-                            Image(systemName: "chevron.right")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(10)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                    }
+                    .buttonStyle(PlainButtonStyle())
                     Spacer()
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, UISpacing.md)
                 
                 // Search Results or Placeholder
                 if searchText.isEmpty {
@@ -128,33 +140,41 @@ struct SearchView: View {
                             .font(.headline)
                             .foregroundColor(.gray)
                         
-                        // Saved Searches
+                        // Material Glass Saved Searches
                         if !savedSearches.isEmpty {
-                            VStack(alignment: .leading, spacing: 8) {
+                            VStack(alignment: .leading, spacing: UISpacing.sm) {
                                 HStack {
                                     Text("Saved searches")
-                                        .font(.subheadline).bold()
-                                        .foregroundColor(.primary)
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundColor(UIColors.label)
                                     Spacer()
                                 }
-                                .padding(.horizontal)
+                                .padding(.horizontal, UISpacing.md)
                                 
                                 ForEach(savedSearches, id: \.self) { item in
-                                    HStack {
-                                        Button(action: { searchText = item }) {
-                                            HStack(spacing: 8) {
+                                    Button(action: { 
+                                        searchText = item
+                                        triggerSearch(immediate: true)
+                                    }) {
+                                        GlassCard(
+                                            material: MaterialDesignSystem.Glass.thin,
+                                            cornerRadius: UICornerRadius.md,
+                                            padding: UISpacing.md
+                                        ) {
+                                            HStack(spacing: UISpacing.sm) {
                                                 Image(systemName: "bookmark")
-                                                    .foregroundColor(.blue)
+                                                    .foregroundColor(UIColors.accentPrimary)
+                                                    .font(.system(size: 16, weight: .medium))
                                                 Text(item)
-                                                    .foregroundColor(.primary)
+                                                    .foregroundColor(UIColors.label)
+                                                    .font(.system(size: 15))
                                                     .lineLimit(1)
                                                 Spacer()
                                             }
-                                            .padding()
-                                            .cardBackground()
                                         }
                                     }
-                                    .padding(.horizontal)
+                                    .buttonStyle(PlainButtonStyle())
+                                    .padding(.horizontal, UISpacing.md)
                                     .contextMenu {
                                         Button(role: .destructive) {
                                             if let idx = savedSearches.firstIndex(of: item) {
@@ -167,7 +187,7 @@ struct SearchView: View {
                                         .onTapGesture {
                                             Task {
                                                 do {
-                                                    try await SavedSearchService.shared.delete(query: item)
+                                                    try await services.searchService.deleteLegacySearch(query: item)
                                                     savedSearches.removeAll { $0 == item }
                                                     HapticFeedback.impact(style: .light)
                                                     toastCenter.show(.success, NSLocalizedString("Deleted saved search", comment: ""))
@@ -182,31 +202,39 @@ struct SearchView: View {
                             }
                         }
                         
-                        VStack(alignment: .leading, spacing: 12) {
+                        VStack(alignment: .leading, spacing: UISpacing.sm) {
                             Text("Try searching for:")
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                                .padding(.horizontal)
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(UIColors.secondaryLabel)
+                                .padding(.horizontal, UISpacing.md)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             
                             ForEach(["#ghosting", "#redflag", "#greendate", "@username"], id: \.self) { suggestion in
                                 Button(action: {
                                     searchText = suggestion
+                                    triggerSearch(immediate: true)
                                 }) {
-                                    HStack {
-                                        Text(suggestion)
-                                            .foregroundColor(.primary)
-                                        Spacer()
-                                        Image(systemName: "arrow.up.left")
-                                            .foregroundColor(.gray)
+                                    GlassCard(
+                                        material: MaterialDesignSystem.Glass.thin,
+                                        cornerRadius: UICornerRadius.md,
+                                        padding: UISpacing.md
+                                    ) {
+                                        HStack {
+                                            Text(suggestion)
+                                                .foregroundColor(UIColors.label)
+                                                .font(.system(size: 15))
+                                            Spacer()
+                                            Image(systemName: "arrow.up.left")
+                                                .foregroundColor(UIColors.secondaryLabel)
+                                                .font(.system(size: 14))
+                                        }
                                     }
-                                    .padding()
-                                    .cardBackground()
-                                    .padding(.horizontal)
                                 }
+                                .buttonStyle(PlainButtonStyle())
+                                .padding(.horizontal, UISpacing.md)
                             }
                         }
-                        .padding(.top, 20)
+                        .padding(.top, UISpacing.lg)
                         
                         Spacer()
                     }
@@ -249,14 +277,18 @@ struct SearchView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if !searchText.isEmpty {
-                        Button("Save") {
+                        GlassButton(
+                            "Save",
+                            systemImage: "bookmark",
+                            style: .secondary
+                        ) {
                             let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
                             guard !trimmed.isEmpty else { return }
                             Task {
                                 do {
-                                    try await SavedSearchService.shared.save(query: trimmed)
+                                    try await services.searchService.saveLegacySearch(query: trimmed)
                                     // refresh list
-                                    savedSearches = try await SavedSearchService.shared.list()
+                                    savedSearches = try await services.searchService.listSavedSearchQueries()
                                     HapticFeedback.notification(type: .success)
                                     toastCenter.show(.success, NSLocalizedString("Saved search", comment: ""))
                                 } catch {
@@ -268,11 +300,11 @@ struct SearchView: View {
                     }
                 }
             }
-            .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all))
+            .background(MaterialDesignSystem.Glass.ultraThin.ignoresSafeArea())
             .onChange(of: searchText) { triggerSearch() }
             .task {
                 // Load saved searches on first appear
-                do { savedSearches = try await SavedSearchService.shared.list() } catch { }
+                do { savedSearches = try await services.searchService.listSavedSearchQueries() } catch { }
             }
         }
     }
@@ -320,40 +352,55 @@ extension SearchView {
     }
 }
 
-// MARK: - Result Row
+// MARK: - Material Glass Result Row
 struct SearchResultRow: View {
     let result: SearchResult
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(result.title)
-                    .font(.subheadline).fontWeight(.semibold)
-                Spacer()
-                Text(String(format: "%.0f", result.score * 100))
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-            Text(result.snippet)
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .lineLimit(3)
-            if !result.tags.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        ForEach(result.tags, id: \.self) { t in
-                            Text(t)
-                                .font(.caption2)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color(.systemGray6))
-                                .cornerRadius(10)
+        GlassCard(
+            material: MaterialDesignSystem.Context.card,
+            cornerRadius: UICornerRadius.lg,
+            padding: UISpacing.md
+        ) {
+            VStack(alignment: .leading, spacing: UISpacing.sm) {
+                HStack {
+                    Text(result.title)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(UIColors.label)
+                    Spacer()
+                    Text(String(format: "%.0f%%", result.score * 100))
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(UIColors.secondaryLabel)
+                        .padding(.horizontal, UISpacing.xs)
+                        .padding(.vertical, 2)
+                        .background(MaterialDesignSystem.Glass.ultraThin, in: RoundedRectangle(cornerRadius: UICornerRadius.xs))
+                }
+                
+                Text(result.snippet)
+                    .font(.system(size: 14))
+                    .foregroundColor(UIColors.secondaryLabel)
+                    .lineLimit(3)
+                
+                if !result.tags.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: UISpacing.xs) {
+                            ForEach(result.tags, id: \.self) { tag in
+                                Text(tag)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(UIColors.accentPrimary)
+                                    .padding(.horizontal, UISpacing.xs)
+                                    .padding(.vertical, 4)
+                                    .background(MaterialDesignSystem.Glass.ultraThin, in: RoundedRectangle(cornerRadius: UICornerRadius.xs))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: UICornerRadius.xs)
+                                            .fill(MaterialDesignSystem.GlassColors.primary)
+                                    )
+                            }
                         }
                     }
                 }
             }
         }
-        .padding()
-        .cardBackground()
     }
 }
 

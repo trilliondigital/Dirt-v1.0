@@ -3,6 +3,7 @@ import SwiftUI
 struct CreatePostView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject private var toastCenter: ToastCenter
+    @Environment(\.services) private var services
     @State private var postText: String = ""
     @State private var selectedImage: UIImage?
     @State private var isImageRevealed: Bool = false
@@ -199,7 +200,7 @@ struct CreatePostView: View {
                         let tags = selectedTags.map { $0.rawValue }
                         Task {
                             do {
-                                try await PostSubmissionService.shared.createPost(content: trimmed, flag: flag, tags: tags, anonymous: isAnonymous)
+                                try await services.postSubmissionService.createPost(content: trimmed, flag: flag, tags: tags, anonymous: isAnonymous)
                                 HapticFeedback.notification(type: .success)
                                 toastCenter.show(.success, NSLocalizedString("Posted", comment: ""))
                                 presentationMode.wrappedValue.dismiss()

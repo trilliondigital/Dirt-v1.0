@@ -4,6 +4,7 @@ import AuthenticationServices
 struct OnboardingView: View {
     @EnvironmentObject private var supabase: SupabaseManager
     @EnvironmentObject private var toastCenter: ToastCenter
+    @Environment(\.services) private var services
     @State private var page = 0
     @State private var email: String = ""
     @State private var showDone = false
@@ -36,7 +37,7 @@ struct OnboardingView: View {
                         } else {
                             Task {
                                 do {
-                                    try await InterestsService.shared.save(interests: Array(selectedInterests).map { $0.rawValue })
+                                    try await services.interestsService.save(interests: Array(selectedInterests).map { $0.rawValue })
                                 } catch {
                                     // non-fatal
                                 }

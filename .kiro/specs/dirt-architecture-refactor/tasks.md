@@ -36,28 +36,28 @@
   - Write integration tests to verify service consolidation works correctly
   - _Requirements: 6.1, 6.3_
 
-- [-] 5. Implement service dependency injection
+- [x] 5. Implement service dependency injection
   - Create `ServiceContainer` class with lazy-loaded service instances
   - Implement environment key pattern for service injection throughout the app
   - Update existing view models to use injected services instead of direct instantiation
   - Write tests for dependency injection functionality
   - _Requirements: 3.2, 6.2_
 
-- [ ] 6. Create Material Glass base components
+- [x] 6. Create Material Glass base components
   - Implement `GlassCard` component with proper Material background and styling
   - Create `GlassButton` component with Material Glass effects
   - Implement `GlassNavigationBar` and `GlassTabBar` components
   - Write UI tests for Material Glass component rendering and accessibility
   - _Requirements: 2.1, 2.3, 7.1_
 
-- [ ] 7. Update Feed feature with Material Glass
+- [x] 7. Update Feed feature with Material Glass
   - Refactor `FeedView.swift` to use Material Glass components
   - Update feed cards to use `GlassCard` component
   - Implement Material Glass navigation bar in feed
   - Write tests to verify feed functionality remains intact with new design
   - _Requirements: 2.2, 5.1, 5.3_
 
-- [ ] 8. Update Search feature with Material Glass
+- [-] 8. Update Search feature with Material Glass
   - Refactor `SearchView.swift` to use Material Glass components
   - Update search results to use `GlassCard` components
   - Implement Material Glass search bar and filters

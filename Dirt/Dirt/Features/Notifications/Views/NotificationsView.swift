@@ -62,6 +62,7 @@ struct NotificationsView: View {
         "Austin": false
     ]
     @State private var alertsStatus: AlertsService.AuthorizationStatus = .notDetermined
+    @Environment(\.services) private var services
     
     var body: some View {
         NavigationView {
@@ -82,7 +83,7 @@ struct NotificationsView: View {
                         }
                         Spacer()
                         Button(NSLocalizedString("Enable", comment: "")) {
-                            Task { alertsStatus = await AlertsService.shared.requestAuthorization() }
+                            Task { alertsStatus = await services.alertsService.requestAuthorization() }
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -167,7 +168,7 @@ struct NotificationsView: View {
                 }
             }
             .task {
-                alertsStatus = await AlertsService.shared.currentStatus()
+                alertsStatus = await services.alertsService.currentStatus()
             }
         }
     }

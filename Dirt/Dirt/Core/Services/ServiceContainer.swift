@@ -81,6 +81,9 @@ class ServiceContainer: ObservableObject {
     /// Network monitoring
     lazy var networkMonitor = NetworkMonitor.shared
     
+    /// Network monitoring
+    lazy var networkMonitor = NetworkMonitor.shared
+    
     // MARK: - Service Registration
     
     /// Register a custom service instance
