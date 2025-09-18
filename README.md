@@ -110,6 +110,9 @@ See `backend/README.md` for setup, env, migrations, RLS, and security. Key Edge 
 
 Comprehensive architecture documentation is available in the `docs/` directory:
 
+- **[Development Roadmap](docs/DEVELOPMENT_ROADMAP.md)** - Implementation plan for PLAN.md milestones M1-M5
+- **[Feature Development Guide](docs/FEATURE_DEVELOPMENT_GUIDE.md)** - Step-by-step guide for adding new features
+- **[Architecture Governance](docs/ARCHITECTURE_GOVERNANCE.md)** - Process for maintaining architectural consistency
 - **[Coding Standards](docs/CODING_STANDARDS.md)** - Development guidelines and best practices
 - **[Architecture Decisions](docs/architecture/)** - ADRs documenting major design choices
 - **[Dependency Diagrams](docs/architecture/DEPENDENCY_DIAGRAMS.md)** - Visual module relationships
