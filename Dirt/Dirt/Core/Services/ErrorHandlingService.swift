@@ -262,47 +262,7 @@ enum StorageError: LocalizedError {
     }
 }
 
-enum MediaError: LocalizedError {
-    case compressionFailed
-    case uploadFailed
-    case invalidFile
-    case fileTooLarge
-    
-    var errorDescription: String? {
-        switch self {
-        case .compressionFailed:
-            return "Failed to compress image"
-        case .uploadFailed:
-            return "Failed to upload file"
-        case .invalidFile:
-            return "Invalid file format"
-        case .fileTooLarge:
-            return "File is too large"
-        }
-    }
-    
-    var recoverySuggestion: String? {
-        switch self {
-        case .compressionFailed:
-            return "Try again with a different image"
-        case .uploadFailed:
-            return "Check your connection and try again"
-        case .invalidFile:
-            return "Please select a valid file"
-        case .fileTooLarge:
-            return "Please select a smaller file"
-        }
-    }
-    
-    var isRetryable: Bool {
-        switch self {
-        case .compressionFailed, .invalidFile, .fileTooLarge:
-            return false
-        case .uploadFailed:
-            return true
-        }
-    }
-}
+// MediaError is defined in Services/MediaService.swift
 
 // MARK: - Error Boundary
 
@@ -457,87 +417,10 @@ struct ErrorRecoveryStrategy {
     let description: String
 }
 
-@MainActor
-class ErrorRecoveryService: ObservableObject {
-    static let shared = ErrorRecoveryService()
-    
-    private let strategies: [ErrorRecoveryStrategy] = [
-        ErrorRecoveryStrategy(
-            canRecover: { error in
-                if case .network(.noConnection) = error { return true }
-                return false
-            },
-            recover: { _ in
-                // Wait for network connection
-                try? await Task.sleep(nanoseconds: 2_000_000_000)
-                return NetworkMonitor.shared.isConnected
-            },
-            description: "Waiting for network connection"
-        ),
-        ErrorRecoveryStrategy(
-            canRecover: { error in
-                if case .authentication(.sessionExpired) = error { return true }
-                return false
-            },
-            recover: { _ in
-                // Attempt to refresh session
-                do {
-                    try await SupabaseManager.shared.signOut()
-                    return false // Require user to sign in again
-                } catch {
-                    return false
-                }
-            },
-            description: "Refreshing authentication"
-        )
-    ]
-    
-    private init() {}
-    
-    func attemptRecovery(for error: AppError) async -> Bool {
-        for strategy in strategies {
-            if strategy.canRecover(error) {
-                return await strategy.recover(error)
-            }
-        }
-        return false
-    }
-    
-    func getRecoveryDescription(for error: AppError) -> String? {
-        return strategies.first { $0.canRecover(error) }?.description
-    }
-}
+// ErrorRecoveryService is defined in Services/ErrorRecoveryService.swift
 
 // MARK: - Network Monitor
-
-@MainActor
-class NetworkMonitor: ObservableObject {
-    static let shared = NetworkMonitor()
-    
-    @Published var isConnected = true
-    @Published var connectionType: ConnectionType = .wifi
-    
-    enum ConnectionType {
-        case wifi
-        case cellular
-        case none
-    }
-    
-    private init() {
-        // In a real implementation, you would use Network framework
-        // For now, we'll simulate network monitoring
-        startMonitoring()
-    }
-    
-    private func startMonitoring() {
-        Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { _ in
-            Task { @MainActor in
-                // Simulate network status check
-                self.isConnected = Bool.random() ? true : true // Mostly connected
-            }
-        }
-    }
-}
+// NetworkMonitor is defined in Core/Services/NetworkMonitor.swift
 
 // MARK: - Error UI Components
 

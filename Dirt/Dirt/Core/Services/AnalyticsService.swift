@@ -134,7 +134,7 @@ final class AnalyticsService: ObservableObject {
         }
     }
     
-    private init() {
+    init() {
         isEnabled = UserDefaults.standard.object(forKey: "analyticsEnabled") as? Bool ?? true
         loadUserProperties()
         startSession()

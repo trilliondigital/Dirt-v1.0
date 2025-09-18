@@ -483,22 +483,4 @@ private struct VideoPlayerView: View {
 }
 
 // MARK: - Placeholder Views for Navigation Destinations
-
-private struct PostDetailView: View {
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: UISpacing.md) {
-                Text("Post Detail View")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                
-                Text("This is a placeholder for the post detail view.")
-                    .foregroundColor(.secondary)
-                
-                Spacer(minLength: 100)
-            }
-            .padding()
-        }
-        .background(UIColors.background)
-    }
-}
+// PostDetailView is defined in Features/Feed/Views/PostDetailView.swift

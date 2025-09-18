@@ -33,6 +33,7 @@ struct AppColors {
     static let primaryDark = Color(red: 0.4, green: 0.78, blue: 1.0)
     
     // Background Colors
+    #if canImport(UIKit)
     static let backgroundLight = Color(.systemBackground)
     static let backgroundDark = Color(.systemBackground)
     
@@ -53,6 +54,29 @@ struct AppColors {
     // Card Colors
     static let cardLight = Color(.systemBackground)
     static let cardDark = Color(.systemBackground)
+    #else
+    // macOS fallbacks
+    static let backgroundLight = Color(.windowBackground)
+    static let backgroundDark = Color(.windowBackground)
+    
+    static let secondaryBackgroundLight = Color(.controlBackground)
+    static let secondaryBackgroundDark = Color(.controlBackground)
+    
+    // Text Colors
+    static let textPrimaryLight = Color(.labelColor)
+    static let textPrimaryDark = Color(.labelColor)
+    
+    static let textSecondaryLight = Color(.secondaryLabelColor)
+    static let textSecondaryDark = Color(.secondaryLabelColor)
+    
+    // Border Colors
+    static let borderLight = Color(.separatorColor)
+    static let borderDark = Color(.separatorColor)
+    
+    // Card Colors
+    static let cardLight = Color(.controlBackgroundColor)
+    static let cardDark = Color(.controlBackgroundColor)
+    #endif
     
     // Success/Error Colors
     static let success = Color.green

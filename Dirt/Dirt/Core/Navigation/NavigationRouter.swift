@@ -126,68 +126,7 @@ struct NavigationRouter {
 
 // MARK: - Enhanced Destination Views
 
-/// Enhanced Post Detail View with Material Glass styling
-private struct PostDetailView: View {
-    let postId: String
-    
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: UISpacing.md) {
-                GlassCard {
-                    VStack(alignment: .leading, spacing: UISpacing.sm) {
-                        Text("Post Detail")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                        
-                        Text("Post ID: \(postId)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Text("This is a placeholder for the post detail view with Material Glass styling.")
-                            .foregroundColor(.secondary)
-                    }
-                }
-                
-                GlassCard {
-                    VStack(alignment: .leading, spacing: UISpacing.sm) {
-                        Text("Comments")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                        
-                        ForEach(0..<3) { index in
-                            VStack(alignment: .leading, spacing: UISpacing.xs) {
-                                Text("Comment \(index + 1)")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                
-                                Text("This is a sample comment with Material Glass styling.")
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.vertical, UISpacing.xs)
-                            
-                            if index < 2 {
-                                Divider()
-                            }
-                        }
-                    }
-                }
-                
-                Spacer(minLength: 100) // Account for tab bar
-            }
-            .padding()
-        }
-        .background(UIColors.background)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                GlassButton("Share", systemImage: "square.and.arrow.up", style: .subtle) {
-                    // Handle share action
-                }
-            }
-        }
-    }
-}
+// PostDetailView is defined in Features/Feed/Views/PostDetailView.swift
 
 /// Enhanced Search Results View
 private struct SearchResultsView: View {
