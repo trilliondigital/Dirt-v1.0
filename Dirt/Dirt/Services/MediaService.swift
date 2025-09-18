@@ -104,8 +104,8 @@ class ImageCompressionService {
 // MARK: - Enhanced Media Service
 
 @MainActor
-class EnhancedMediaService: ObservableObject {
-    static let shared = EnhancedMediaService()
+class MediaService: ObservableObject {
+    static let shared = MediaService()
     
     @Published var isUploading = false
     @Published var uploadProgress: Double = 0.0
@@ -585,18 +585,19 @@ struct ImageZoomView: View {
     }
 }
 
-// MARK: - Legacy MediaService Compatibility
+// MARK: - Legacy Compatibility
 
-final class MediaService {
-    static let shared = MediaService()
-    private init() {}
-
-    struct MediaProcessResponse: Codable { let hash: String; let stripped: Bool }
-
+extension MediaService {
+    /// Legacy compatibility method for media processing
     func processMedia(at url: URL) async throws -> MediaProcessResponse {
         let payload: [String: Any] = ["url": url.absoluteString]
         let data = try await SupabaseManager.shared.callEdgeFunction(name: "media-process", json: payload)
         return try JSONDecoder().decode(MediaProcessResponse.self, from: data)
+    }
+    
+    struct MediaProcessResponse: Codable { 
+        let hash: String
+        let stripped: Bool 
     }
 }
 

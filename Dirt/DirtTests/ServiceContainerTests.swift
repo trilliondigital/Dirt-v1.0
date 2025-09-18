@@ -65,7 +65,7 @@ final class ServiceContainerTests: XCTestCase {
         
         // We can't easily test registration without modifying the container structure
         // This test verifies the service method works
-        let mediaService = serviceContainer.service(of: EnhancedMediaService.self)
+        let mediaService = serviceContainer.service(of: MediaService.self)
         XCTAssertNotNil(mediaService)
     }
     
@@ -74,7 +74,7 @@ final class ServiceContainerTests: XCTestCase {
         _ = serviceContainer.mediaService
         
         // Then try to retrieve it by type
-        let retrievedService = serviceContainer.service(of: EnhancedMediaService.self)
+        let retrievedService = serviceContainer.service(of: MediaService.self)
         XCTAssertNotNil(retrievedService)
         XCTAssertTrue(retrievedService === serviceContainer.mediaService)
     }

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SearchView: View {
+    @Environment(\.services) private var services
     @EnvironmentObject private var toastCenter: ToastCenter
     @State private var searchText = ""
     @State private var selectedFilter = "Recent"
@@ -304,7 +305,7 @@ extension SearchView {
                 case "Trending": sort = .trending
                 default: sort = .recent
                 }
-                let res = try await SearchService.shared.search(query: q, tags: [], sort: sort)
+                let res = try await services.searchService.search(query: q, tags: [], sort: sort)
                 if !Task.isCancelled {
                     results = res
                     isLoading = false

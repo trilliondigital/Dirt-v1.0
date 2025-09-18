@@ -26,13 +26,13 @@ class ServiceContainer: ObservableObject {
     
     // MARK: - Media Services
     
-    /// Enhanced media upload and processing service
-    lazy var mediaService: EnhancedMediaService = EnhancedMediaService.shared
+    /// Media upload and processing service (consolidated from EnhancedMediaService)
+    lazy var mediaService: MediaService = MediaService.shared
     
     // MARK: - Search Services
     
-    /// Enhanced search functionality with filtering and caching
-    lazy var searchService: EnhancedSearchService = EnhancedSearchService.shared
+    /// Search functionality with filtering and caching (consolidated from EnhancedSearchService)
+    lazy var searchService: SearchService = SearchService.shared
     
     // MARK: - Content Services
     
