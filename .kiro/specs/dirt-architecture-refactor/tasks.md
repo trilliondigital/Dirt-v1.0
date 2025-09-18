@@ -84,7 +84,7 @@
   - Write tests for error handling consistency across the app
   - _Requirements: 4.1, 4.3, 6.3_
 
-- [-] 12. Reorganize file structure
+- [x] 12. Reorganize file structure
   - Move appropriate files from `Dirt/Dirt/UI/Design/` to `Core/Design/`
   - Move core services from `Services/` to `Core/Services/`
   - Move shared utilities to `Shared/Utilities/`

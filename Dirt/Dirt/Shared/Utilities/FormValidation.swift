@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 // MARK: - Validation Rules
 
@@ -340,5 +341,3 @@ struct MaskedTextField: View {
         return text.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
     }
 }
-
-import Combine

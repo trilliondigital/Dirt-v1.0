@@ -262,6 +262,48 @@ enum StorageError: LocalizedError {
     }
 }
 
+enum MediaError: LocalizedError {
+    case compressionFailed
+    case uploadFailed
+    case invalidFile
+    case fileTooLarge
+    
+    var errorDescription: String? {
+        switch self {
+        case .compressionFailed:
+            return "Failed to compress image"
+        case .uploadFailed:
+            return "Failed to upload file"
+        case .invalidFile:
+            return "Invalid file format"
+        case .fileTooLarge:
+            return "File is too large"
+        }
+    }
+    
+    var recoverySuggestion: String? {
+        switch self {
+        case .compressionFailed:
+            return "Try again with a different image"
+        case .uploadFailed:
+            return "Check your connection and try again"
+        case .invalidFile:
+            return "Please select a valid file"
+        case .fileTooLarge:
+            return "Please select a smaller file"
+        }
+    }
+    
+    var isRetryable: Bool {
+        switch self {
+        case .compressionFailed, .invalidFile, .fileTooLarge:
+            return false
+        case .uploadFailed:
+            return true
+        }
+    }
+}
+
 // MARK: - Error Boundary
 
 @MainActor
