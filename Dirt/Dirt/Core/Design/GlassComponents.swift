@@ -286,11 +286,16 @@ struct GlassModal<Content: View>: View {
 
 // MARK: - Glass Toast Notification
 
-/// A Material Glass toast notification component
+/// A Material Glass toast notification component with enhanced error handling support
 struct GlassToast: View {
     let message: String
     let type: ToastType
+    let duration: TimeInterval
+    let onDismiss: (() -> Void)?
+    let isDismissible: Bool
+    
     @State private var isVisible = false
+    @State private var dismissTimer: Timer?
     
     enum ToastType {
         case success
@@ -324,11 +329,38 @@ struct GlassToast: View {
             case .info: return MaterialDesignSystem.GlassColors.primary
             }
         }
+        
+        var defaultDuration: TimeInterval {
+            switch self {
+            case .success: return 3.0
+            case .warning: return 5.0
+            case .error: return 6.0
+            case .info: return 4.0
+            }
+        }
+        
+        var hapticFeedback: UINotificationFeedbackGenerator.FeedbackType? {
+            switch self {
+            case .success: return .success
+            case .warning: return .warning
+            case .error: return .error
+            case .info: return nil
+            }
+        }
     }
     
-    init(message: String, type: ToastType = .info) {
+    init(
+        message: String, 
+        type: ToastType = .info,
+        duration: TimeInterval? = nil,
+        isDismissible: Bool = true,
+        onDismiss: (() -> Void)? = nil
+    ) {
         self.message = message
         self.type = type
+        self.duration = duration ?? type.defaultDuration
+        self.isDismissible = isDismissible
+        self.onDismiss = onDismiss
     }
     
     var body: some View {
@@ -341,8 +373,18 @@ struct GlassToast: View {
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(UIColors.label)
                 .multilineTextAlignment(.leading)
+                .lineLimit(3)
             
             Spacer(minLength: 0)
+            
+            if isDismissible {
+                Button(action: dismiss) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(UIColors.secondaryLabel)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
         }
         .padding(UISpacing.md)
         .background(MaterialDesignSystem.Glass.regular, in: RoundedRectangle(cornerRadius: UICornerRadius.md))
@@ -358,9 +400,44 @@ struct GlassToast: View {
         .scaleEffect(isVisible ? 1.0 : 0.9)
         .opacity(isVisible ? 1.0 : 0.0)
         .onAppear {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+            // Trigger haptic feedback
+            if let hapticType = type.hapticFeedback {
+                let generator = UINotificationFeedbackGenerator()
+                generator.notificationOccurred(hapticType)
+            }
+            
+            // Animate appearance
+            withAnimation(MaterialMotion.Glass.toastAppear) {
                 isVisible = true
             }
+            
+            // Set up auto-dismiss timer
+            if duration > 0 {
+                dismissTimer = Timer.scheduledTimer(withTimeInterval: duration, repeats: false) { _ in
+                    dismiss()
+                }
+            }
+        }
+        .onDisappear {
+            dismissTimer?.invalidate()
+        }
+        .onTapGesture {
+            if isDismissible {
+                dismiss()
+            }
+        }
+    }
+    
+    private func dismiss() {
+        dismissTimer?.invalidate()
+        
+        withAnimation(MaterialMotion.Glass.toastAppear) {
+            isVisible = false
+        }
+        
+        // Call onDismiss after animation completes
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            onDismiss?()
         }
     }
 }

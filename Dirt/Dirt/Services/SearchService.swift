@@ -162,7 +162,7 @@ struct EnhancedSearchResult: Identifiable, Codable {
 // MARK: - Enhanced Search Service
 
 @MainActor
-class SearchService: ObservableObject {
+class SearchService: ObservableObject, ErrorHandlingService {
     static let shared = SearchService()
     
     @Published var searchText = ""
@@ -248,6 +248,7 @@ class SearchService: ObservableObject {
             
         } catch {
             errorMessage = error.localizedDescription
+            handleError(error, context: "SearchService.executeSearch(query: \(searchText))")
         }
         
         isSearching = false
@@ -351,17 +352,23 @@ class SearchService: ObservableObject {
     // MARK: - Saved Searches
     
     func saveCurrentSearch(name: String) {
-        let savedSearch = SavedSearch(
-            id: UUID().uuidString,
-            name: name,
-            query: searchText,
-            scope: searchScope,
-            filter: searchFilter,
-            createdAt: Date()
-        )
-        
-        savedSearches.append(savedSearch)
-        saveSavedSearches()
+        do {
+            let savedSearch = SavedSearch(
+                id: UUID().uuidString,
+                name: name,
+                query: searchText,
+                scope: searchScope,
+                filter: searchFilter,
+                createdAt: Date()
+            )
+            
+            savedSearches.append(savedSearch)
+            saveSavedSearches()
+            
+            ErrorHandlingManager.shared.presentSuccess("Search saved as '\(name)'")
+        } catch {
+            handleError(error, context: "SearchService.saveCurrentSearch(name: \(name))")
+        }
     }
     
     func deleteSavedSearch(_ search: SavedSearch) {

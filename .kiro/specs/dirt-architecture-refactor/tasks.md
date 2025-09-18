@@ -77,14 +77,14 @@
   - Write comprehensive UI tests for all updated features
   - _Requirements: 2.2, 2.4, 5.1_
 
-- [-] 11. Implement standardized error handling
+- [x] 11. Implement standardized error handling
   - Enhance `ErrorPresenter` to support Material Glass toast notifications
   - Create `GlassToast` component for consistent error display
   - Update all services to use standardized error handling patterns
   - Write tests for error handling consistency across the app
   - _Requirements: 4.1, 4.3, 6.3_
 
-- [ ] 12. Reorganize file structure
+- [-] 12. Reorganize file structure
   - Move appropriate files from `Dirt/Dirt/UI/Design/` to `Core/Design/`
   - Move core services from `Services/` to `Core/Services/`
   - Move shared utilities to `Shared/Utilities/`

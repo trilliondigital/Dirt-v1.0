@@ -104,7 +104,7 @@ class ImageCompressionService {
 // MARK: - Enhanced Media Service
 
 @MainActor
-class MediaService: ObservableObject {
+class MediaService: ObservableObject, ErrorHandlingService {
     static let shared = MediaService()
     
     @Published var isUploading = false
@@ -155,9 +155,11 @@ class MediaService: ObservableObject {
                 contentType: "image/jpeg"
             )
             
+            ErrorHandlingManager.shared.presentSuccess("Image uploaded successfully")
             return url
         } catch {
             errorMessage = error.localizedDescription
+            handleError(error, context: "MediaService.uploadImage")
             throw error
         }
     }
