@@ -69,40 +69,46 @@ struct NotificationsView: View {
             VStack(spacing: 0) {
                 // Enable alerts banner
                 if alertsStatus != .authorized {
-                    HStack(alignment: .top, spacing: 12) {
-                        Image(systemName: "bell.badge")
-                            .font(.title3)
-                            .foregroundColor(.accentColor)
-                            .accessibilityHidden(true)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(NSLocalizedString("Turn on alerts", comment: ""))
-                                .font(.headline)
-                            Text(NSLocalizedString("Get notified about mentions and keyword matches.", comment: ""))
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                    GlassCard(material: MaterialDesignSystem.Context.card, padding: UISpacing.md) {
+                        HStack(alignment: .top, spacing: UISpacing.sm) {
+                            Image(systemName: "bell.badge")
+                                .font(.title3)
+                                .foregroundColor(UIColors.accentPrimary)
+                                .accessibilityHidden(true)
+                            
+                            VStack(alignment: .leading, spacing: UISpacing.xxs) {
+                                Text(NSLocalizedString("Turn on alerts", comment: ""))
+                                    .font(.headline)
+                                    .foregroundColor(UIColors.label)
+                                
+                                Text(NSLocalizedString("Get notified about mentions and keyword matches.", comment: ""))
+                                    .font(.subheadline)
+                                    .foregroundColor(UIColors.secondaryLabel)
+                            }
+                            
+                            Spacer()
+                            
+                            GlassButton(
+                                NSLocalizedString("Enable", comment: ""),
+                                style: .primary
+                            ) {
+                                Task { alertsStatus = await services.alertsService.requestAuthorization() }
+                            }
+                            .accessibilityLabel(Text(NSLocalizedString("Enable", comment: "")))
                         }
-                        Spacer()
-                        Button(NSLocalizedString("Enable", comment: "")) {
-                            Task { alertsStatus = await services.alertsService.requestAuthorization() }
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color.blue.opacity(0.15))
-                        .foregroundColor(.blue)
-                        .cornerRadius(8)
-                        .accessibilityLabel(Text(NSLocalizedString("Enable", comment: "")))
                     }
-                    .padding()
-                    .cardBackground()
                     .padding([.horizontal, .top])
+                    .glassAppear()
                 }
-                // Segmented control
-                Picker("", selection: $selectedTab) {
-                    Text("Activity").tag(0)
-                    Text("Keyword Alerts").tag(1)
+                // Segmented control with glass styling
+                GlassCard(material: MaterialDesignSystem.Glass.ultraThin, padding: UISpacing.xs) {
+                    Picker("", selection: $selectedTab) {
+                        Text("Activity").tag(0)
+                        Text("Keyword Alerts").tag(1)
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
                 }
-                .pickerStyle(SegmentedPickerStyle())
-                .padding()
+                .padding(.horizontal)
                 
                 if selectedTab == 0 {
                     // Activity list
@@ -150,8 +156,10 @@ struct NotificationsView: View {
                                 keywordAlerts["new keyword \(Int.random(in: 1...99))"] = true
                             }) {
                                 HStack {
-                                    Image(systemName: "plus.circle.fill").foregroundColor(.blue)
+                                    Image(systemName: "plus.circle.fill")
+                                        .foregroundColor(UIColors.accentPrimary)
                                     Text("Add keyword alert")
+                                        .foregroundColor(UIColors.label)
                                 }
                             }
                         }
@@ -160,10 +168,18 @@ struct NotificationsView: View {
                 }
             }
             .navigationBarTitle("Alerts", displayMode: .inline)
+            .background(MaterialDesignSystem.Context.navigation.ignoresSafeArea())
             .toolbar {
                 if selectedTab == 0 {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("Mark all as read") { notifications = notifications.map { n in var n = n; n.isRead = true; return n } }
+                        GlassButton(
+                            "Mark all as read",
+                            style: .subtle
+                        ) {
+                            withAnimation(MaterialMotion.Spring.standard) {
+                                notifications = notifications.map { n in var n = n; n.isRead = true; return n }
+                            }
+                        }
                     }
                 }
             }

@@ -25,222 +25,306 @@ struct CreatePostView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Text Editor
-                TextEditor(text: $postText)
-                    .padding()
-                    .frame(height: 150)
-                    .background(Color(.systemBackground))
-                    .cornerRadius(12)
-                    .padding()
-                    .overlay(
-                        postText.isEmpty ? 
-                            Text("Share your experience...")
-                                .foregroundColor(Color(UIColor.placeholderText))
-                                .padding(.top, 24)
-                                .padding(.leading, 24)
-                                .allowsHitTesting(false) : nil,
-                        alignment: .topLeading
-                    )
-                    .onChange(of: postText) { _, newValue in
-                        if newValue.count > maxCharacters {
-                            postText = String(newValue.prefix(maxCharacters))
+                // Text Editor with Material Glass background
+                GlassCard(material: MaterialDesignSystem.Glass.thin, cornerRadius: UICornerRadius.lg, padding: 0) {
+                    TextEditor(text: $postText)
+                        .padding(UISpacing.md)
+                        .frame(height: 150)
+                        .background(Color.clear)
+                        .overlay(
+                            postText.isEmpty ? 
+                                Text("Share your experience...")
+                                    .foregroundColor(UIColors.secondaryLabel)
+                                    .padding(.top, UISpacing.md)
+                                    .padding(.leading, UISpacing.md)
+                                    .allowsHitTesting(false) : nil,
+                            alignment: .topLeading
+                        )
+                        .onChange(of: postText) { _, newValue in
+                            if newValue.count > maxCharacters {
+                                postText = String(newValue.prefix(maxCharacters))
+                            }
                         }
-                    }
+                }
+                .padding(UISpacing.md)
                 
                 // Character Counter
                 HStack {
                     Spacer()
                     Text("\(postText.count)/\(maxCharacters)")
                         .font(.caption)
-                        .foregroundColor(postText.count > maxCharacters - 20 ? .red : .secondary)
-                        .padding(.trailing)
+                        .foregroundColor(postText.count > maxCharacters - 20 ? UIColors.danger : UIColors.secondaryLabel)
+                        .padding(.trailing, UISpacing.md)
                 }
-                .padding(.bottom, 4)
+                .padding(.bottom, UISpacing.xs)
                 
-                // Required Flag Selection
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Flag")
-                        .font(.headline)
-                        .padding(.horizontal)
-                    HStack(spacing: 12) {
-                        ForEach(FlagCategory.allCases) { flag in
-                            Button(action: {
-                                selectedFlag = flag
-                            }) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: flag == .red ? "flag.fill" : "checkmark.seal.fill")
-                                    Text(flag.rawValue)
-                                        .font(.subheadline)
-                                }
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 10)
-                                .background(
-                                    (selectedFlag == flag ? (flag == .red ? Color.red.opacity(0.15) : Color.green.opacity(0.15)) : Color.gray.opacity(0.1))
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(selectedFlag == flag ? (flag == .red ? Color.red.opacity(0.5) : Color.green.opacity(0.5)) : Color.clear, lineWidth: 1)
-                                )
-                                .cornerRadius(10)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                        }
-                    }
-                    .padding(.horizontal)
-                }
-                .padding(.bottom, 8)
-                
-                // Selected Image Preview
-                if let selectedImage = selectedImage {
-                    Image(uiImage: isImageRevealed ? selectedImage : ImageProcessing.blurForUpload(selectedImage))
-                        .resizable()
-                        .scaledToFit()
-                        .cornerRadius(12)
-                        .padding()
-                        .onTapGesture { withAnimation { isImageRevealed.toggle() } }
-                        .overlay(
-                            Group {
-                                if !isImageRevealed {
-                                    Text("Tap to reveal")
-                                        .font(.caption).bold()
-                                        .padding(6)
-                                        .background(.ultraThinMaterial, in: Capsule())
-                                        .padding(10)
-                                }
-                            }, alignment: .bottomTrailing
-                        )
-                        .overlay(
-                            Button(action: {
-                                withAnimation { self.selectedImage = nil }
-                            }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.white)
-                                    .background(Circle().fill(Color.black.opacity(0.7)))
-                            }
-                            .padding(8),
-                            alignment: .topTrailing
-                        )
-                }
-                
-                // Tag Selection
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Add Tags")
-                        .font(.headline)
-                        .padding(.horizontal)
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(TagCatalog.all) { tag in
+                // Required Flag Selection with Material Glass
+                GlassCard(material: MaterialDesignSystem.Glass.ultraThin, cornerRadius: UICornerRadius.lg) {
+                    VStack(alignment: .leading, spacing: UISpacing.sm) {
+                        Text("Flag")
+                            .font(.headline)
+                            .foregroundColor(UIColors.label)
+                        
+                        HStack(spacing: UISpacing.sm) {
+                            ForEach(FlagCategory.allCases) { flag in
                                 Button(action: {
-                                    if selectedTags.contains(tag) {
-                                        selectedTags.remove(tag)
-                                    } else {
-                                        selectedTags.insert(tag)
-                                    }
+                                    selectedFlag = flag
+                                    // Add haptic feedback
+                                    let selectionFeedback = UISelectionFeedbackGenerator()
+                                    selectionFeedback.selectionChanged()
                                 }) {
-                                    Text(tag.rawValue)
-                                        .font(.subheadline)
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 8)
-                                        .background(
-                                            selectedTags.contains(tag) ? 
-                                                Color.blue.opacity(0.15) : 
-                                                Color.gray.opacity(0.1)
-                                        )
-                                        .cornerRadius(20)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 20)
-                                                .stroke(selectedTags.contains(tag) ? Color.blue.opacity(0.6) : Color.clear, lineWidth: 1)
-                                        )
+                                    HStack(spacing: UISpacing.xs) {
+                                        Image(systemName: flag == .red ? "flag.fill" : "checkmark.seal.fill")
+                                            .foregroundColor(flag == .red ? UIColors.danger : UIColors.success)
+                                        Text(flag.rawValue)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                    }
+                                    .padding(.horizontal, UISpacing.md)
+                                    .padding(.vertical, UISpacing.sm)
+                                    .background(
+                                        selectedFlag == flag ? 
+                                            (flag == .red ? MaterialDesignSystem.GlassColors.danger : MaterialDesignSystem.GlassColors.success) :
+                                            MaterialDesignSystem.Glass.ultraThin,
+                                        in: RoundedRectangle(cornerRadius: UICornerRadius.sm)
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: UICornerRadius.sm)
+                                            .stroke(
+                                                selectedFlag == flag ? 
+                                                    (flag == .red ? UIColors.danger.opacity(0.5) : UIColors.success.opacity(0.5)) : 
+                                                    MaterialDesignSystem.GlassBorders.subtle,
+                                                lineWidth: selectedFlag == flag ? 2 : 1
+                                            )
+                                    )
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
                         }
-                        .padding(.horizontal)
                     }
                 }
-                .padding(.vertical)
+                .padding(.horizontal, UISpacing.md)
+                .padding(.bottom, UISpacing.xs)
                 
-                // Anonymous Toggle
-                Toggle(isOn: $isAnonymous) {
-                    HStack {
-                        Image(systemName: "theatermasks")
-                            .foregroundColor(.purple)
-                        Text("Post Anonymously")
-                            .font(.subheadline)
+                // Selected Image Preview with Material Glass
+                if let selectedImage = selectedImage {
+                    GlassCard(material: MaterialDesignSystem.Glass.thin, cornerRadius: UICornerRadius.lg, padding: 0) {
+                        Image(uiImage: isImageRevealed ? selectedImage : ImageProcessing.blurForUpload(selectedImage))
+                            .resizable()
+                            .scaledToFit()
+                            .clipped()
+                            .onTapGesture { 
+                                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) { 
+                                    isImageRevealed.toggle() 
+                                }
+                                // Add haptic feedback
+                                let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                                impactFeedback.impactOccurred()
+                            }
+                            .overlay(
+                                Group {
+                                    if !isImageRevealed {
+                                        Text("Tap to reveal")
+                                            .font(.caption)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(UIColors.label)
+                                            .padding(UISpacing.xs)
+                                            .background(MaterialDesignSystem.Glass.regular, in: Capsule())
+                                            .overlay(
+                                                Capsule()
+                                                    .stroke(MaterialDesignSystem.GlassBorders.subtle, lineWidth: 1)
+                                            )
+                                            .padding(UISpacing.sm)
+                                    }
+                                }, alignment: .bottomTrailing
+                            )
+                            .overlay(
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { 
+                                        self.selectedImage = nil 
+                                    }
+                                    // Add haptic feedback
+                                    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                    impactFeedback.impactOccurred()
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.system(size: 24))
+                                        .foregroundColor(.white)
+                                        .background(
+                                            Circle()
+                                                .fill(Color.black.opacity(0.7))
+                                                .frame(width: 28, height: 28)
+                                        )
+                                }
+                                .padding(UISpacing.sm),
+                                alignment: .topTrailing
+                            )
+                    }
+                    .padding(.horizontal, UISpacing.md)
+                }
+                
+                // Tag Selection with Material Glass
+                GlassCard(material: MaterialDesignSystem.Glass.ultraThin, cornerRadius: UICornerRadius.lg) {
+                    VStack(alignment: .leading, spacing: UISpacing.sm) {
+                        Text("Add Tags")
+                            .font(.headline)
+                            .foregroundColor(UIColors.label)
+                        
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: UISpacing.xs) {
+                                ForEach(TagCatalog.all) { tag in
+                                    Button(action: {
+                                        withAnimation(.easeInOut(duration: 0.2)) {
+                                            if selectedTags.contains(tag) {
+                                                selectedTags.remove(tag)
+                                            } else {
+                                                selectedTags.insert(tag)
+                                            }
+                                        }
+                                        // Add haptic feedback
+                                        let selectionFeedback = UISelectionFeedbackGenerator()
+                                        selectionFeedback.selectionChanged()
+                                    }) {
+                                        Text(tag.rawValue)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(
+                                                selectedTags.contains(tag) ? 
+                                                    UIColors.accentPrimary : 
+                                                    UIColors.label
+                                            )
+                                            .padding(.horizontal, UISpacing.md)
+                                            .padding(.vertical, UISpacing.xs)
+                                            .background(
+                                                selectedTags.contains(tag) ? 
+                                                    MaterialDesignSystem.GlassColors.primary : 
+                                                    MaterialDesignSystem.Glass.ultraThin,
+                                                in: Capsule()
+                                            )
+                                            .overlay(
+                                                Capsule()
+                                                    .stroke(
+                                                        selectedTags.contains(tag) ? 
+                                                            UIColors.accentPrimary.opacity(0.6) : 
+                                                            MaterialDesignSystem.GlassBorders.subtle,
+                                                        lineWidth: selectedTags.contains(tag) ? 2 : 1
+                                                    )
+                                            )
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+                            }
+                            .padding(.horizontal, UISpacing.xxs)
+                        }
                     }
                 }
-                .padding()
-                .background(Color(.systemBackground))
-                .cornerRadius(12)
-                .padding(.horizontal)
-                .padding(.vertical, 8)
+                .padding(.horizontal, UISpacing.md)
+                .padding(.vertical, UISpacing.xs)
+                
+                // Anonymous Toggle with Material Glass
+                GlassCard(material: MaterialDesignSystem.Glass.ultraThin, cornerRadius: UICornerRadius.lg) {
+                    Toggle(isOn: $isAnonymous) {
+                        HStack(spacing: UISpacing.sm) {
+                            Image(systemName: "theatermasks")
+                                .foregroundColor(UIColors.accentSecondary)
+                                .font(.system(size: 16, weight: .medium))
+                            Text("Post Anonymously")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(UIColors.label)
+                        }
+                    }
+                    .toggleStyle(SwitchToggleStyle(tint: UIColors.accentSecondary))
+                }
+                .padding(.horizontal, UISpacing.md)
+                .padding(.vertical, UISpacing.xs)
                 
                 Spacer()
                 
-                // Action Buttons
-                HStack(spacing: 16) {
-                    Button(action: {
+                // Action Buttons with Material Glass
+                HStack(spacing: UISpacing.md) {
+                    GlassButton(
+                        "Photo",
+                        systemImage: "photo",
+                        style: .secondary
+                    ) {
                         isImagePickerPresented = true
-                    }) {
-                        HStack {
-                            Image(systemName: "photo")
-                            Text("Photo")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue.opacity(0.1))
-                        .foregroundColor(.blue)
-                        .cornerRadius(12)
                     }
                     
-                    Button(action: {
+                    GlassButton(
+                        NSLocalizedString("Post", comment: ""),
+                        style: canPost ? .primary : .subtle
+                    ) {
                         let trimmed = postText.trimmingCharacters(in: .whitespacesAndNewlines)
                         let flag = selectedFlag == .red ? "red" : "green"
                         let tags = selectedTags.map { $0.rawValue }
                         Task {
                             do {
                                 try await services.postSubmissionService.createPost(content: trimmed, flag: flag, tags: tags, anonymous: isAnonymous)
-                                HapticFeedback.notification(type: .success)
+                                // Success haptic feedback
+                                let notificationFeedback = UINotificationFeedbackGenerator()
+                                notificationFeedback.notificationOccurred(.success)
                                 toastCenter.show(.success, NSLocalizedString("Posted", comment: ""))
                                 presentationMode.wrappedValue.dismiss()
                             } catch {
-                                HapticFeedback.notification(type: .error)
+                                // Error haptic feedback
+                                let notificationFeedback = UINotificationFeedbackGenerator()
+                                notificationFeedback.notificationOccurred(.error)
                                 toastCenter.show(.error, ErrorPresenter.message(for: error))
                             }
                         }
-                    }) {
-                        Text(NSLocalizedString("Post", comment: ""))
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(canPost ? Color.blue : Color.gray.opacity(0.3))
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
                     }
                     .disabled(!canPost)
                 }
-                .padding()
+                .padding(UISpacing.md)
             }
-            .background(Color(.systemGroupedBackground).edgesIgnoringSafeArea(.bottom))
-            .navigationBarTitle("New Post", displayMode: .inline)
-            .navigationBarItems(
-                leading: Button("Cancel") {
-                    presentationMode.wrappedValue.dismiss()
-                }
-            )
-            .sheet(isPresented: $isImagePickerPresented) {
-                // In a real app, you would use PHPickerViewController or UIImagePickerController
-                // For this demo, we'll just simulate image selection
-                Button("Select Image") {
-                    // Simulate image selection
-                    if let raw = UIImage(systemName: "photo") {
-                        let stripped = ImageProcessing.stripEXIF(raw)
-                        self.selectedImage = stripped
-                        self.isImageRevealed = false
+            .background(UIColors.groupedBackground.ignoresSafeArea(.all))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    GlassButton("Cancel", style: .subtle) {
+                        presentationMode.wrappedValue.dismiss()
                     }
-                    isImagePickerPresented = false
                 }
-                .padding()
+                
+                ToolbarItem(placement: .principal) {
+                    Text("New Post")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(UIColors.label)
+                }
+            }
+            .sheet(isPresented: $isImagePickerPresented) {
+                // Material Glass modal for image picker
+                GlassModal(isPresented: $isImagePickerPresented) {
+                    VStack(spacing: UISpacing.lg) {
+                        Text("Select Image")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(UIColors.label)
+                        
+                        Text("In a real app, this would open PHPickerViewController")
+                            .font(.body)
+                            .foregroundColor(UIColors.secondaryLabel)
+                            .multilineTextAlignment(.center)
+                        
+                        VStack(spacing: UISpacing.md) {
+                            GlassButton("Select Demo Image", systemImage: "photo", style: .primary) {
+                                // Simulate image selection
+                                if let raw = UIImage(systemName: "photo") {
+                                    let stripped = ImageProcessing.stripEXIF(raw)
+                                    self.selectedImage = stripped
+                                    self.isImageRevealed = false
+                                }
+                                isImagePickerPresented = false
+                            }
+                            
+                            GlassButton("Cancel", style: .secondary) {
+                                isImagePickerPresented = false
+                            }
+                        }
+                    }
+                }
             }
         }
     }

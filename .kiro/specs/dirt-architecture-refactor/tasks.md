@@ -64,14 +64,14 @@
   - Write tests to verify search functionality works with consolidated `SearchService`
   - _Requirements: 2.2, 5.1, 5.3_
 
-- [-] 9. Update CreatePost feature with Material Glass
+- [x] 9. Update CreatePost feature with Material Glass
   - Refactor `CreatePostView.swift` to use Material Glass components
   - Update form elements to use `GlassButton` and Material backgrounds
   - Implement Material Glass modal presentation
   - Write tests to verify post creation functionality remains intact
   - _Requirements: 2.2, 5.1, 5.3_
 
-- [ ] 10. Update remaining features with Material Glass
+- [-] 10. Update remaining features with Material Glass
   - Update `NotificationsView.swift`, `ProfileView.swift`, and other feature views
   - Apply Material Glass components consistently across all features
   - Ensure proper Dark Mode support for all Material Glass implementations
