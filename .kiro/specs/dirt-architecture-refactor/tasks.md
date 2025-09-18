@@ -91,7 +91,7 @@
   - Update all import statements and references to reflect new file locations
   - _Requirements: 3.1, 4.2, 5.2_
 
-- [ ] 13. Implement navigation coordination
+- [-] 13. Implement navigation coordination
   - Create `NavigationCoordinator` in `Core/Navigation/`
   - Implement proper navigation flow management for Material Glass transitions
   - Update tab navigation to use Material Glass tab bar
