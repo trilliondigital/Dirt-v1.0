@@ -25,7 +25,7 @@ struct LookupWizardView: View {
         .navigationTitle(step == 1 ? "Lookup" : "Lookup Results")
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) { footer }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .background(MaterialDesignSystem.Context.navigation.ignoresSafeArea())
     }
     
     private var stepOne: some View {
@@ -76,10 +76,12 @@ struct LookupWizardView: View {
             
             if premiumLocked {
                 Section(footer: Text("Unlock detailed results with Dirt+ to support moderation and safety.")) {
-                    Button {
+                    GlassButton(
+                        "Unlock detailed results — $14.99/mo",
+                        systemImage: "lock.fill",
+                        style: .primary
+                    ) {
                         // Upsell action
-                    } label: {
-                        Label("Unlock detailed results — $14.99/mo", systemImage: "lock.fill")
                     }
                 }
             }
@@ -88,20 +90,44 @@ struct LookupWizardView: View {
     }
     
     private var footer: some View {
-        HStack(spacing: 12) {
-            if step == 1 {
-                Button("Learn more") { /* open docs */ }
-                    .buttonStyle(.bordered)
-                Button("Continue") { withAnimation { step = 2 } }
-                    .buttonStyle(.borderedProminent)
+        GlassCard(
+            material: MaterialDesignSystem.Context.modal,
+            cornerRadius: 0,
+            padding: UISpacing.md
+        ) {
+            HStack(spacing: UISpacing.sm) {
+                if step == 1 {
+                    GlassButton(
+                        "Learn more",
+                        style: .secondary
+                    ) {
+                        // open docs
+                    }
+                    
+                    GlassButton(
+                        "Continue",
+                        style: .primary
+                    ) {
+                        withAnimation(MaterialMotion.Spring.standard) { 
+                            step = 2 
+                        }
+                    }
                     .disabled(phoneNumber.isEmpty && firstName.isEmpty && lastName.isEmpty)
-            } else {
-                Button("Start new lookup") { withAnimation { step = 1; phoneNumber.removeAll(); firstName.removeAll(); lastName.removeAll() } }
-                    .buttonStyle(.bordered)
+                } else {
+                    GlassButton(
+                        "Start new lookup",
+                        style: .secondary
+                    ) {
+                        withAnimation(MaterialMotion.Spring.standard) { 
+                            step = 1
+                            phoneNumber.removeAll()
+                            firstName.removeAll()
+                            lastName.removeAll()
+                        }
+                    }
+                }
             }
         }
-        .padding()
-        .background(.ultraThinMaterial)
     }
 }
 

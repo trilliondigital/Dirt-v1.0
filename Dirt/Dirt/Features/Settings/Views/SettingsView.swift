@@ -13,34 +13,34 @@ struct SettingsView: View {
                 // Account Section
                 Section(header: Text("Account")) {
                     NavigationLink(destination: ProfileSettingsView()) {
-                        SettingsRow(icon: "person.fill", title: "Profile", color: .blue)
+                        SettingsRow(icon: "person.fill", title: "Profile", color: UIColors.accentPrimary)
                     }
                     
                     NavigationLink(destination: NotificationSettingsView()) {
-                        SettingsRow(icon: "bell.fill", title: "Notifications", color: .red)
+                        SettingsRow(icon: "bell.fill", title: "Notifications", color: UIColors.danger)
                     }
                     
                     NavigationLink(destination: PrivacySettingsView()) {
-                        SettingsRow(icon: "lock.fill", title: "Privacy", color: .green)
+                        SettingsRow(icon: "lock.fill", title: "Privacy", color: UIColors.success)
                     }
                 }
                 
                 // App Settings Section
                 Section(header: Text("App Settings")) {
                     Toggle(isOn: $isDarkMode) {
-                        SettingsRow(icon: "moon.fill", title: "Dark Mode", color: .purple)
+                        SettingsRow(icon: "moon.fill", title: "Dark Mode", color: UIColors.accentSecondary)
                     }
                     
                     NavigationLink(destination: AppearanceSettingsView()) {
-                        SettingsRow(icon: "paintpalette.fill", title: "Appearance", color: .pink)
+                        SettingsRow(icon: "paintpalette.fill", title: "Appearance", color: Color.pink)
                     }
                     
                     NavigationLink(destination: LanguageSettingsView()) {
                         HStack {
-                            SettingsRow(icon: "globe", title: "Language", color: .blue)
+                            SettingsRow(icon: "globe", title: "Language", color: UIColors.accentPrimary)
                             Spacer()
                             Text("English")
-                                .foregroundColor(.gray)
+                                .foregroundColor(UIColors.secondaryLabel)
                                 .font(.subheadline)
                         }
                     }
@@ -49,19 +49,19 @@ struct SettingsView: View {
                 // Support Section
                 Section(header: Text("Support")) {
                     NavigationLink(destination: HelpCenterView()) {
-                        SettingsRow(icon: "questionmark.circle.fill", title: "Help Center", color: .orange)
+                        SettingsRow(icon: "questionmark.circle.fill", title: "Help Center", color: UIColors.warning)
                     }
                     
                     NavigationLink(destination: InviteView()) {
-                        SettingsRow(icon: "person.2.fill", title: "Invite Friends", color: .blue)
+                        SettingsRow(icon: "person.2.fill", title: "Invite Friends", color: UIColors.accentPrimary)
                     }
                     
                     NavigationLink(destination: ContactUsView()) {
-                        SettingsRow(icon: "envelope.fill", title: "Contact Us", color: .green)
+                        SettingsRow(icon: "envelope.fill", title: "Contact Us", color: UIColors.success)
                     }
                     
                     NavigationLink(destination: AboutView()) {
-                        SettingsRow(icon: "info.circle.fill", title: "About", color: .gray)
+                        SettingsRow(icon: "info.circle.fill", title: "About", color: UIColors.secondaryLabel)
                     }
                 }
                 
@@ -82,8 +82,9 @@ struct SettingsView: View {
                         showLogoutAlert = true
                     }) {
                         Text("Log Out")
-                            .foregroundColor(.red)
+                            .foregroundColor(UIColors.danger)
                             .frame(maxWidth: .infinity, alignment: .center)
+                            .font(.system(size: 16, weight: .medium))
                     }
                     .alert(isPresented: $showLogoutAlert) {
                         Alert(
@@ -100,8 +101,9 @@ struct SettingsView: View {
                         showDeleteAccountAlert = true
                     }) {
                         Text("Delete Account")
-                            .foregroundColor(.red)
+                            .foregroundColor(UIColors.danger)
                             .frame(maxWidth: .infinity, alignment: .center)
+                            .font(.system(size: 16, weight: .medium))
                     }
                     .alert(isPresented: $showDeleteAccountAlert) {
                         Alert(
@@ -118,6 +120,7 @@ struct SettingsView: View {
             .listStyle(InsetGroupedListStyle())
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .background(MaterialDesignSystem.Context.navigation.ignoresSafeArea())
         }
     }
 }
@@ -129,18 +132,31 @@ struct SettingsRow: View {
     let color: Color
     
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 17, weight: .semibold))
-                .frame(width: 28, height: 28)
-                .background(color.opacity(0.2))
-                .foregroundColor(color)
-                .cornerRadius(6)
+        HStack(spacing: UISpacing.sm) {
+            // Glass icon container
+            ZStack {
+                RoundedRectangle(cornerRadius: UICornerRadius.xs)
+                    .fill(MaterialDesignSystem.Glass.ultraThin)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: UICornerRadius.xs)
+                            .fill(color.opacity(0.1))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: UICornerRadius.xs)
+                            .stroke(color.opacity(0.3), lineWidth: 1)
+                    )
+                    .frame(width: 28, height: 28)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(color)
+            }
             
             Text(title)
                 .font(.system(size: 16, weight: .regular))
+                .foregroundColor(UIColors.label)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, UISpacing.xxs)
     }
 }
 

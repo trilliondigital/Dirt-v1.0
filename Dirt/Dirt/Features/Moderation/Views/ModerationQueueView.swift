@@ -10,31 +10,43 @@ struct ModerationQueueView: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            // Status filter
-            Picker("Status", selection: Binding(
-                get: { selectedFilter ?? ReportStatus.pending },
-                set: { selectedFilter = $0 }
-            )) {
-                Text("Pending").tag(ReportStatus.pending)
-                Text("Reviewed").tag(ReportStatus.reviewed)
-                Text("Actioned").tag(ReportStatus.actioned)
-                Text("Dismissed").tag(ReportStatus.dismissed)
+            // Status filter with glass styling
+            GlassCard(material: MaterialDesignSystem.Glass.ultraThin, padding: UISpacing.xs) {
+                Picker("Status", selection: Binding(
+                    get: { selectedFilter ?? ReportStatus.pending },
+                    set: { selectedFilter = $0 }
+                )) {
+                    Text("Pending").tag(ReportStatus.pending)
+                    Text("Reviewed").tag(ReportStatus.reviewed)
+                    Text("Actioned").tag(ReportStatus.actioned)
+                    Text("Dismissed").tag(ReportStatus.dismissed)
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .accessibilityLabel(Text("Status"))
             }
-            .pickerStyle(SegmentedPickerStyle())
             .padding(.horizontal)
-            .accessibilityLabel(Text("Status"))
 
             List {
                 if let errorMessage = errorMessage {
                     Section {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label(errorMessage, systemImage: "exclamationmark.triangle")
-                                .foregroundColor(.orange)
-                            Button("Retry") { Task { await load() } }
-                                .buttonStyle(.bordered)
+                        GlassCard(
+                            material: MaterialDesignSystem.Context.card,
+                            padding: UISpacing.md
+                        ) {
+                            VStack(alignment: .leading, spacing: UISpacing.xs) {
+                                Label(errorMessage, systemImage: "exclamationmark.triangle")
+                                    .foregroundColor(UIColors.warning)
+                                
+                                GlassButton(
+                                    "Retry",
+                                    style: .secondary
+                                ) {
+                                    Task { await load() }
+                                }
                                 .accessibilityLabel(Text("Retry"))
+                            }
                         }
-                        .padding(.vertical, 8)
+                        .padding(.horizontal)
                     }
                 }
 
@@ -53,16 +65,33 @@ struct ModerationQueueView: View {
         }
         .overlay {
             if isLoading {
-                ProgressView().controlSize(.regular)
+                GlassCard(
+                    material: MaterialDesignSystem.Glass.regular,
+                    padding: UISpacing.lg
+                ) {
+                    ProgressView()
+                        .controlSize(.regular)
+                        .tint(UIColors.accentPrimary)
+                }
             } else if reports.isEmpty && errorMessage == nil {
-                VStack(spacing: 8) {
-                    Image(systemName: "tray").foregroundColor(.gray)
-                    Text("No reports in queue").foregroundColor(.gray)
+                GlassCard(
+                    material: MaterialDesignSystem.Context.card,
+                    padding: UISpacing.lg
+                ) {
+                    VStack(spacing: UISpacing.xs) {
+                        Image(systemName: "tray")
+                            .font(.system(size: 48))
+                            .foregroundColor(UIColors.secondaryLabel)
+                        Text("No reports in queue")
+                            .foregroundColor(UIColors.secondaryLabel)
+                            .font(.headline)
+                    }
                 }
             }
         }
         .refreshable { await load() }
         .navigationTitle("Moderation Queue")
+        .background(MaterialDesignSystem.Context.navigation.ignoresSafeArea())
         .task { await load() }
     }
 
@@ -155,10 +184,10 @@ private struct ReportRow: View {
                 Button("Dismiss") { onAction(.dismissed) }
             }
         }
-        .padding()
-        .cardBackground()
+        .padding(UISpacing.md)
+        .glassCard(material: MaterialDesignSystem.Context.card)
         .padding(.horizontal)
-        .padding(.vertical, 6)
+        .padding(.vertical, UISpacing.xxs)
         .task {
             if preview == nil {
                 preview = try? await services.postService.fetchPost(by: report.postId)

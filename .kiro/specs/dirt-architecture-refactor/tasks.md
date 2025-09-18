@@ -16,7 +16,6 @@
 
 
 
-
   - Create `Core/` directory structure with `Design/`, `Navigation/`, and `Services/` subdirectories
   - Implement basic service container pattern for dependency injection
   - Write unit tests for service container functionality
@@ -71,14 +70,14 @@
   - Write tests to verify post creation functionality remains intact
   - _Requirements: 2.2, 5.1, 5.3_
 
-- [-] 10. Update remaining features with Material Glass
+- [x] 10. Update remaining features with Material Glass
   - Update `NotificationsView.swift`, `ProfileView.swift`, and other feature views
   - Apply Material Glass components consistently across all features
   - Ensure proper Dark Mode support for all Material Glass implementations
   - Write comprehensive UI tests for all updated features
   - _Requirements: 2.2, 2.4, 5.1_
 
-- [ ] 11. Implement standardized error handling
+- [-] 11. Implement standardized error handling
   - Enhance `ErrorPresenter` to support Material Glass toast notifications
   - Create `GlassToast` component for consistent error display
   - Update all services to use standardized error handling patterns

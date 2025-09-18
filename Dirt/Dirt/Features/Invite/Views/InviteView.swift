@@ -19,59 +19,106 @@ struct InviteView: View {
             .padding(.horizontal)
             .padding(.top)
             
-            // Referral Card
-            VStack(spacing: 16) {
-                HStack(spacing: 12) {
-                    Text(referralCode)
-                        .font(.title2).monospaced().bold()
-                        .padding(12)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                    
-                    Button(action: copyCode) {
-                        Label("Copy", systemImage: "doc.on.doc")
+            // Referral Card with glass styling
+            GlassCard(
+                material: MaterialDesignSystem.Context.card,
+                cornerRadius: UICornerRadius.xl,
+                padding: UISpacing.lg
+            ) {
+                VStack(spacing: UISpacing.md) {
+                    HStack(spacing: UISpacing.sm) {
+                        Text(referralCode)
+                            .font(.title2)
+                            .fontDesign(.monospaced)
+                            .fontWeight(.bold)
+                            .foregroundColor(UIColors.label)
+                            .padding(UISpacing.sm)
+                            .background(MaterialDesignSystem.Glass.ultraThin)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: UICornerRadius.xs)
+                                    .stroke(MaterialDesignSystem.GlassBorders.subtle, lineWidth: 1)
+                            )
+                            .cornerRadius(UICornerRadius.xs)
+                        
+                        GlassButton(
+                            "Copy",
+                            systemImage: "doc.on.doc",
+                            style: .secondary
+                        ) {
+                            copyCode()
+                        }
                     }
-                    .buttonStyle(.bordered)
+                    
+                    GlassButton(
+                        "Share Invite",
+                        systemImage: "square.and.arrow.up",
+                        style: .primary
+                    ) {
+                        share()
+                    }
                 }
-                
-                Button(action: share) {
-                    Label("Share Invite", systemImage: "square.and.arrow.up")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
             }
-            .padding()
-            .background(.thinMaterial)
-            .cornerRadius(16)
+            .padding(.horizontal)
+            .glassAppear()
+            
+            // Benefits with glass card
+            GlassCard(
+                material: MaterialDesignSystem.Context.card,
+                padding: UISpacing.md
+            ) {
+                VStack(alignment: .leading, spacing: UISpacing.sm) {
+                    Text("Benefits")
+                        .font(.headline)
+                        .foregroundColor(UIColors.label)
+                    
+                    VStack(alignment: .leading, spacing: UISpacing.xs) {
+                        Label("Unlock extra monthly lookups", systemImage: "bolt.fill")
+                            .foregroundColor(UIColors.warning)
+                        Label("Priority alerts for saved searches", systemImage: "bell.badge.fill")
+                            .foregroundColor(UIColors.accentPrimary)
+                        Label("Early access to new features", systemImage: "sparkles")
+                            .foregroundColor(UIColors.accentSecondary)
+                    }
+                    .font(.subheadline)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
             .padding(.horizontal)
             
-            // Benefits
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Benefits")
-                    .font(.headline)
-                Label("Unlock extra monthly lookups", systemImage: "bolt.fill")
-                Label("Priority alerts for saved searches", systemImage: "bell.badge.fill")
-                Label("Early access to new features", systemImage: "sparkles")
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            
-            // Share Targets (placeholder)
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Share via")
-                    .font(.headline)
-                HStack(spacing: 12) {
-                    ForEach(["message.fill", "envelope.fill", "link"], id: \.self) { icon in
-                        Image(systemName: icon)
-                            .font(.title3)
-                            .frame(width: 52, height: 52)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
+            // Share Targets with glass styling
+            GlassCard(
+                material: MaterialDesignSystem.Context.card,
+                padding: UISpacing.md
+            ) {
+                VStack(alignment: .leading, spacing: UISpacing.sm) {
+                    Text("Share via")
+                        .font(.headline)
+                        .foregroundColor(UIColors.label)
+                    
+                    HStack(spacing: UISpacing.sm) {
+                        ForEach(Array(zip(["message.fill", "envelope.fill", "link"], [UIColors.success, UIColors.accentPrimary, UIColors.secondaryLabel])), id: \.0) { icon, color in
+                            Button(action: {
+                                // Handle specific share action
+                            }) {
+                                Image(systemName: icon)
+                                    .font(.title3)
+                                    .foregroundColor(color)
+                                    .frame(width: 52, height: 52)
+                                    .background(MaterialDesignSystem.Glass.ultraThin)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: UICornerRadius.sm)
+                                            .stroke(MaterialDesignSystem.GlassBorders.subtle, lineWidth: 1)
+                                    )
+                                    .cornerRadius(UICornerRadius.sm)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                        
+                        Spacer()
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
             
             Spacer()
@@ -79,16 +126,12 @@ struct InviteView: View {
         .navigationBarTitleDisplayMode(.inline)
         .overlay(alignment: .top) {
             if showCopied {
-                Text("Copied!")
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(.thinMaterial)
-                    .cornerRadius(12)
-                    .padding(.top, 8)
-                    .transition(.move(edge: .top).combined(with: .opacity))
+                GlassToast(message: "Copied!", type: .success)
+                    .padding(.top, UISpacing.xs)
+                    .transition(MaterialMotion.Transition.slideDown)
             }
         }
-        .animation(.easeInOut, value: showCopied)
+        .animation(MaterialMotion.Glass.toastAppear, value: showCopied)
     }
     
     private func copyCode() {

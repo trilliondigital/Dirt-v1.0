@@ -192,48 +192,69 @@ struct NotificationsView: View {
 
 struct NotificationRow: View {
     let notification: Notification
+    @State private var isPressed = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .top, spacing: 12) {
-                // Notification Icon
+        GlassCard(
+            material: notification.isRead ? MaterialDesignSystem.Glass.ultraThin : MaterialDesignSystem.Glass.thin,
+            padding: UISpacing.md
+        ) {
+            HStack(alignment: .top, spacing: UISpacing.sm) {
+                // Notification Icon with glass effect
                 ZStack {
                     Circle()
-                        .fill(notification.isRead ? Color.gray.opacity(0.2) : Color.blue.opacity(0.2))
+                        .fill(notification.isRead ? 
+                              MaterialDesignSystem.GlassColors.neutral : 
+                              MaterialDesignSystem.GlassColors.primary)
                         .frame(width: 44, height: 44)
+                        .overlay(
+                            Circle()
+                                .stroke(
+                                    notification.isRead ? 
+                                    MaterialDesignSystem.GlassBorders.subtle : 
+                                    MaterialDesignSystem.GlassBorders.accent,
+                                    lineWidth: 1
+                                )
+                        )
                     
                     if let imageName = notification.imageName {
                         Image(systemName: imageName)
-                            .foregroundColor(notification.isRead ? .blue : .white)
-                            .imageScale(.small)
+                            .foregroundColor(notification.isRead ? UIColors.secondaryLabel : UIColors.accentPrimary)
+                            .font(.system(size: 16, weight: .medium))
                     }
                 }
                 
                 // Notification Content
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: UISpacing.xxs) {
                     Text("\(notification.username) \(notification.action)")
                         .font(.subheadline)
-                        .foregroundColor(notification.isRead ? .gray : .primary)
+                        .fontWeight(notification.isRead ? .regular : .medium)
+                        .foregroundColor(notification.isRead ? UIColors.secondaryLabel : UIColors.label)
+                        .lineLimit(2)
                     
                     Text(notification.timeAgo)
                         .font(.caption)
-                        .foregroundColor(.gray)
+                        .foregroundColor(UIColors.secondaryLabel)
                 }
-                .padding(.vertical, 12)
                 
                 Spacer()
                 
-                // Unread indicator
+                // Unread indicator with glass effect
                 if !notification.isRead {
                     Circle()
-                        .fill(Color.blue)
+                        .fill(UIColors.accentPrimary)
                         .frame(width: 8, height: 8)
+                        .shadow(color: MaterialDesignSystem.GlassShadows.soft, radius: 2)
                 }
             }
-            .padding()
         }
-        .cardBackground()
         .padding(.horizontal)
+        .glassPress(isPressed: isPressed)
+        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
+            withAnimation(MaterialMotion.Interactive.buttonPress(isPressed: pressing)) {
+                isPressed = pressing
+            }
+        }, perform: {})
     }
 }
 

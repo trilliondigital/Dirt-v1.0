@@ -9,155 +9,149 @@ struct ProfileView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 0) {
-                    // Header
+                    // Header with Material Glass overlay
                     ZStack(alignment: .bottomTrailing) {
-                        // Cover Photo
+                        // Cover Photo with glass overlay
                         Rectangle()
-                            .fill(LinearGradient(gradient: Gradient(colors: [.blue, .purple]), 
-                                              startPoint: .topLeading, 
-                                              endPoint: .bottomTrailing))
+                            .fill(UIGradients.primary)
                             .frame(height: 160)
                             .overlay(
-                                VStack {
-                                    Spacer()
-                                    Text("Dirt")
-                                        .font(.largeTitle)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.white)
-                                        .shadow(radius: 5)
-                                    Text("@dirtapp")
-                                        .font(.subheadline)
-                                        .foregroundColor(.white.opacity(0.9))
-                                        .padding(.bottom, 8)
-                                }
+                                // Glass overlay for better text readability
+                                Rectangle()
+                                    .fill(MaterialDesignSystem.Glass.thin)
+                                    .overlay(
+                                        VStack {
+                                            Spacer()
+                                            Text("Dirt")
+                                                .font(.largeTitle)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.white)
+                                                .shadow(color: MaterialDesignSystem.GlassShadows.strong, radius: 8)
+                                            Text("@dirtapp")
+                                                .font(.subheadline)
+                                                .foregroundColor(.white.opacity(0.9))
+                                                .padding(.bottom, UISpacing.xs)
+                                        }
+                                    )
                             )
                         
-                        // Profile Image
+                        // Profile Image with glass effect
                         ZStack {
                             Circle()
-                                .fill(Color.white)
+                                .fill(MaterialDesignSystem.Glass.regular)
                                 .frame(width: 100, height: 100)
-                                .shadow(radius: 5)
+                                .overlay(
+                                    Circle()
+                                        .stroke(MaterialDesignSystem.GlassBorders.prominent, lineWidth: 2)
+                                )
+                                .shadow(color: MaterialDesignSystem.GlassShadows.medium, radius: 12, x: 0, y: 6)
                                 .offset(y: 20)
                             
                             Image(systemName: "person.fill")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 50, height: 50)
-                                .foregroundColor(.gray)
+                                .foregroundColor(UIColors.secondaryLabel)
                                 .offset(y: 20)
                         }
                         .offset(x: 20, y: 40)
                     }
                     .padding(.bottom, 40)
                     
-                    // Stats
-                    HStack {
-                        VStack {
-                            Text("1,234")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                            Text("Posts")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                        .frame(maxWidth: .infinity)
-                        
-                        Divider()
-                            .frame(height: 30)
-                        
-                        VStack {
-                            Text("5.6K")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                            Text("Followers")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                        .frame(maxWidth: .infinity)
-                        
-                        Divider()
-                            .frame(height: 30)
-                        
-                        VStack {
-                            Text("2.1K")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                            Text("Following")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .padding(.vertical)
-                    .padding(.horizontal, 20)
-                    
-                    // Bio
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("About")
-                            .font(.headline)
-                        
-                        Text("Welcome to Dirt - the app where men can share their dating experiences, warn others about red flags, and celebrate green flags. Stay safe out there! 🚩✅")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                            .lineSpacing(4)
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color(.systemBackground))
-                    .cornerRadius(12)
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-                    
-                    // Tabs
-                    HStack(spacing: 0) {
-                        Button(action: { selectedTab = 0 }) {
+                    // Stats with glass card
+                    GlassCard(material: MaterialDesignSystem.Context.card, padding: UISpacing.md) {
+                        HStack {
                             VStack {
+                                Text("1,234")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(UIColors.label)
                                 Text("Posts")
-                                    .font(.subheadline)
-                                    .fontWeight(selectedTab == 0 ? .semibold : .regular)
-                                    .foregroundColor(selectedTab == 0 ? .blue : .gray)
-                                
-                                Capsule()
-                                    .fill(selectedTab == 0 ? Color.blue : Color.clear)
-                                    .frame(height: 2)
-                                    .padding(.horizontal, 20)
+                                    .font(.caption)
+                                    .foregroundColor(UIColors.secondaryLabel)
                             }
-                        }
-                        .frame(maxWidth: .infinity)
-                        
-                        Button(action: { selectedTab = 1 }) {
+                            .frame(maxWidth: .infinity)
+                            
+                            Rectangle()
+                                .fill(MaterialDesignSystem.GlassBorders.subtle)
+                                .frame(width: 1, height: 30)
+                            
                             VStack {
-                                Text("Saved")
-                                    .font(.subheadline)
-                                    .fontWeight(selectedTab == 1 ? .semibold : .regular)
-                                    .foregroundColor(selectedTab == 1 ? .blue : .gray)
-                                
-                                Capsule()
-                                    .fill(selectedTab == 1 ? Color.blue : Color.clear)
-                                    .frame(height: 2)
-                                    .padding(.horizontal, 20)
+                                Text("5.6K")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(UIColors.label)
+                                Text("Followers")
+                                    .font(.caption)
+                                    .foregroundColor(UIColors.secondaryLabel)
                             }
-                        }
-                        .frame(maxWidth: .infinity)
-                        
-                        Button(action: { selectedTab = 2 }) {
+                            .frame(maxWidth: .infinity)
+                            
+                            Rectangle()
+                                .fill(MaterialDesignSystem.GlassBorders.subtle)
+                                .frame(width: 1, height: 30)
+                            
                             VStack {
-                                Text("Liked")
-                                    .font(.subheadline)
-                                    .fontWeight(selectedTab == 2 ? .semibold : .regular)
-                                    .foregroundColor(selectedTab == 2 ? .blue : .gray)
-                                
-                                Capsule()
-                                    .fill(selectedTab == 2 ? Color.blue : Color.clear)
-                                    .frame(height: 2)
-                                    .padding(.horizontal, 20)
+                                Text("2.1K")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(UIColors.label)
+                                Text("Following")
+                                    .font(.caption)
+                                    .foregroundColor(UIColors.secondaryLabel)
                             }
+                            .frame(maxWidth: .infinity)
                         }
-                        .frame(maxWidth: .infinity)
                     }
-                    .padding(.top, 20)
-                    .padding(.bottom, 8)
+                    .padding(.horizontal)
+                    
+                    // Bio with glass card
+                    GlassCard(material: MaterialDesignSystem.Context.card, padding: UISpacing.md) {
+                        VStack(alignment: .leading, spacing: UISpacing.sm) {
+                            Text("About")
+                                .font(.headline)
+                                .foregroundColor(UIColors.label)
+                            
+                            Text("Welcome to Dirt - the app where men can share their dating experiences, warn others about red flags, and celebrate green flags. Stay safe out there! 🚩✅")
+                                .font(.subheadline)
+                                .foregroundColor(UIColors.secondaryLabel)
+                                .lineSpacing(4)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, UISpacing.xs)
+                    .glassAppear()
+                    
+                    // Tabs with glass styling
+                    GlassCard(material: MaterialDesignSystem.Glass.ultraThin, padding: UISpacing.xs) {
+                        HStack(spacing: 0) {
+                            ForEach(Array(zip(["Posts", "Saved", "Liked"], [0, 1, 2])), id: \.1) { title, index in
+                                Button(action: { 
+                                    withAnimation(MaterialMotion.Interactive.tabSelection()) {
+                                        selectedTab = index
+                                    }
+                                }) {
+                                    VStack(spacing: UISpacing.xxs) {
+                                        Text(title)
+                                            .font(.subheadline)
+                                            .fontWeight(selectedTab == index ? .semibold : .regular)
+                                            .foregroundColor(selectedTab == index ? UIColors.accentPrimary : UIColors.secondaryLabel)
+                                        
+                                        Capsule()
+                                            .fill(selectedTab == index ? UIColors.accentPrimary : Color.clear)
+                                            .frame(height: 2)
+                                            .padding(.horizontal, UISpacing.lg)
+                                    }
+                                    .padding(.vertical, UISpacing.sm)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, UISpacing.lg)
                     
                     // Content based on tab
                     if selectedTab == 0 {
@@ -216,13 +210,15 @@ struct ProfileView: View {
                 }
             }
             .navigationBarTitle("", displayMode: .inline)
+            .background(MaterialDesignSystem.Context.navigation.ignoresSafeArea())
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
+                    GlassButton(
+                        "",
+                        systemImage: "gearshape",
+                        style: .subtle
+                    ) {
                         isSettingsPresented = true
-                    }) {
-                        Image(systemName: "gearshape")
-                            .font(.system(size: 18))
                     }
                 }
             }

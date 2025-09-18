@@ -28,12 +28,26 @@ struct OnboardingView: View {
 
                 HStack {
                     if page > 0 {
-                        Button("Back") { withAnimation { page -= 1 } }
+                        GlassButton(
+                            "Back",
+                            style: .secondary
+                        ) {
+                            withAnimation(MaterialMotion.Spring.standard) { 
+                                page -= 1 
+                            }
+                        }
                     }
+                    
                     Spacer()
-                    Button(page == 2 ? "Get Started" : "Next") {
+                    
+                    GlassButton(
+                        page == 2 ? "Get Started" : "Next",
+                        style: .primary
+                    ) {
                         if page < 2 {
-                            withAnimation { page += 1 }
+                            withAnimation(MaterialMotion.Spring.standard) { 
+                                page += 1 
+                            }
                         } else {
                             Task {
                                 do {
@@ -44,20 +58,23 @@ struct OnboardingView: View {
                                 showDone = true
                                 onboardingCompleted = true
                                 onComplete?()
-                                HapticFeedback.notification(type: .success)
+                                MaterialHaptics.success()
                                 toastCenter.show(.success, "You're set!")
                             }
                         }
                     }
-                    .buttonStyle(.borderedProminent)
                 }
                 .padding()
             }
             .navigationTitle("Welcome")
+            .background(MaterialDesignSystem.Context.navigation.ignoresSafeArea())
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if page < 2 {
-                        Button("Skip") {
+                        GlassButton(
+                            "Skip",
+                            style: .subtle
+                        ) {
                             onboardingCompleted = true
                             onComplete?()
                         }
@@ -74,36 +91,64 @@ struct OnboardingView: View {
 
     private var purposeView: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Purpose & Community Rules")
-                    .font(.title2).bold()
-                Text("Dirt helps men share and discover dating insights with privacy-first defaults. Be respectful and constructive.")
-                VStack(alignment: .leading, spacing: 8) {
-                    Label("No doxxing or PII.", systemImage: "checkmark.seal")
-                    Label("Report harmful content.", systemImage: "flag")
-                    Label("Blurred media by default.", systemImage: "eye.slash")
-                    Label("Select Red/Green signals honestly.", systemImage: "hand.thumbsup")
+            VStack(spacing: UISpacing.lg) {
+                GlassCard(
+                    material: MaterialDesignSystem.Context.card,
+                    padding: UISpacing.lg
+                ) {
+                    VStack(alignment: .leading, spacing: UISpacing.md) {
+                        Text("Purpose & Community Rules")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(UIColors.label)
+                        
+                        Text("Dirt helps men share and discover dating insights with privacy-first defaults. Be respectful and constructive.")
+                            .font(.subheadline)
+                            .foregroundColor(UIColors.secondaryLabel)
+                        
+                        VStack(alignment: .leading, spacing: UISpacing.xs) {
+                            Label("No doxxing or PII.", systemImage: "checkmark.seal")
+                                .foregroundColor(UIColors.success)
+                            Label("Report harmful content.", systemImage: "flag")
+                                .foregroundColor(UIColors.warning)
+                            Label("Blurred media by default.", systemImage: "eye.slash")
+                                .foregroundColor(UIColors.accentPrimary)
+                            Label("Select Red/Green signals honestly.", systemImage: "hand.thumbsup")
+                                .foregroundColor(UIColors.accentSecondary)
+                        }
+                        .font(.subheadline)
+                        
+                        Text("By continuing you agree to the community rules.")
+                            .font(.footnote)
+                            .foregroundColor(UIColors.secondaryLabel)
+                            .padding(.top, UISpacing.sm)
+                    }
                 }
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                Spacer(minLength: 12)
-                Text("By continuing you agree to the community rules.")
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
+                .glassAppear()
             }
             .padding()
         }
     }
 
     private var authView: some View {
-        VStack(spacing: 16) {
-            Text("Sign In")
-                .font(.title2).bold()
-            Text("Anonymous-first. Use Apple for privacy or email as fallback.")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
+        VStack(spacing: UISpacing.lg) {
+            GlassCard(
+                material: MaterialDesignSystem.Context.card,
+                padding: UISpacing.lg
+            ) {
+                VStack(spacing: UISpacing.md) {
+                    Text("Sign In")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(UIColors.label)
+                    
+                    Text("Anonymous-first. Use Apple for privacy or email as fallback.")
+                        .font(.subheadline)
+                        .foregroundColor(UIColors.secondaryLabel)
+                        .multilineTextAlignment(.center)
+                }
+            }
+            .glassAppear()
 
             // Apple Sign In
             SignInWithAppleButton(.continue) { request in
@@ -138,27 +183,41 @@ struct OnboardingView: View {
             .cornerRadius(8)
             .padding(.horizontal)
 
-            // Email fallback (stub)
-            HStack {
-                TextField("Email", text: $email)
-                    .textInputAutocapitalization(.never)
-                    .keyboardType(.emailAddress)
-                    .textFieldStyle(.roundedBorder)
-                Button("Send Link") {
-                    let e = email.trimmingCharacters(in: .whitespacesAndNewlines)
-                    guard !e.isEmpty else { return }
-                    Task { @MainActor in
-                        do {
-                            try await supabase.signInWithEmailMagicLink(email: e)
-                            HapticFeedback.impact(style: .light)
-                            toastCenter.show(.info, "Check your email for the link")
-                        } catch {
-                            HapticFeedback.notification(type: .error)
-                            toastCenter.show(.error, NSLocalizedString("Something went wrong. Please try again.", comment: ""))
+            // Email fallback with glass styling
+            GlassCard(
+                material: MaterialDesignSystem.Context.card,
+                padding: UISpacing.md
+            ) {
+                HStack(spacing: UISpacing.sm) {
+                    TextField("Email", text: $email)
+                        .textInputAutocapitalization(.never)
+                        .keyboardType(.emailAddress)
+                        .padding(UISpacing.sm)
+                        .background(MaterialDesignSystem.Glass.ultraThin)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: UICornerRadius.xs)
+                                .stroke(MaterialDesignSystem.GlassBorders.subtle, lineWidth: 1)
+                        )
+                        .cornerRadius(UICornerRadius.xs)
+                    
+                    GlassButton(
+                        "Send Link",
+                        style: .secondary
+                    ) {
+                        let e = email.trimmingCharacters(in: .whitespacesAndNewlines)
+                        guard !e.isEmpty else { return }
+                        Task { @MainActor in
+                            do {
+                                try await supabase.signInWithEmailMagicLink(email: e)
+                                MaterialHaptics.light()
+                                toastCenter.show(.info, "Check your email for the link")
+                            } catch {
+                                MaterialHaptics.error()
+                                toastCenter.show(.error, NSLocalizedString("Something went wrong. Please try again.", comment: ""))
+                            }
                         }
                     }
                 }
-                .buttonStyle(.bordered)
             }
             .padding(.horizontal)
             Spacer()
@@ -167,27 +226,63 @@ struct OnboardingView: View {
 
     private var interestsView: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Pick a few interests (optional)")
-                    .font(.title3).bold()
-                FlowLayout(TagCatalog.all, spacing: 8) { tag in
-                    let isOn = selectedInterests.contains(tag)
-                    Text(tag.rawValue)
-                        .font(.subheadline)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(isOn ? Color.blue.opacity(0.15) : Color(.systemGray6))
-                        .cornerRadius(16)
-                        .onTapGesture {
-                            if isOn { selectedInterests.remove(tag) } else { selectedInterests.insert(tag) }
+            GlassCard(
+                material: MaterialDesignSystem.Context.card,
+                padding: UISpacing.lg
+            ) {
+                VStack(alignment: .leading, spacing: UISpacing.md) {
+                    Text("Pick a few interests (optional)")
+                        .font(.title3)
+                        .fontWeight(.bold)
+                        .foregroundColor(UIColors.label)
+                    
+                    FlowLayout(TagCatalog.all, spacing: UISpacing.xs) { tag in
+                        let isOn = selectedInterests.contains(tag)
+                        
+                        Button(action: {
+                            withAnimation(MaterialMotion.Spring.quick) {
+                                if isOn { 
+                                    selectedInterests.remove(tag) 
+                                } else { 
+                                    selectedInterests.insert(tag) 
+                                }
+                            }
+                            MaterialHaptics.selection()
+                        }) {
+                            Text(tag.rawValue)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(isOn ? UIColors.accentPrimary : UIColors.label)
+                                .padding(.horizontal, UISpacing.sm)
+                                .padding(.vertical, UISpacing.xs)
+                                .background(
+                                    isOn ? 
+                                    MaterialDesignSystem.GlassColors.primary : 
+                                    MaterialDesignSystem.Glass.ultraThin
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: UICornerRadius.xl)
+                                        .stroke(
+                                            isOn ? 
+                                            MaterialDesignSystem.GlassBorders.accent : 
+                                            MaterialDesignSystem.GlassBorders.subtle,
+                                            lineWidth: 1
+                                        )
+                                )
+                                .cornerRadius(UICornerRadius.xl)
                         }
+                        .buttonStyle(PlainButtonStyle())
+                        .glassSelection(isSelected: isOn)
+                    }
+                    
+                    Text("These help personalize your Feed.")
+                        .font(.footnote)
+                        .foregroundColor(UIColors.secondaryLabel)
+                        .padding(.top, UISpacing.sm)
                 }
-                Spacer(minLength: 12)
-                Text("These help personalize your Feed.")
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
             }
             .padding()
+            .glassAppear()
         }
     }
 }

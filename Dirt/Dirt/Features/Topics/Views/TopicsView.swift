@@ -20,42 +20,45 @@ struct TopicsView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Search
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass").foregroundColor(.secondary)
-                TextField("Search topics", text: $search)
-                if !search.isEmpty {
-                    Button { search.removeAll() } label: { Image(systemName: "xmark.circle.fill").foregroundColor(.secondary) }
-                }
-            }
-            .padding(10)
-            .background(Color(.systemGray6))
-            .cornerRadius(10)
+            // Glass search bar
+            GlassSearchBar(
+                text: $search,
+                placeholder: "Search topics"
+            )
             .padding([.horizontal, .top])
             
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 12) {
+                LazyVGrid(columns: columns, spacing: UISpacing.sm) {
                     ForEach(filtered) { topic in
                         NavigationLink(destination: Text("Filtered feed for \(topic.title)")) {
-                            HStack(alignment: .center, spacing: 12) {
-                                Text(topic.icon)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(topic.title)
-                                        .foregroundColor(.primary)
-                                    Text("\(topic.count) posts")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
+                            GlassCard(
+                                material: MaterialDesignSystem.Context.card,
+                                padding: UISpacing.md
+                            ) {
+                                HStack(alignment: .center, spacing: UISpacing.sm) {
+                                    Text(topic.icon)
+                                        .font(.title2)
+                                    
+                                    VStack(alignment: .leading, spacing: UISpacing.xxs) {
+                                        Text(topic.title)
+                                            .foregroundColor(UIColors.label)
+                                            .font(.system(size: 16, weight: .medium))
+                                        
+                                        Text("\(topic.count) posts")
+                                            .font(.caption)
+                                            .foregroundColor(UIColors.secondaryLabel)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12, weight: .medium))
+                                        .foregroundColor(UIColors.secondaryLabel)
                                 }
-                                Spacer()
                             }
-                            .padding(14)
-                            .background(Color(.systemBackground))
-                            .cornerRadius(12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(.systemGray5), lineWidth: 1)
-                            )
+                            .glassAppear()
                         }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
                 .padding()
@@ -63,7 +66,7 @@ struct TopicsView: View {
         }
         .navigationTitle("Topics")
         .navigationBarTitleDisplayMode(.inline)
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .background(MaterialDesignSystem.Context.navigation.ignoresSafeArea())
     }
 }
 
