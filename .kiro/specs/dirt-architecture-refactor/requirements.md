@@ -16,6 +16,7 @@ The Dirt iOS app has grown organically and now requires architectural refactorin
 2. WHEN organizing the architecture THEN the system SHALL follow iOS best practices with clear separation of concerns
 3. WHEN refactoring is complete THEN the system SHALL have a documented file structure with clear ownership and purpose for each component
 4. IF files are unused or deprecated THEN the system SHALL remove them or clearly mark them as archived
+5. WHEN creating the new architecture THEN the system SHALL maintain backward compatibility during the transition
 
 ### Requirement 2
 
@@ -27,6 +28,7 @@ The Dirt iOS app has grown organically and now requires architectural refactorin
 2. WHEN applying visual updates THEN the system SHALL maintain existing UX flows while modernizing the visual presentation
 3. WHEN updating UI components THEN the system SHALL ensure proper Dark Mode support
 4. WHEN implementing glass effects THEN the system SHALL maintain accessibility standards and readability
+5. WHEN creating Material Glass components THEN the system SHALL ensure consistent visual hierarchy and spacing
 
 ### Requirement 3
 
@@ -71,6 +73,7 @@ The Dirt iOS app has grown organically and now requires architectural refactorin
 2. WHEN structuring the project THEN the system SHALL optimize build times through proper module organization
 3. WHEN cleaning up code THEN the system SHALL remove dead code and unused dependencies
 4. WHEN refactoring is complete THEN the system SHALL have measurably improved build and test execution times
+5. WHEN consolidating services THEN the system SHALL maintain or improve performance characteristics
 
 ### Requirement 7
 
