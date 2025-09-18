@@ -16,7 +16,7 @@ struct ReportService {
             "timestamp": ISO8601DateFormatter().string(from: Date())
         ]
         debugPrint("[ReportService] submitReport:", payload)
-        AnalyticsService.shared.log("report_submitted", [
+        AnalyticsService.shared.trackUserAction("report_submitted", parameters: [
             "post_id": postId.uuidString,
             "reason": reason.rawValue
         ])
@@ -33,7 +33,7 @@ struct ReportService {
                     try await submitReportWithRetry(postId: postId, reason: reason)
                 } catch {
                     debugPrint("[ReportService] backend submit failed after retries:", String(describing: error))
-                    AnalyticsService.shared.log("report_submit_failed", [
+                    AnalyticsService.shared.trackUserAction("report_submit_failed", parameters: [
                         "post_id": postId.uuidString,
                         "reason": reason.rawValue
                     ])
