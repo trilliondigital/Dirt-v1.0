@@ -9,7 +9,9 @@ struct DirtNotification: Codable, Identifiable, Equatable {
     let data: NotificationData?
     let createdAt: Date
     var isRead: Bool
+    var isDelivered: Bool
     var deliveredAt: Date?
+    var readAt: Date?
     
     init(
         id: UUID = UUID(),
@@ -20,7 +22,9 @@ struct DirtNotification: Codable, Identifiable, Equatable {
         data: NotificationData? = nil,
         createdAt: Date = Date(),
         isRead: Bool = false,
-        deliveredAt: Date? = nil
+        isDelivered: Bool = false,
+        deliveredAt: Date? = nil,
+        readAt: Date? = nil
     ) {
         self.id = id
         self.userId = userId
@@ -30,7 +34,15 @@ struct DirtNotification: Codable, Identifiable, Equatable {
         self.data = data
         self.createdAt = createdAt
         self.isRead = isRead
+        self.isDelivered = isDelivered
         self.deliveredAt = deliveredAt
+        self.readAt = readAt
+    }
+    
+    var timeAgo: String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .abbreviated
+        return formatter.localizedString(for: createdAt, relativeTo: Date())
     }
 }
 
