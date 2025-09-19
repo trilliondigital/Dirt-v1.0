@@ -1,0 +1,78 @@
+import SwiftUI
+import Combine
+
+@MainActor
+class AppState: ObservableObject {
+    @Published var selectedTab: TabItem = .feed
+    @Published var isLoading = false
+    @Published var showingAlert = false
+    @Published var alertMessage = ""
+    @Published var currentUser: User?
+    
+    // Navigation state
+    @Published var navigationPath = NavigationPath()
+    
+    // Theme and appearance
+    @Published var isDarkMode = false
+    @Published var useSystemAppearance = true
+    
+    init() {
+        setupAppearance()
+    }
+    
+    private func setupAppearance() {
+        // Configure app-wide appearance
+        if useSystemAppearance {
+            // Use system appearance
+        } else {
+            // Use custom theme
+        }
+    }
+    
+    func showAlert(message: String) {
+        alertMessage = message
+        showingAlert = true
+    }
+    
+    func setLoading(_ loading: Bool) {
+        isLoading = loading
+    }
+}
+
+enum TabItem: String, CaseIterable {
+    case feed = "Feed"
+    case search = "Search"
+    case create = "Create"
+    case notifications = "Notifications"
+    case profile = "Profile"
+    
+    var iconName: String {
+        switch self {
+        case .feed:
+            return "house"
+        case .search:
+            return "magnifyingglass"
+        case .create:
+            return "plus.circle"
+        case .notifications:
+            return "bell"
+        case .profile:
+            return "person.circle"
+        }
+    }
+    
+    var selectedIconName: String {
+        switch self {
+        case .feed:
+            return "house.fill"
+        case .search:
+            return "magnifyingglass"
+        case .create:
+            return "plus.circle.fill"
+        case .notifications:
+            return "bell.fill"
+        case .profile:
+            return "person.circle.fill"
+        }
+    }
+}

@@ -1,0 +1,351 @@
+import SwiftUI
+
+struct NotificationCenterView: View {
+    @StateObject private var pushNotificationService = PushNotificationService.shared
+    @StateObject private var communityAnnouncementService = CommunityAnnouncementService.shared
+    
+    @State private var selectedFilter: NotificationFilter = .all
+    @State private var showingSettings = false
+    
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 0) {
+                // Filter tabs
+                filterTabs
+                
+                // Content
+                if filteredNotifications.isEmpty {
+                    emptyState
+                } else {
+                    notificationsList
+                }
+            }
+            .navigationTitle("Notifications")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    if pushNotificationService.unreadCount > 0 {
+                        Button("Mark All Read") {
+                            pushNotificationService.markAllAsRead()
+                        }
+                        .font(.caption)
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gear")
+                    }
+                }
+            }
+            .sheet(isPresented: $showingSettings) {
+                NotificationSettingsView()
+            }
+        }
+    }
+    
+    // MARK: - Filter Tabs
+    
+    private var filterTabs: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(NotificationFilter.allCases, id: \.self) { filter in
+                    FilterChip(
+                        title: filter.displayName,
+                        count: getCountForFilter(filter),
+                        isSelected: selectedFilter == filter
+                    ) {
+                        selectedFilter = filter
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+        .padding(.vertical, 8)
+    }
+    
+    // MARK: - Notifications List
+    
+    private var notificationsList: some View {
+        List {
+            // Community announcements (if any)
+            if selectedFilter == .all || selectedFilter == .announcements {
+                let activeAnnouncements = communityAnnouncementService.getActiveAnnouncements()
+                if !activeAnnouncements.isEmpty {
+                    Section("Community Announcements") {
+                        ForEach(activeAnnouncements.prefix(3)) { announcement in
+                            AnnouncementRowView(
+                                announcement: announcement,
+                                onTap: {
+                                    handleAnnouncementTap(announcement)
+                                },
+                                onMarkAsRead: {
+                                    communityAnnouncementService.markAnnouncementAsRead(announcement.id)
+                                },
+                                onDismiss: {
+                                    communityAnnouncementService.dismissAnnouncement(announcement.id)
+                                }
+                            )
+                        }
+                        
+                        if activeAnnouncements.count > 3 {
+                            NavigationLink("View All Announcements") {
+                                AnnouncementsListView()
+                            }
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                        }
+                    }
+                }
+            }
+            
+            // Regular notifications
+            Section("Activity") {
+                ForEach(filteredNotifications) { notification in
+                    NotificationRowView(
+                        notification: notification,
+                        onTap: {
+                            handleNotificationTap(notification)
+                        },
+                        onMarkAsRead: {
+                            pushNotificationService.markAsRead(notification.id)
+                        },
+                        onDelete: {
+                            pushNotificationService.deleteNotification(notification.id)
+                        }
+                    )
+                }
+            }
+        }
+        .listStyle(PlainListStyle())
+        .refreshable {
+            // In a real app, this would fetch new notifications
+            await refreshNotifications()
+        }
+    }
+    
+    // MARK: - Empty State
+    
+    private var emptyState: some View {
+        VStack(spacing: 20) {
+            Image(systemName: emptyStateIcon)
+                .font(.system(size: 64))
+                .foregroundColor(.secondary)
+            
+            VStack(spacing: 8) {
+                Text(emptyStateTitle)
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                
+                Text(emptyStateMessage)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+            }
+            
+            if selectedFilter != .all {
+                Button("View All Notifications") {
+                    selectedFilter = .all
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    // MARK: - Computed Properties
+    
+    private var filteredNotifications: [DirtNotification] {
+        switch selectedFilter {
+        case .all:
+            return pushNotificationService.notifications
+        case .unread:
+            return pushNotificationService.notifications.filter { !$0.isRead }
+        case .interactions:
+            return pushNotificationService.notifications.filter { $0.type.category == .interaction }
+        case .milestones:
+            return pushNotificationService.notifications.filter { $0.type.category == .milestone }
+        case .achievements:
+            return pushNotificationService.notifications.filter { $0.type.category == .achievement }
+        case .announcements:
+            return pushNotificationService.notifications.filter { $0.type.category == .community }
+        }
+    }
+    
+    private var emptyStateIcon: String {
+        switch selectedFilter {
+        case .all:
+            return "bell.slash"
+        case .unread:
+            return "bell.badge"
+        case .interactions:
+            return "person.2"
+        case .milestones:
+            return "star"
+        case .achievements:
+            return "trophy"
+        case .announcements:
+            return "megaphone"
+        }
+    }
+    
+    private var emptyStateTitle: String {
+        switch selectedFilter {
+        case .all:
+            return "No Notifications"
+        case .unread:
+            return "All Caught Up!"
+        case .interactions:
+            return "No Interactions"
+        case .milestones:
+            return "No Milestones Yet"
+        case .achievements:
+            return "No Achievements Yet"
+        case .announcements:
+            return "No Announcements"
+        }
+    }
+    
+    private var emptyStateMessage: String {
+        switch selectedFilter {
+        case .all:
+            return "When you receive notifications, they'll appear here."
+        case .unread:
+            return "You've read all your notifications."
+        case .interactions:
+            return "Replies, upvotes, and mentions will appear here."
+        case .milestones:
+            return "Reputation and engagement milestones will appear here."
+        case .achievements:
+            return "Badges and accomplishments will appear here."
+        case .announcements:
+            return "Community updates and announcements will appear here."
+        }
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func getCountForFilter(_ filter: NotificationFilter) -> Int {
+        switch filter {
+        case .all:
+            return pushNotificationService.notifications.count
+        case .unread:
+            return pushNotificationService.unreadCount
+        case .interactions:
+            return pushNotificationService.notifications.filter { $0.type.category == .interaction }.count
+        case .milestones:
+            return pushNotificationService.notifications.filter { $0.type.category == .milestone }.count
+        case .achievements:
+            return pushNotificationService.notifications.filter { $0.type.category == .achievement }.count
+        case .announcements:
+            return pushNotificationService.notifications.filter { $0.type.category == .community }.count + communityAnnouncementService.getActiveAnnouncements().count
+        }
+    }
+    
+    private func handleNotificationTap(_ notification: DirtNotification) {
+        pushNotificationService.markAsRead(notification.id)
+        
+        // Handle deep linking if available
+        if let deepLinkPath = notification.data?.deepLinkPath {
+            handleDeepLink(deepLinkPath)
+        }
+    }
+    
+    private func handleAnnouncementTap(_ announcement: CommunityAnnouncement) {
+        communityAnnouncementService.markAnnouncementAsRead(announcement.id)
+        
+        // Handle action URL if available
+        if let actionURL = announcement.actionURL {
+            handleDeepLink(actionURL)
+        }
+    }
+    
+    private func handleDeepLink(_ path: String) {
+        // This would integrate with your app's navigation system
+        print("Deep link: \(path)")
+    }
+    
+    private func refreshNotifications() async {
+        // In a real app, this would fetch new notifications from the server
+        await Task.sleep(nanoseconds: 1_000_000_000) // Simulate network delay
+    }
+}
+
+// MARK: - Filter Chip
+
+struct FilterChip: View {
+    let title: String
+    let count: Int
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Text(title)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                
+                if count > 0 {
+                    Text("\(count)")
+                        .font(.caption2)
+                        .fontWeight(.bold)
+                        .foregroundColor(isSelected ? .white : .blue)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(
+                            Capsule()
+                                .fill(isSelected ? Color.white.opacity(0.3) : Color.blue.opacity(0.2))
+                        )
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                Capsule()
+                    .fill(isSelected ? Color.blue : Color.gray.opacity(0.2))
+            )
+            .foregroundColor(isSelected ? .white : .primary)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+// MARK: - Notification Filter
+
+enum NotificationFilter: CaseIterable {
+    case all
+    case unread
+    case interactions
+    case milestones
+    case achievements
+    case announcements
+    
+    var displayName: String {
+        switch self {
+        case .all:
+            return "All"
+        case .unread:
+            return "Unread"
+        case .interactions:
+            return "Interactions"
+        case .milestones:
+            return "Milestones"
+        case .achievements:
+            return "Achievements"
+        case .announcements:
+            return "Announcements"
+        }
+    }
+}
+
+// MARK: - Preview
+
+struct NotificationCenterView_Previews: PreviewProvider {
+    static var previews: some View {
+        NotificationCenterView()
+    }
+}
