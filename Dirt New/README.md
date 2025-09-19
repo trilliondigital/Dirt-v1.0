@@ -40,6 +40,10 @@ Dirt New/
 │   ├── CreatePost/                 # Post creation
 │   ├── Notifications/              # Notification management
 │   └── Profile/                    # User profile and settings
+├── Reference/                      # Reference materials for development
+│   ├── Tea Screenshots/            # UI/UX reference screenshots (132 images)
+│   ├── whitepaper_dirt.md          # Original product vision and strategy
+│   └── README.md                   # Reference materials guide
 └── README.md                       # This file
 ```
 
@@ -123,6 +127,21 @@ Dirt New/
 ## License
 
 This project is proprietary. All rights reserved.
+
+## Migration Notes
+
+This is a complete rewrite of the Dirt app. The original codebase has been archived as `Dirt Old - ARCHIVED` and essential reference materials have been preserved in the `Reference/` directory.
+
+### What's Preserved
+- **Tea Screenshots**: 132 UI/UX reference screenshots from the original Tea app
+- **Product Vision**: Core whitepaper with MVP features and data model
+
+### What's New
+- Complete SwiftUI rewrite with modern iOS 16+ features
+- Improved architecture with better separation of concerns
+- Enhanced privacy and security implementations
+- Production-ready code with comprehensive error handling
+- Accessibility-first design approach
 
 ## Support
 

@@ -3,45 +3,94 @@ import SwiftUI
 struct NotificationCenterView: View {
     @StateObject private var pushNotificationService = PushNotificationService.shared
     @StateObject private var communityAnnouncementService = CommunityAnnouncementService.shared
+    @StateObject private var badgeManager = NotificationBadgeManager.shared
     
     @State private var selectedFilter: NotificationFilter = .all
     @State private var showingSettings = false
+    @State private var showingHistory = false
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // Filter tabs
-                filterTabs
-                
-                // Content
-                if filteredNotifications.isEmpty {
-                    emptyState
-                } else {
-                    notificationsList
+            TabView {
+                // Notifications Tab
+                VStack(spacing: 0) {
+                    // Filter tabs
+                    filterTabs
+                    
+                    // Content
+                    if filteredNotifications.isEmpty {
+                        emptyState
+                    } else {
+                        notificationsList
+                    }
                 }
+                .tabItem {
+                    Label("Notifications", systemImage: "bell")
+                }
+                .badge(badgeManager.totalBadgeCount > 0 ? badgeManager.totalBadgeCount : nil)
+                
+                // Activity Feed Tab
+                ActivityFeedView()
+                    .tabItem {
+                        Label("Activity", systemImage: "clock.arrow.circlepath")
+                    }
             }
             .navigationTitle("Notifications")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    if pushNotificationService.unreadCount > 0 {
+                    if badgeManager.totalBadgeCount > 0 {
                         Button("Mark All Read") {
-                            pushNotificationService.markAllAsRead()
+                            badgeManager.clearAllBadges()
                         }
                         .font(.caption)
                     }
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showingSettings = true
+                    Menu {
+                        Button {
+                            showingHistory = true
+                        } label: {
+                            Label("History", systemImage: "clock.arrow.circlepath")
+                        }
+                        
+                        NavigationLink {
+                            NotificationManagementView()
+                        } label: {
+                            Label("Manage", systemImage: "slider.horizontal.3")
+                        }
+                        
+                        Button {
+                            showingSettings = true
+                        } label: {
+                            Label("Settings", systemImage: "gear")
+                        }
                     } label: {
-                        Image(systemName: "gear")
+                        ZStack {
+                            Image(systemName: "ellipsis.circle")
+                            
+                            // Badge for settings if there are disabled notifications
+                            if !pushNotificationService.preferences.isEnabled {
+                                VStack {
+                                    HStack {
+                                        Spacer()
+                                        Circle()
+                                            .fill(Color.red)
+                                            .frame(width: 8, height: 8)
+                                    }
+                                    Spacer()
+                                }
+                            }
+                        }
                     }
                 }
             }
             .sheet(isPresented: $showingSettings) {
                 NotificationSettingsView()
+            }
+            .sheet(isPresented: $showingHistory) {
+                NotificationHistoryView()
             }
         }
     }
@@ -231,17 +280,17 @@ struct NotificationCenterView: View {
     private func getCountForFilter(_ filter: NotificationFilter) -> Int {
         switch filter {
         case .all:
-            return pushNotificationService.notifications.count
+            return badgeManager.totalBadgeCount
         case .unread:
-            return pushNotificationService.unreadCount
+            return badgeManager.totalBadgeCount
         case .interactions:
-            return pushNotificationService.notifications.filter { $0.type.category == .interaction }.count
+            return badgeManager.getBadgeCount(for: .interaction)
         case .milestones:
-            return pushNotificationService.notifications.filter { $0.type.category == .milestone }.count
+            return badgeManager.getBadgeCount(for: .milestone)
         case .achievements:
-            return pushNotificationService.notifications.filter { $0.type.category == .achievement }.count
+            return badgeManager.getBadgeCount(for: .achievement)
         case .announcements:
-            return pushNotificationService.notifications.filter { $0.type.category == .community }.count + communityAnnouncementService.getActiveAnnouncements().count
+            return badgeManager.getBadgeCount(for: .community)
         }
     }
     

@@ -245,13 +245,7 @@ enum NotificationFilter: String, CaseIterable {
 }
 
 // MARK: - Extensions
-extension DirtNotification {
-    var timeAgo: String {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
-        return formatter.localizedString(for: createdAt, relativeTo: Date())
-    }
-}
+// timeAgo is now defined in the DirtNotification model
 
 #Preview {
     NotificationsView()

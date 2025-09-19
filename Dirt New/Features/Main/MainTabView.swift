@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @EnvironmentObject var appState: AppState
+    @StateObject private var badgeManager = NotificationBadgeManager.shared
     
     var body: some View {
         TabView(selection: $appState.selectedTab) {
@@ -30,12 +31,13 @@ struct MainTabView: View {
                 .tag(TabItem.create)
             
             // Notifications Tab
-            NotificationsView()
+            NotificationCenterView()
                 .tabItem {
                     Image(systemName: appState.selectedTab == .notifications ? TabItem.notifications.selectedIconName : TabItem.notifications.iconName)
                     Text(TabItem.notifications.rawValue)
                 }
                 .tag(TabItem.notifications)
+                .badge(badgeManager.totalBadgeCount > 0 ? badgeManager.totalBadgeCount : nil)
             
             // Profile Tab
             ProfileView()

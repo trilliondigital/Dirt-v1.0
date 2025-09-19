@@ -1,4 +1,5 @@
 import Foundation
+import UserNotifications
 
 struct DirtNotification: Codable, Identifiable, Equatable {
     let id: UUID

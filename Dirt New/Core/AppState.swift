@@ -11,6 +11,8 @@ class AppState: ObservableObject {
     
     // Navigation state
     @Published var navigationPath = NavigationPath()
+    @Published var deepLinkPath: String?
+    @Published var notificationBadges: [TabItem: Int] = [:]
     
     // Theme and appearance
     @Published var isDarkMode = false
@@ -41,7 +43,7 @@ class AppState: ObservableObject {
 
 enum TabItem: String, CaseIterable {
     case feed = "Feed"
-    case search = "Search"
+    case reviews = "Reviews"
     case create = "Create"
     case notifications = "Notifications"
     case profile = "Profile"
@@ -50,8 +52,8 @@ enum TabItem: String, CaseIterable {
         switch self {
         case .feed:
             return "house"
-        case .search:
-            return "magnifyingglass"
+        case .reviews:
+            return "star"
         case .create:
             return "plus.circle"
         case .notifications:
@@ -65,8 +67,8 @@ enum TabItem: String, CaseIterable {
         switch self {
         case .feed:
             return "house.fill"
-        case .search:
-            return "magnifyingglass"
+        case .reviews:
+            return "star.fill"
         case .create:
             return "plus.circle.fill"
         case .notifications:
