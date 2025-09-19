@@ -27,7 +27,7 @@ struct AuthenticationView: View {
                     },
                     onCompletion: { result in
                         Task {
-                            await handleAppleSignIn(result)
+                            handleAppleSignIn(result)
                         }
                     }
                 )
@@ -88,10 +88,10 @@ struct AuthenticationView: View {
         } message: {
             Text(authService.error?.localizedDescription ?? "An unknown error occurred")
         }
-        .onChange(of: authService.error) { _, error in
+        .onChange(of: authService.error) { error in
             showingError = error != nil
         }
-        .onChange(of: authService.isAuthenticated) { _, isAuthenticated in
+        .onChange(of: authService.isAuthenticated) { isAuthenticated in
             if isAuthenticated {
                 onContinue()
             }
@@ -101,7 +101,7 @@ struct AuthenticationView: View {
     private func handleAppleSignIn(_ result: Result<ASAuthorization, Error>) {
         switch result {
         case .success(let authorization):
-            if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+            if authorization.credential is ASAuthorizationAppleIDCredential {
                 Task {
                     await authService.signInWithApple()
                 }

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct MainTabView: View {
     @EnvironmentObject var appState: AppState
@@ -299,9 +300,9 @@ extension AppState {
     }
     
     func navigateToTabWithPath(_ tab: TabItem, path: String) {
-        selectedTab = tab
-        navigationPath = NavigationPath()
-        navigationPath.append(path)
+        appState.selectedTab = tab
+        appState.navigationPath = []
+        appState.navigationPath.append(path)
     }
 }
 

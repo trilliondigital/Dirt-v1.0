@@ -16,7 +16,7 @@ class NotificationsViewModel: ObservableObject {
         error = nil
         
         // Simulate loading notifications
-        await Task.sleep(nanoseconds: 1_000_000_000)
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
         
         notifications = generateMockNotifications()
         applyFilter(currentFilter)
@@ -117,7 +117,7 @@ class NotificationsViewModel: ObservableObject {
             
             DirtNotification(
                 userId: userId,
-                type: .milestone,
+                type: .reputationMilestone,
                 title: "Reputation Milestone! ⭐",
                 message: "You've reached 100 points and are now a Contributor!",
                 createdAt: Date().addingTimeInterval(-7200), // 2 hours ago
@@ -126,7 +126,7 @@ class NotificationsViewModel: ObservableObject {
             
             DirtNotification(
                 userId: userId,
-                type: .recommendation,
+                type: .announcement,
                 title: "New content for you",
                 message: "Check out trending posts in Dating Advice",
                 createdAt: Date().addingTimeInterval(-14400), // 4 hours ago
@@ -135,7 +135,7 @@ class NotificationsViewModel: ObservableObject {
             
             DirtNotification(
                 userId: userId,
-                type: .achievement,
+                type: .helpfulContributor,
                 title: "Achievement Unlocked! 🏆",
                 message: "You've earned the \"Helpful Community Member\" achievement",
                 createdAt: Date().addingTimeInterval(-86400), // 1 day ago

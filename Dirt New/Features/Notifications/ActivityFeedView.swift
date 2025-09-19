@@ -126,7 +126,6 @@ struct ActivityFeedView: View {
                 ForEach(ActivityTimeframe.allCases, id: \.self) { timeframe in
                     FilterChip(
                         title: timeframe.displayName,
-                        count: getActivityCount(for: timeframe),
                         isSelected: selectedTimeframe == timeframe
                     ) {
                         selectedTimeframe = timeframe
@@ -312,7 +311,7 @@ struct ActivityFeedView: View {
     
     private func refreshActivities() async {
         // In a real app, this would refresh data from the server
-        await Task.sleep(nanoseconds: 1_000_000_000)
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
     }
     
     private func handleDeepLink(_ path: String) {
@@ -341,7 +340,7 @@ struct ActivityTimelineRow: View {
                         )
                     
                     Rectangle()
-                        .fill(Color(.systemGray4))
+                        .fill(Color.gray.opacity(0.3))
                         .frame(width: 2)
                         .frame(maxHeight: .infinity)
                 }

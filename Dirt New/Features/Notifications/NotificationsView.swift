@@ -45,7 +45,7 @@ struct NotificationsView: View {
             .navigationTitle("Notifications")
             
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .primaryAction) {
                     Menu {
                         Button("Mark All as Read") {
                             viewModel.markAllAsRead()
@@ -62,7 +62,7 @@ struct NotificationsView: View {
             .task {
                 await viewModel.loadNotifications()
             }
-            .onChange(of: selectedFilter) { _, newFilter in
+            .onChange(of: selectedFilter) { newFilter in
                 viewModel.applyFilter(newFilter)
             }
             .overlay {
@@ -176,15 +176,17 @@ struct NotificationIcon: View {
             return Color.blue.opacity(0.2)
         case .upvote:
             return Color.green.opacity(0.2)
-        case .milestone, .achievement:
+        case .reputationMilestone, .postMilestone, .engagementMilestone, .anniversaryMilestone:
             return Color.yellow.opacity(0.2)
-        case .announcement:
+        case .firstPost, .firstUpvote, .popularPost, .helpfulContributor, .communityChampion:
+            return Color.green.opacity(0.2)
+        case .announcement, .communityEvent:
             return Color.purple.opacity(0.2)
-        case .recommendation:
+        case .featureUpdate:
             return Color.orange.opacity(0.2)
-        case .moderation:
+        case .moderationUpdate:
             return Color.red.opacity(0.2)
-        case .featureUnlock:
+        case .comment:
             return Color.cyan.opacity(0.2)
         }
     }
@@ -195,15 +197,17 @@ struct NotificationIcon: View {
             return .blue
         case .upvote:
             return .green
-        case .milestone, .achievement:
+        case .reputationMilestone, .postMilestone, .engagementMilestone, .anniversaryMilestone:
             return .yellow
-        case .announcement:
+        case .firstPost, .firstUpvote, .popularPost, .helpfulContributor, .communityChampion:
+            return .green
+        case .announcement, .communityEvent:
             return .purple
-        case .recommendation:
+        case .featureUpdate:
             return .orange
-        case .moderation:
+        case .moderationUpdate:
             return .red
-        case .featureUnlock:
+        case .comment:
             return .cyan
         }
     }

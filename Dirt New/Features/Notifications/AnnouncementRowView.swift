@@ -270,7 +270,6 @@ struct AnnouncementsListView: View {
             HStack(spacing: 12) {
                 FilterChip(
                     title: "All",
-                    count: communityAnnouncementService.getActiveAnnouncements().count,
                     isSelected: selectedType == nil
                 ) {
                     selectedType = nil
