@@ -44,16 +44,7 @@ struct Comment: Codable, Identifiable, Equatable {
     }
 }
 
-// MARK: - Content Type
-enum ContentType: String, Codable, CaseIterable {
-    case post = "post"
-    case review = "review"
-    case comment = "comment"
-    
-    var displayName: String {
-        return rawValue.capitalized
-    }
-}
+// ContentType is defined in ModerationModels.swift
 
 // MARK: - Comment Validation
 extension Comment {

@@ -42,7 +42,7 @@
     - Implement post validation and submission
     - _Requirements: 4.1, 4.5_
 
-  - [-] 3.3 Create content display components
+  - [x] 3.3 Create content display components
     - Build review card component with ratings display
     - Create discussion post component with engagement metrics
     - Implement threaded comment system
@@ -64,8 +64,8 @@
     - Create reputation milestone notifications
     - _Requirements: 2.6, 9.4, 9.5_
 
-- [ ] 5. Develop content moderation system
-  - [ ] 5.1 Implement AI-powered content moderation
+- [-] 5. Develop content moderation system
+  - [-] 5.1 Implement AI-powered content moderation
     - Create automatic PII detection and blurring for images
     - Implement text content scanning for prohibited material
     - Add automatic content flagging system

@@ -1,5 +1,6 @@
 import Foundation
 import UserNotifications
+import SwiftUI
 
 // MARK: - Reputation Notification Service
 class ReputationNotificationService: ObservableObject {
@@ -410,7 +411,7 @@ struct ReputationNotificationView: View {
     private var notificationColor: Color {
         switch notification.type {
         case .achievement:
-            return .gold
+            return .yellow
         case .milestone:
             return .blue
         case .featureUnlock:

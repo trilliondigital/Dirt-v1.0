@@ -131,31 +131,89 @@ class AIContentModerationService {
         // Basic keyword-based detection (would use ML model in production)
         let lowercaseText = text.lowercased()
         
-        // Check for inappropriate content
-        let inappropriateKeywords = ["fuck", "shit", "damn", "bitch", "asshole"]
-        if inappropriateKeywords.contains(where: { lowercaseText.contains($0) }) {
+        // Enhanced inappropriate content detection
+        let inappropriateKeywords = [
+            "fuck", "shit", "damn", "bitch", "asshole", "cunt", "whore", "slut",
+            "retard", "faggot", "nigger", "chink", "spic", "kike"
+        ]
+        let inappropriateMatches = inappropriateKeywords.filter { lowercaseText.contains($0) }
+        if !inappropriateMatches.isEmpty {
             flags.append(.inappropriateContent)
+            confidence = min(confidence, 0.85 - Double(inappropriateMatches.count) * 0.05)
+        }
+        
+        // Enhanced harassment detection
+        let harassmentPatterns = [
+            "kill yourself", "kys", "die", "hate you", "worthless", "pathetic",
+            "loser", "nobody likes you", "go die", "end yourself", "suicide",
+            "you should die", "waste of space", "piece of shit"
+        ]
+        let harassmentMatches = harassmentPatterns.filter { lowercaseText.contains($0) }
+        if !harassmentMatches.isEmpty {
+            flags.append(.harassment)
+            confidence = min(confidence, 0.9 - Double(harassmentMatches.count) * 0.03)
+        }
+        
+        // Enhanced spam detection
+        let spamIndicators = [
+            text.count < 10,
+            text.filter({ $0.isUppercase }).count > text.count / 2,
+            lowercaseText.contains("click here"),
+            lowercaseText.contains("buy now"),
+            lowercaseText.contains("limited time"),
+            lowercaseText.contains("act now"),
+            text.filter({ $0 == "!" }).count > 3,
+            text.components(separatedBy: .whitespacesAndNewlines).count < 3
+        ]
+        let spamScore = spamIndicators.filter { $0 }.count
+        if spamScore >= 2 {
+            flags.append(.spam)
+            confidence = min(confidence, 0.8 - Double(spamScore) * 0.05)
+        }
+        
+        // Enhanced hate speech detection
+        let hateSpeechKeywords = [
+            "nazi", "hitler", "terrorist", "subhuman", "inferior race",
+            "white power", "blood and soil", "jews will not replace us",
+            "gas the", "holocaust hoax", "white genocide"
+        ]
+        let hateSpeechMatches = hateSpeechKeywords.filter { lowercaseText.contains($0) }
+        if !hateSpeechMatches.isEmpty {
+            flags.append(.hateSpeech)
+            confidence = min(confidence, 0.95 - Double(hateSpeechMatches.count) * 0.02)
+        }
+        
+        // Sexual content detection
+        let sexualKeywords = [
+            "porn", "xxx", "sex", "nude", "naked", "dick", "pussy", "cock",
+            "masturbate", "orgasm", "cum", "blowjob", "anal", "vagina"
+        ]
+        let sexualMatches = sexualKeywords.filter { lowercaseText.contains($0) }
+        if sexualMatches.count >= 2 {
+            flags.append(.sexualContent)
+            confidence = min(confidence, 0.8)
+        }
+        
+        // Violence detection
+        let violenceKeywords = [
+            "murder", "kill", "stab", "shoot", "bomb", "explosion", "violence",
+            "beat up", "assault", "attack", "hurt", "pain", "blood", "death"
+        ]
+        let violenceMatches = violenceKeywords.filter { lowercaseText.contains($0) }
+        if violenceMatches.count >= 2 {
+            flags.append(.violentContent)
             confidence = min(confidence, 0.85)
         }
         
-        // Check for harassment
-        let harassmentKeywords = ["kill yourself", "die", "hate you", "worthless"]
-        if harassmentKeywords.contains(where: { lowercaseText.contains($0) }) {
-            flags.append(.harassment)
-            confidence = min(confidence, 0.9)
-        }
-        
-        // Check for spam patterns
-        if text.count < 10 || text.filter({ $0.isUppercase }).count > text.count / 2 {
-            flags.append(.spam)
+        // Misinformation patterns (basic detection)
+        let misinformationPatterns = [
+            "fake news", "conspiracy", "government lies", "they don't want you to know",
+            "big pharma", "wake up sheeple", "do your research", "mainstream media lies"
+        ]
+        let misinformationMatches = misinformationPatterns.filter { lowercaseText.contains($0) }
+        if !misinformationMatches.isEmpty {
+            flags.append(.misinformation)
             confidence = min(confidence, 0.7)
-        }
-        
-        // Check for hate speech
-        let hateSpeechKeywords = ["nazi", "terrorist", "subhuman"]
-        if hateSpeechKeywords.contains(where: { lowercaseText.contains($0) }) {
-            flags.append(.hateSpeech)
-            confidence = min(confidence, 0.95)
         }
         
         return (flags, confidence)
@@ -211,23 +269,32 @@ class PIIDetectionService {
     func detectPIIInText(_ text: String) async -> [PIIDetection] {
         var detections: [PIIDetection] = []
         
-        // Phone number detection
-        let phoneRegex = try! NSRegularExpression(pattern: #"\b\d{3}[-.]?\d{3}[-.]?\d{4}\b"#)
-        let phoneMatches = phoneRegex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+        // Enhanced phone number detection (multiple formats)
+        let phonePatterns = [
+            #"\b\d{3}[-.]?\d{3}[-.]?\d{4}\b"#, // 123-456-7890, 123.456.7890, 1234567890
+            #"\b\(\d{3}\)\s?\d{3}[-.]?\d{4}\b"#, // (123) 456-7890, (123)456-7890
+            #"\b\+1[-.]?\d{3}[-.]?\d{3}[-.]?\d{4}\b"#, // +1-123-456-7890
+            #"\b1[-.]?\d{3}[-.]?\d{3}[-.]?\d{4}\b"# // 1-123-456-7890
+        ]
         
-        for match in phoneMatches {
-            if let range = Range(match.range, in: text) {
-                let phoneNumber = String(text[range])
-                detections.append(PIIDetection(
-                    type: .phoneNumber,
-                    location: CGRect.zero, // Text doesn't have visual location
-                    confidence: 0.9,
-                    text: phoneNumber
-                ))
+        for pattern in phonePatterns {
+            let phoneRegex = try! NSRegularExpression(pattern: pattern)
+            let phoneMatches = phoneRegex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+            
+            for match in phoneMatches {
+                if let range = Range(match.range, in: text) {
+                    let phoneNumber = String(text[range])
+                    detections.append(PIIDetection(
+                        type: .phoneNumber,
+                        location: CGRect.zero,
+                        confidence: 0.9,
+                        text: phoneNumber
+                    ))
+                }
             }
         }
         
-        // Email detection
+        // Enhanced email detection
         let emailRegex = try! NSRegularExpression(pattern: #"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"#)
         let emailMatches = emailRegex.matches(in: text, range: NSRange(text.startIndex..., in: text))
         
@@ -243,23 +310,144 @@ class PIIDetectionService {
             }
         }
         
-        // Social media handle detection
-        let socialRegex = try! NSRegularExpression(pattern: #"@[A-Za-z0-9_]+"#)
-        let socialMatches = socialRegex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+        // Enhanced social media handle detection
+        let socialPatterns = [
+            #"@[A-Za-z0-9_]+"#, // @username
+            #"\binstagram\.com/[A-Za-z0-9_.]+\b"#, // instagram.com/username
+            #"\btwitter\.com/[A-Za-z0-9_]+\b"#, // twitter.com/username
+            #"\bfacebook\.com/[A-Za-z0-9.]+\b"#, // facebook.com/username
+            #"\btiktok\.com/@[A-Za-z0-9_.]+\b"#, // tiktok.com/@username
+            #"\bsnapchat\.com/add/[A-Za-z0-9_.]+\b"# // snapchat.com/add/username
+        ]
         
-        for match in socialMatches {
+        for pattern in socialPatterns {
+            let socialRegex = try! NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+            let socialMatches = socialRegex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+            
+            for match in socialMatches {
+                if let range = Range(match.range, in: text) {
+                    let handle = String(text[range])
+                    detections.append(PIIDetection(
+                        type: .socialMedia,
+                        location: CGRect.zero,
+                        confidence: 0.85,
+                        text: handle
+                    ))
+                }
+            }
+        }
+        
+        // Name detection (basic patterns)
+        let namePatterns = [
+            #"\bmy name is [A-Z][a-z]+ [A-Z][a-z]+\b"#,
+            #"\bi'm [A-Z][a-z]+ [A-Z][a-z]+\b"#,
+            #"\bcall me [A-Z][a-z]+\b"#
+        ]
+        
+        for pattern in namePatterns {
+            let nameRegex = try! NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+            let nameMatches = nameRegex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+            
+            for match in nameMatches {
+                if let range = Range(match.range, in: text) {
+                    let nameText = String(text[range])
+                    detections.append(PIIDetection(
+                        type: .name,
+                        location: CGRect.zero,
+                        confidence: 0.7,
+                        text: nameText
+                    ))
+                }
+            }
+        }
+        
+        // Address detection (basic patterns)
+        let addressPatterns = [
+            #"\b\d+\s+[A-Za-z\s]+\s+(Street|St|Avenue|Ave|Road|Rd|Drive|Dr|Lane|Ln|Boulevard|Blvd)\b"#,
+            #"\b\d{5}(-\d{4})?\b"# // ZIP codes
+        ]
+        
+        for pattern in addressPatterns {
+            let addressRegex = try! NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+            let addressMatches = addressRegex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+            
+            for match in addressMatches {
+                if let range = Range(match.range, in: text) {
+                    let addressText = String(text[range])
+                    detections.append(PIIDetection(
+                        type: .address,
+                        location: CGRect.zero,
+                        confidence: 0.8,
+                        text: addressText
+                    ))
+                }
+            }
+        }
+        
+        // Credit card detection
+        let creditCardRegex = try! NSRegularExpression(pattern: #"\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b"#)
+        let creditCardMatches = creditCardRegex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+        
+        for match in creditCardMatches {
             if let range = Range(match.range, in: text) {
-                let handle = String(text[range])
+                let cardNumber = String(text[range])
                 detections.append(PIIDetection(
-                    type: .socialMedia,
+                    type: .creditCard,
                     location: CGRect.zero,
-                    confidence: 0.8,
-                    text: handle
+                    confidence: 0.9,
+                    text: cardNumber
                 ))
             }
         }
         
+        // SSN detection
+        let ssnRegex = try! NSRegularExpression(pattern: #"\b\d{3}[-]?\d{2}[-]?\d{4}\b"#)
+        let ssnMatches = ssnRegex.matches(in: text, range: NSRange(text.startIndex..., in: text))
+        
+        for match in ssnMatches {
+            if let range = Range(match.range, in: text) {
+                let ssn = String(text[range])
+                // Additional validation to avoid false positives
+                if isValidSSNPattern(ssn) {
+                    detections.append(PIIDetection(
+                        type: .ssn,
+                        location: CGRect.zero,
+                        confidence: 0.95,
+                        text: ssn
+                    ))
+                }
+            }
+        }
+        
         return detections
+    }
+    
+    private func isValidSSNPattern(_ ssn: String) -> Bool {
+        let digits = ssn.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        
+        // Basic SSN validation rules
+        guard digits.count == 9 else { return false }
+        
+        let area = String(digits.prefix(3))
+        let group = String(digits.dropFirst(3).prefix(2))
+        let serial = String(digits.suffix(4))
+        
+        // Invalid area numbers
+        if area == "000" || area == "666" || area.hasPrefix("9") {
+            return false
+        }
+        
+        // Invalid group numbers
+        if group == "00" {
+            return false
+        }
+        
+        // Invalid serial numbers
+        if serial == "0000" {
+            return false
+        }
+        
+        return true
     }
     
     func detectPIIInImage(_ image: UIImage) async -> [PIIDetection] {
