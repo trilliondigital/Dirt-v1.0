@@ -30,12 +30,12 @@ struct NotificationManagementView: View {
                     analyticsTab
                         .tag(ManagementTab.analytics)
                 }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                .tabViewStyle(DefaultTabViewStyle())
             }
             .navigationTitle("Manage Notifications")
             
             .toolbar {
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Button(isSelectionMode ? "Done" : "Select") {
                         isSelectionMode.toggle()
                         if !isSelectionMode {
@@ -216,7 +216,7 @@ struct NotificationManagementView: View {
                     category: category,
                     unreadCount: badgeManager.getBadgeCount(for: category),
                     totalCount: getCategoryTotalCount(category),
-                    isEnabled: pushNotificationService.preferences.isCategoryEnabled(category),
+                    isEnabled: pushNotificationService.preferences.categoryPreferences[category] ?? false,
                     onToggle: { enabled in
                         pushNotificationService.toggleNotificationCategory(category, enabled: enabled)
                     },

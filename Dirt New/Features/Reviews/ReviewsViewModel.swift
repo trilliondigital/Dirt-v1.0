@@ -140,19 +140,30 @@ class ReviewsViewModel: ObservableObject {
         return titles.enumerated().map { index, title in
             Review(
                 id: UUID().uuidString,
+                authorId: "user_\(index)",
+                authorName: "User \(index + 1)",
                 title: title,
                 content: "This was an amazing experience that I would definitely recommend to others looking for a great date idea.",
                 rating: Double.random(in: 3.0...5.0),
-                authorId: "user_\(index)",
-                authorName: "User \(index + 1)",
+                category: ReviewCategory.allCases.randomElement(),
+                tags: ["coffee", "romantic", "fun"].shuffled().prefix(Int.random(in: 1...3)).map(String.init),
                 createdAt: Date().addingTimeInterval(-Double.random(in: 0...604800)), // Random time in last week
                 updatedAt: Date(),
-                tags: ["coffee", "romantic", "fun"].shuffled().prefix(Int.random(in: 1...3)).map(String.init),
-                imageUrls: [],
                 likeCount: Int.random(in: 0...50),
                 commentCount: Int.random(in: 0...20),
                 isLiked: Bool.random(),
-                location: "San Francisco, CA"
+                isVisible: true,
+                isReported: false,
+                reportCount: 0,
+                imageUrls: [],
+                location: "San Francisco, CA",
+                venue: nil,
+                cost: CostLevel.allCases.randomElement(),
+                duration: nil,
+                wouldRecommend: true,
+                viewCount: Int.random(in: 0...100),
+                shareCount: Int.random(in: 0...10),
+                saveCount: Int.random(in: 0...15)
             )
         }
     }
@@ -196,7 +207,7 @@ enum SortOption: String, CaseIterable {
     }
 }
 
-enum ReviewCategory: String, CaseIterable {
+enum ReviewCategory: String, CaseIterable, Codable {
     case coffee = "Coffee"
     case dinner = "Dinner"
     case activities = "Activities"

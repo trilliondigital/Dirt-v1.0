@@ -319,9 +319,8 @@ struct SearchTipRow: View {
                     .font(.subheadline)
                 
                 Text(example)
-                    .font(.caption)
+                    .font(.system(.caption, design: .monospaced))
                     .foregroundColor(.secondary)
-                    .fontFamily(.monospaced)
             }
         }
     }

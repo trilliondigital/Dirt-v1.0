@@ -96,7 +96,7 @@ struct EditProfileView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
                         saveProfile()
                     }

@@ -38,13 +38,13 @@ struct NotificationSettingsView: View {
             
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel")) {
+                    Button("Cancel") {
                         dismiss()
                     }
                 }
                 
                 ToolbarItem(placement: .primaryAction) {
-                    Button("Save")) {
+                    Button("Save") {
                         savePreferences()
                         dismiss()
                     }
@@ -201,12 +201,12 @@ struct NotificationSettingsView: View {
     
     private var advancedSettingsSection: some View {
         Section(header: Text("Advanced")) {
-            Button("Reset to Defaults")) {
+            Button("Reset to Defaults") {
                 resetToDefaults()
             }
             .foregroundColor(.blue)
             
-            Button("Clear All Notifications")) {
+            Button("Clear All Notifications") {
                 clearAllNotifications()
             }
             .foregroundColor(.red)
@@ -340,10 +340,10 @@ struct QuietHoursDetailView: View {
             
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button("Done")) {
+                    Button("Done") {
                         dismiss()
                     }
-                    .fontWeight(.semibold)
+                    .font(.system(size: 17, weight: .semibold))
                 }
             }
         }

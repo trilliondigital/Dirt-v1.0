@@ -10,10 +10,10 @@ let package = Package(
     products: [
         .library(
             name: "Dirt",
-            targets: ["Dirt"]),
+            targets: ["Dirt"])
     ],
     dependencies: [
-        .package(url: "https://github.com/supabase-community/supabase-swift.git", from: "2.0.0"),
+        .package(url: "https://github.com/supabase-community/supabase-swift.git", from: "2.0.0")
     ],
     targets: [
         .target(
@@ -26,12 +26,6 @@ let package = Package(
                 "Reference",
                 "README.md",
                 ".swiftpm"
-            ],
-            sources: [
-                "Core",
-                "Features",
-                "DirtApp.swift",
-                "ContentView.swift"
             ]
         )
     ]

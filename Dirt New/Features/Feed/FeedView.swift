@@ -78,7 +78,7 @@ struct FeedView: View {
             .navigationTitle("Feed")
             
             .toolbar {
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { showingFilters = true }) {
                         Image(systemName: "line.3.horizontal.decrease.circle")
                     }
@@ -731,7 +731,7 @@ struct FeedFilterSheet: View {
                     }
                 }
                 
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     HStack {
                         Button("Clear") {
                             tempFilter = .latest

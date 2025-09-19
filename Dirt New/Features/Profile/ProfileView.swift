@@ -40,7 +40,7 @@ struct ProfileView: View {
             .navigationTitle("Profile")
             
             .toolbar {
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { showingSettings = true }) {
                         Image(systemName: "gearshape")
                     }

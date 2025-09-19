@@ -5,7 +5,7 @@ struct NotificationCenterView: View {
     @StateObject private var communityAnnouncementService = CommunityAnnouncementService.shared
     @StateObject private var badgeManager = NotificationBadgeManager.shared
     
-    @State private var selectedFilter: NotificationFilter = .all
+    @State private var selectedFilter: NotificationCenterFilter = .all
     @State private var showingSettings = false
     @State private var showingHistory = false
     
@@ -27,7 +27,7 @@ struct NotificationCenterView: View {
                 .tabItem {
                     Label("Notifications", systemImage: "bell")
                 }
-                .badge(badgeManager.totalBadgeCount > 0 ? badgeManager.totalBadgeCount : nil)
+                .badge(badgeManager.totalBadgeCount > 0 ? badgeManager.totalBadgeCount : 0)
                 
                 // Activity Feed Tab
                 ActivityFeedView()
@@ -47,7 +47,7 @@ struct NotificationCenterView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button {
                             showingHistory = true
@@ -100,10 +100,9 @@ struct NotificationCenterView: View {
     private var filterTabs: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                ForEach(NotificationFilter.allCases, id: \.self) { filter in
+                ForEach(NotificationCenterFilter.allCases, id: \.self) { filter in
                     FilterChip(
                         title: filter.displayName,
-                        count: getCountForFilter(filter),
                         isSelected: selectedFilter == filter
                     ) {
                         selectedFilter = filter
@@ -277,7 +276,7 @@ struct NotificationCenterView: View {
     
     // MARK: - Helper Methods
     
-    private func getCountForFilter(_ filter: NotificationFilter) -> Int {
+    private func getCountForFilter(_ filter: NotificationCenterFilter) -> Int {
         switch filter {
         case .all:
             return badgeManager.totalBadgeCount
@@ -319,53 +318,16 @@ struct NotificationCenterView: View {
     
     private func refreshNotifications() async {
         // In a real app, this would fetch new notifications from the server
-        await Task.sleep(nanoseconds: 1_000_000_000) // Simulate network delay
+        try? await Task.sleep(nanoseconds: 1_000_000_000) // Simulate network delay
     }
 }
 
 // MARK: - Filter Chip
-
-struct FilterChip: View {
-    let title: String
-    let count: Int
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 4) {
-                Text(title)
-                    .font(.caption)
-                    .fontWeight(.medium)
-                
-                if count > 0 {
-                    Text("\(count)")
-                        .font(.caption2)
-                        .fontWeight(.bold)
-                        .foregroundColor(isSelected ? .white : .blue)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(
-                            Capsule()
-                                .fill(isSelected ? Color.white.opacity(0.3) : Color.blue.opacity(0.2))
-                        )
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(
-                Capsule()
-                    .fill(isSelected ? Color.blue : Color.gray.opacity(0.2))
-            )
-            .foregroundColor(isSelected ? .white : .primary)
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-}
+// FilterChip is defined in FeedView.swift to avoid redeclaration
 
 // MARK: - Notification Filter
 
-enum NotificationFilter: CaseIterable {
+enum NotificationCenterFilter: CaseIterable {
     case all
     case unread
     case interactions

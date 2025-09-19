@@ -75,7 +75,7 @@ class SearchViewModel: ObservableObject {
     
     private func loadTrendingTopics() async -> [String] {
         // Simulate loading trending topics
-        await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(nanoseconds: 500_000_000)
         
         return [
             "first-date",

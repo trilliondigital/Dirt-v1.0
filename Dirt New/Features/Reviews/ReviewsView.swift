@@ -48,7 +48,7 @@ struct ReviewsView: View {
                         }
                 }
             }
-            .navigationBarHidden(true)
+            .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $viewModel.showingFilterSheet) {
                 FilterSheet(
                     currentFilter: viewModel.currentFilter,
@@ -298,32 +298,7 @@ struct ReviewCardSkeleton: View {
 }
 
 // MARK: - Shimmer Effect
-
-extension View {
-    func shimmer(isAnimating: Bool) -> some View {
-        self.overlay(
-            Rectangle()
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.clear,
-                            Color.white.opacity(0.6),
-                            Color.clear
-                        ],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .rotationEffect(.degrees(30))
-                .offset(x: isAnimating ? 200 : -200)
-                .animation(
-                    .easeInOut(duration: 1.5).repeatForever(autoreverses: false),
-                    value: isAnimating
-                )
-        )
-        .clipped()
-    }
-}
+// Shimmer extension is defined in FeedView.swift to avoid redeclaration
 
 #Preview {
     ReviewsView()

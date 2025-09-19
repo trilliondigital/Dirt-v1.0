@@ -126,7 +126,7 @@ struct ReportCommentSheet: View {
             .navigationTitle("Report Comment")
             
             .toolbar {
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("Cancel") {
                         dismiss()
                     }

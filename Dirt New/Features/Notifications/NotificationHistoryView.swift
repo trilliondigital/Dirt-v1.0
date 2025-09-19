@@ -26,7 +26,7 @@ struct NotificationHistoryView: View {
             .navigationTitle("Notification History")
             
             .toolbar {
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button("Export History") {
                             exportHistory()
@@ -97,7 +97,6 @@ struct NotificationHistoryView: View {
                 ForEach(TimeRange.allCases, id: \.self) { range in
                     FilterChip(
                         title: range.displayName,
-                        count: getNotificationCount(for: range),
                         isSelected: selectedTimeRange == range
                     ) {
                         selectedTimeRange = range
@@ -113,7 +112,6 @@ struct NotificationHistoryView: View {
             HStack(spacing: 12) {
                 FilterChip(
                     title: "All Categories",
-                    count: getNotificationCount(for: selectedTimeRange),
                     isSelected: selectedCategory == nil
                 ) {
                     selectedCategory = nil
@@ -122,7 +120,6 @@ struct NotificationHistoryView: View {
                 ForEach(NotificationCategory.allCases, id: \.self) { category in
                     FilterChip(
                         title: category.displayName,
-                        count: getNotificationCount(for: selectedTimeRange, category: category),
                         isSelected: selectedCategory == category
                     ) {
                         selectedCategory = category

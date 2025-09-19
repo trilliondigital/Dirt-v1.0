@@ -28,7 +28,7 @@ struct ActivityFeedView: View {
             .navigationTitle("Activity Feed")
             
             .toolbar {
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showingFilters.toggle()
                     } label: {
@@ -501,7 +501,7 @@ struct ActivityFiltersView: View {
             .navigationTitle("Activity Filters")
             
             .toolbar {
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") {
                         dismiss()
                     }

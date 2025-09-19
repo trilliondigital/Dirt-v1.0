@@ -133,7 +133,7 @@ struct SettingsView: View {
             .navigationTitle("Settings")
             
             .toolbar {
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") {
                         dismiss()
                     }

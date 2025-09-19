@@ -45,7 +45,7 @@ struct NotificationsView: View {
             .navigationTitle("Notifications")
             
             .toolbar {
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button("Mark All as Read") {
                             viewModel.markAllAsRead()

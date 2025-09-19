@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 #if canImport(UIKit)
 import UIKit
 #endif
@@ -393,6 +394,19 @@ extension NotificationCategory {
             return .green
         case .community:
             return .purple
+        }
+    }
+    
+    var iconName: String {
+        switch self {
+        case .interaction:
+            return "person.2"
+        case .milestone:
+            return "flag"
+        case .achievement:
+            return "trophy"
+        case .community:
+            return "globe"
         }
     }
 }

@@ -251,7 +251,7 @@ struct AnnouncementsListView: View {
             .navigationTitle("Announcements")
             
             .toolbar {
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     if communityAnnouncementService.unreadAnnouncementCount > 0 {
                         Button("Mark All Read") {
                             communityAnnouncementService.markAllAnnouncementsAsRead()

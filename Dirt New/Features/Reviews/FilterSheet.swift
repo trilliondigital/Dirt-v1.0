@@ -122,7 +122,7 @@ struct FilterSheet: View {
                     }
                 }
                 
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     HStack {
                         if tempFilter.isActive {
                             Button("Clear") {

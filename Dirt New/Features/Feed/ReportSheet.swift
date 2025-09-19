@@ -101,7 +101,7 @@ struct ReportSheet: View {
                     }
                 }
                 
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("Submit") {
                         submitReport()
                     }

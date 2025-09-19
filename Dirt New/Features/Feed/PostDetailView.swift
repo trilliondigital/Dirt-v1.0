@@ -33,7 +33,7 @@ struct PostDetailView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button("Save Post") {
                             viewModel.savePost(post)

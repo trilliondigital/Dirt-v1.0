@@ -48,7 +48,7 @@ struct CreatePostView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .trailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button("Post") {
                         Task {
                             await viewModel.createPost()
