@@ -15,6 +15,9 @@ enum DatingReviewValidationError: LocalizedError {
     case missingRequiredFields
     case inappropriateContent
     case personalInformationDetected
+    case invalidPhoneHash
+    case invalidReputation
+    case invalidCategory
     
     var errorDescription: String? {
         switch self {
@@ -44,6 +47,12 @@ enum DatingReviewValidationError: LocalizedError {
             return "Content contains inappropriate material"
         case .personalInformationDetected:
             return "Content contains personal information that must be removed"
+        case .invalidPhoneHash:
+            return "Phone number hash is required"
+        case .invalidReputation:
+            return "Reputation cannot be negative"
+        case .invalidCategory:
+            return "Invalid category selected"
         }
     }
     
@@ -75,6 +84,12 @@ enum DatingReviewValidationError: LocalizedError {
             return "Please remove inappropriate content and try again"
         case .personalInformationDetected:
             return "Please blur or remove any personal information from images and text"
+        case .invalidPhoneHash:
+            return "Please provide a valid phone number"
+        case .invalidReputation:
+            return "Reputation score is invalid"
+        case .invalidCategory:
+            return "Please select a valid category"
         }
     }
 }

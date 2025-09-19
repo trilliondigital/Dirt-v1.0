@@ -90,29 +90,3 @@ struct NotificationPreferences: Codable, Equatable {
     }
 }
 
-// MARK: - Dating Review Validation Errors
-enum DatingReviewValidationError: Error, LocalizedError {
-    case invalidUsername
-    case invalidPhoneHash
-    case invalidReputation
-    case invalidContent
-    case invalidRating
-    case invalidCategory
-    
-    var errorDescription: String? {
-        switch self {
-        case .invalidUsername:
-            return "Username cannot be empty"
-        case .invalidPhoneHash:
-            return "Phone number hash is required"
-        case .invalidReputation:
-            return "Reputation cannot be negative"
-        case .invalidContent:
-            return "Content cannot be empty"
-        case .invalidRating:
-            return "Rating must be between 1 and 5"
-        case .invalidCategory:
-            return "Invalid category selected"
-        }
-    }
-}

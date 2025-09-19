@@ -28,7 +28,7 @@
     - _Requirements: 8.3, 8.4_
 
 - [-] 3. Build core content management system
-  - [ ] 3.1 Implement review creation functionality
+  - [x] 3.1 Implement review creation functionality
     - Create review submission form with multi-category ratings
     - Implement image upload with automatic PII blurring
     - Add tag selection and categorization system
@@ -49,8 +49,8 @@
     - Add upvote/downvote functionality
     - _Requirements: 3.5, 4.2, 4.3_
 
-- [ ] 4. Implement reputation and gamification system
-  - [ ] 4.1 Create reputation tracking service
+- [-] 4. Implement reputation and gamification system
+  - [-] 4.1 Create reputation tracking service
     - Implement reputation point calculation based on community feedback
     - Create achievement and badge system
     - Add reputation-based feature unlocking
@@ -86,7 +86,7 @@
     - Create reporting analytics for moderators
     - _Requirements: 5.1, 5.6_
 
-- [-] 6. Build search and discovery features
+- [ ] 6. Build search and discovery features
   - [ ] 6.1 Implement content search functionality
     - Create global search with keyword, tag, and category filtering
     - Add advanced filtering options (date, popularity, rating)
@@ -131,7 +131,7 @@
     - Create responsive grid layout for reviews
     - _Requirements: 10.1, 10.4_
 
-- [-] 9. Implement offline functionality and data sync
+- [ ] 9. Implement offline functionality and data sync
   - [ ] 9.1 Create offline content caching
     - Implement local content storage for offline viewing
     - Add content synchronization when online

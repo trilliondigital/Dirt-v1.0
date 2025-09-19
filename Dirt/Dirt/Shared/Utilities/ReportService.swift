@@ -9,6 +9,7 @@ struct ReportService {
         set { ModerationService.shared.backendEnabled = newValue }
     }
 
+    @MainActor
     static func submitReport(postId: UUID, reason: ReportReason) {
         let payload: [String: Any] = [
             "postId": postId.uuidString,
@@ -33,7 +34,7 @@ struct ReportService {
                     try await submitReportWithRetry(postId: postId, reason: reason)
                 } catch {
                     debugPrint("[ReportService] backend submit failed after retries:", String(describing: error))
-                    AnalyticsService.shared.trackUserAction("report_submit_failed", parameters: [
+                    await AnalyticsService.shared.trackUserAction("report_submit_failed", parameters: [
                         "post_id": postId.uuidString,
                         "reason": reason.rawValue
                     ])

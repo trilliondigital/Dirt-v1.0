@@ -54,10 +54,12 @@ final class PostSubmissionService {
         }
 
         // Analytics: post_created and time_to_first_post
-        AnalyticsService.shared.log("post_created", [
-            "anonymous": anonymous ? "true" : "false",
-            "flag": flag
-        ])
+        Task {
+            await AnalyticsService.shared.trackUserAction("post_created", parameters: [
+                "anonymous": anonymous ? "true" : "false",
+                "flag": flag
+            ])
+        }
         let defaults = UserDefaults.standard
         let firstLaunchKey = "firstLaunchAt"
         let firstPostLoggedKey = "firstPostLogged"
@@ -67,7 +69,9 @@ final class PostSubmissionService {
         if defaults.bool(forKey: firstPostLoggedKey) == false {
             if let firstLaunchTs = defaults.object(forKey: firstLaunchKey) as? Double {
                 let ms = Int((Date().timeIntervalSince1970 - firstLaunchTs) * 1000)
-                AnalyticsService.shared.log("time_to_first_post_ms", ["value": "\(ms)"])
+                Task {
+                    await AnalyticsService.shared.trackUserAction("time_to_first_post_ms", parameters: ["value": "\(ms)"])
+                }
                 defaults.set(true, forKey: firstPostLoggedKey)
             }
         }

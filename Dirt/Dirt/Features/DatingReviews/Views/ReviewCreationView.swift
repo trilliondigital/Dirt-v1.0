@@ -192,7 +192,7 @@ struct ReviewCreationView: View {
             ImagePickerView(selectedImages: $selectedImages)
         }
         .sheet(isPresented: $showingCamera) {
-            CameraView { image in
+            CameraAccessView { image in
                 if selectedImages.count < 5 {
                     selectedImages.append(image)
                 }
