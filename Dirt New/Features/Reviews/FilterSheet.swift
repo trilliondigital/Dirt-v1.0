@@ -114,7 +114,7 @@ struct FilterSheet: View {
                 .padding()
             }
             .navigationTitle("Filter Reviews")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
@@ -122,7 +122,7 @@ struct FilterSheet: View {
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     HStack {
                         if tempFilter.isActive {
                             Button("Clear") {
@@ -167,7 +167,7 @@ struct SortOptionCard: View {
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? Color.accentColor : Color(.systemGray6))
+                    .fill(isSelected ? Color.accentColor : Color.gray.opacity(0.1))
             )
         }
         .buttonStyle(PlainButtonStyle())
@@ -193,7 +193,7 @@ struct CategoryChip: View {
             .padding(.vertical, 8)
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(isSelected ? category.color : Color(.systemGray6))
+                    .fill(isSelected ? category.color : Color.gray.opacity(0.1))
             )
             .foregroundColor(isSelected ? .white : .primary)
         }

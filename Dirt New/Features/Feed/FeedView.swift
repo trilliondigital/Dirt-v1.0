@@ -8,7 +8,7 @@ struct FeedView: View {
     @State private var selectedReview: Review?
     
     var body: some View {
-        NavigationStack(path: $appState.navigationPath) {
+        NavigationView {
             VStack(spacing: 0) {
                 // Enhanced Filter Bar with content type toggle
                 EnhancedFilterBar(
@@ -76,9 +76,9 @@ struct FeedView: View {
                 }
             }
             .navigationTitle("Feed")
-            .navigationBarTitleDisplayMode(.large)
+            
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Button(action: { showingFilters = true }) {
                         Image(systemName: "line.3.horizontal.decrease.circle")
                     }
@@ -132,7 +132,7 @@ struct FilterBar: View {
                     .font(.subheadline)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color(.systemGray6))
+                    .background(Color.gray.opacity(0.1))
                     .cornerRadius(16)
                 }
                 
@@ -157,7 +157,7 @@ struct FilterBar: View {
             .padding(.horizontal)
         }
         .padding(.vertical, 8)
-        .background(Color(.systemBackground))
+        .background(Color(NSColor.controlBackgroundColor))
     }
 }
 
@@ -172,7 +172,7 @@ struct FilterChip: View {
                 .font(.subheadline)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(isSelected ? Color.blue : Color(.systemGray6))
+                .background(isSelected ? Color.blue : Color.gray.opacity(0.1))
                 .foregroundColor(isSelected ? .white : .primary)
                 .cornerRadius(16)
         }
@@ -233,7 +233,7 @@ struct EnhancedFilterBar: View {
                             .padding(.vertical, 8)
                             .background(
                                 RoundedRectangle(cornerRadius: 20)
-                                    .fill(selectedContentType == type ? Color.accentColor : Color(.systemGray6))
+                                    .fill(selectedContentType == type ? Color.accentColor : Color.gray.opacity(0.1))
                             )
                             .foregroundColor(selectedContentType == type ? .white : .primary)
                     }
@@ -273,7 +273,7 @@ struct EnhancedFilterBar: View {
             }
         }
         .padding(.vertical, 8)
-        .background(Color(.systemBackground))
+        .background(Color(NSColor.controlBackgroundColor))
     }
 }
 
@@ -431,7 +431,7 @@ struct ReviewFeedCard: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(NSColor.controlBackgroundColor))
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
         .onTapGesture {
@@ -601,7 +601,7 @@ struct FeedItemSkeleton: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(NSColor.controlBackgroundColor))
         .cornerRadius(12)
         .onAppear {
             isAnimating = true
@@ -629,7 +629,7 @@ struct ReviewDetailView: View {
                 .padding()
             }
             .navigationTitle("Review")
-            .navigationBarTitleDisplayMode(.inline)
+            
         }
     }
 }
@@ -723,7 +723,7 @@ struct FeedFilterSheet: View {
                 .padding()
             }
             .navigationTitle("Feed Filters")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
@@ -731,7 +731,7 @@ struct FeedFilterSheet: View {
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     HStack {
                         Button("Clear") {
                             tempFilter = .latest
@@ -769,7 +769,7 @@ struct ContentTypeChip: View {
                 .padding(.vertical, 10)
                 .background(
                     RoundedRectangle(cornerRadius: 20)
-                        .fill(isSelected ? Color.accentColor : Color(.systemGray6))
+                        .fill(isSelected ? Color.accentColor : Color.gray.opacity(0.1))
                 )
                 .foregroundColor(isSelected ? .white : .primary)
         }
@@ -798,7 +798,7 @@ struct FeedFilterCard: View {
             .padding(.vertical, 16)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? Color.accentColor : Color(.systemGray6))
+                    .fill(isSelected ? Color.accentColor : Color.gray.opacity(0.1))
             )
         }
         .buttonStyle(PlainButtonStyle())
@@ -824,7 +824,7 @@ struct PostCategoryChip: View {
             .padding(.vertical, 8)
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(isSelected ? Color.blue : Color(.systemGray6))
+                    .fill(isSelected ? Color.blue : Color.gray.opacity(0.1))
             )
             .foregroundColor(isSelected ? .white : .primary)
         }

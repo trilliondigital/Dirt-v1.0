@@ -36,7 +36,7 @@ struct NotificationCenterView: View {
                     }
             }
             .navigationTitle("Notifications")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     if badgeManager.totalBadgeCount > 0 {
@@ -47,7 +47,7 @@ struct NotificationCenterView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Menu {
                         Button {
                             showingHistory = true

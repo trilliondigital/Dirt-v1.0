@@ -33,9 +33,9 @@ struct NotificationManagementView: View {
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             }
             .navigationTitle("Manage Notifications")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Button(isSelectionMode ? "Done" : "Select") {
                         isSelectionMode.toggle()
                         if !isSelectionMode {
@@ -72,7 +72,7 @@ struct NotificationManagementView: View {
                 )
             }
         }
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
     }
     
     // MARK: - Overview Tab
@@ -350,7 +350,7 @@ struct NotificationManagementView: View {
             .frame(height: 150)
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(12)
     }
     
@@ -388,7 +388,7 @@ struct NotificationManagementView: View {
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(12)
     }
     
@@ -429,7 +429,7 @@ struct NotificationManagementView: View {
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(12)
     }
     
@@ -687,7 +687,7 @@ struct StatCard: View {
                 .foregroundColor(.secondary)
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(8)
     }
 }
@@ -712,7 +712,7 @@ struct QuickActionCard: View {
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(Color(.systemGray6))
+            .background(Color.gray.opacity(0.1))
             .cornerRadius(8)
         }
         .buttonStyle(PlainButtonStyle())
@@ -742,7 +742,7 @@ struct MetricCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(NSColor.controlBackgroundColor))
         .cornerRadius(8)
     }
 }

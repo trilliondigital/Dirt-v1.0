@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 import Combine
 
 @MainActor
@@ -75,11 +77,13 @@ class NotificationBadgeManager: ObservableObject {
     private func updateAppBadge() {
         let preferences = pushNotificationService.preferences
         
+        #if canImport(UIKit)
         if preferences.badgeEnabled && preferences.isEnabled {
             UIApplication.shared.applicationIconBadgeNumber = totalBadgeCount
         } else {
             UIApplication.shared.applicationIconBadgeNumber = 0
         }
+        #endif
     }
     
     // MARK: - Badge Count Getters
@@ -194,18 +198,24 @@ class NotificationBadgeManager: ObservableObject {
     
     func animateBadgeUpdate(for category: NotificationCategory) {
         // This could trigger haptic feedback or animations
+        #if canImport(UIKit)
         let impact = UIImpactFeedbackGenerator(style: .light)
         impact.impactOccurred()
+        #endif
     }
     
     func animateBadgeIncrease() {
+        #if canImport(UIKit)
         let impact = UIImpactFeedbackGenerator(style: .medium)
         impact.impactOccurred()
+        #endif
     }
     
     func animateBadgeDecrease() {
+        #if canImport(UIKit)
         let impact = UIImpactFeedbackGenerator(style: .light)
         impact.impactOccurred()
+        #endif
     }
 }
 

@@ -35,16 +35,16 @@ struct NotificationSettingsView: View {
                 }
             }
             .navigationTitle("Notification Settings")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    Button("Cancel")) {
                         dismiss()
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Save")) {
                         savePreferences()
                         dismiss()
                     }
@@ -87,7 +87,7 @@ struct NotificationSettingsView: View {
     // MARK: - Category Preferences Section
     
     private var categoryPreferencesSection: some View {
-        Section("Notification Categories") {
+        Section(header: Text("Notification Categories")) {
             ForEach(NotificationCategory.allCases, id: \.self) { category in
                 Toggle(isOn: Binding(
                     get: { preferences.categoryPreferences[category] ?? false },
@@ -117,7 +117,7 @@ struct NotificationSettingsView: View {
     // MARK: - Type Preferences Section
     
     private var typePreferencesSection: some View {
-        Section("Specific Notifications") {
+        Section(header: Text("Specific Notifications")) {
             ForEach(NotificationType.allCases, id: \.self) { type in
                 let categoryEnabled = preferences.categoryPreferences[type.category] ?? false
                 
@@ -154,7 +154,7 @@ struct NotificationSettingsView: View {
     // MARK: - Quiet Hours Section
     
     private var quietHoursSection: some View {
-        Section("Quiet Hours") {
+        Section(header: Text("Quiet Hours")) {
             Toggle("Enable Quiet Hours", isOn: $preferences.quietHoursEnabled)
             
             if preferences.quietHoursEnabled {
@@ -188,7 +188,7 @@ struct NotificationSettingsView: View {
     // MARK: - Display Preferences Section
     
     private var displayPreferencesSection: some View {
-        Section("Display") {
+        Section(header: Text("Display")) {
             Toggle("Sound", isOn: $preferences.soundEnabled)
             Toggle("Badge", isOn: $preferences.badgeEnabled)
             Toggle("Show Previews", isOn: $preferences.previewEnabled)
@@ -200,13 +200,13 @@ struct NotificationSettingsView: View {
     // MARK: - Advanced Settings Section
     
     private var advancedSettingsSection: some View {
-        Section("Advanced") {
-            Button("Reset to Defaults") {
+        Section(header: Text("Advanced")) {
+            Button("Reset to Defaults")) {
                 resetToDefaults()
             }
             .foregroundColor(.blue)
             
-            Button("Clear All Notifications") {
+            Button("Clear All Notifications")) {
                 clearAllNotifications()
             }
             .foregroundColor(.red)
@@ -320,7 +320,7 @@ struct QuietHoursDetailView: View {
                     Text("During quiet hours, only urgent notifications will be delivered. All other notifications will be held until quiet hours end.")
                 }
                 
-                Section("Preview") {
+                Section(header: Text("Preview")) {
                     HStack {
                         Text("Current Status:")
                         
@@ -337,10 +337,10 @@ struct QuietHoursDetailView: View {
                 }
             }
             .navigationTitle("Quiet Hours")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Done")) {
                         dismiss()
                     }
                     .fontWeight(.semibold)

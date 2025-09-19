@@ -7,7 +7,7 @@ struct OnboardingFlow: View {
     @EnvironmentObject var authService: AuthenticationService
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
                 // Background gradient
                 LinearGradient(
@@ -211,7 +211,7 @@ struct FeatureRow: View {
             Spacer()
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(12)
     }
 }

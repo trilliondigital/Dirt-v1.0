@@ -8,7 +8,7 @@ struct SettingsView: View {
     @State private var showingDeleteAccountAlert = false
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             List {
                 // Account Section
                 Section("Account") {
@@ -131,9 +131,9 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Button("Done") {
                         dismiss()
                     }
@@ -193,12 +193,7 @@ struct SettingsRow: View {
 
 // MARK: - Placeholder Views for Navigation
 
-struct NotificationSettingsView: View {
-    var body: some View {
-        Text("Notification Settings")
-            .navigationTitle("Notifications")
-    }
-}
+// NotificationSettingsView is defined in Features/Notifications/NotificationSettingsView.swift
 
 struct PrivacySettingsView: View {
     var body: some View {
@@ -275,7 +270,7 @@ struct TermsView: View {
             .padding()
         }
         .navigationTitle("Terms of Service")
-        .navigationBarTitleDisplayMode(.inline)
+        
     }
 }
 
@@ -299,7 +294,7 @@ struct PrivacyPolicyView: View {
             .padding()
         }
         .navigationTitle("Privacy Policy")
-        .navigationBarTitleDisplayMode(.inline)
+        
     }
 }
 

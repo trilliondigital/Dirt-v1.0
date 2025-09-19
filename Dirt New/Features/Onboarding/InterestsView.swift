@@ -88,7 +88,7 @@ struct CategorySelectionCard: View {
             .frame(height: 120)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(isSelected ? Color.blue : Color(.systemGray6))
+                    .fill(isSelected ? Color.blue : Color.gray.opacity(0.1))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
                             .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)

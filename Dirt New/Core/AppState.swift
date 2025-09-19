@@ -10,10 +10,10 @@ class AppState: ObservableObject {
     @Published var currentUser: User?
     
     // Navigation state
-    @Published var navigationPath = NavigationPath()
+    @Published var navigationPath: [String] = []
     @Published var deepLinkPath: String?
     @Published var notificationBadges: [TabItem: Int] = [:]
-    @Published var tabNavigationPaths: [TabItem: NavigationPath] = [:]
+    @Published var tabNavigationPaths: [TabItem: [String]] = [:]
     
     // Tab state management
     @Published var previousTab: TabItem = .feed
@@ -65,7 +65,7 @@ class AppState: ObservableObject {
         if let savedPath = tabNavigationPaths[tab] {
             navigationPath = savedPath
         } else {
-            navigationPath = NavigationPath()
+            navigationPath = []
         }
     }
     
@@ -75,13 +75,13 @@ class AppState: ObservableObject {
     
     func clearNavigationPath(for tab: TabItem? = nil) {
         if let tab = tab {
-            tabNavigationPaths[tab] = NavigationPath()
+            tabNavigationPaths[tab] = []
             if selectedTab == tab {
-                navigationPath = NavigationPath()
+                navigationPath = []
             }
         } else {
-            navigationPath = NavigationPath()
-            tabNavigationPaths[selectedTab] = NavigationPath()
+            navigationPath = []
+            tabNavigationPaths[selectedTab] = []
         }
     }
     
@@ -113,8 +113,8 @@ class AppState: ObservableObject {
         selectTab(tab)
         
         // Store the path for further navigation within the tab
-        if let path = components.path, !path.isEmpty {
-            deepLinkPath = path
+        if !components.path.isEmpty {
+            deepLinkPath = components.path
         }
     }
     

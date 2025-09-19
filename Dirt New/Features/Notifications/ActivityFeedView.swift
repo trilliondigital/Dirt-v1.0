@@ -26,9 +26,9 @@ struct ActivityFeedView: View {
                 }
             }
             .navigationTitle("Activity Feed")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Button {
                         showingFilters.toggle()
                     } label: {
@@ -83,7 +83,7 @@ struct ActivityFeedView: View {
             activityTypeBreakdown
         }
         .padding(16)
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
     }
     
     private var activityTypeBreakdown: some View {
@@ -284,7 +284,7 @@ struct ActivityFeedView: View {
                 .foregroundColor(.secondary)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 2)
-                .background(Color(.systemGray5))
+                .background(Color.gray.opacity(0.2))
                 .cornerRadius(8)
         }
     }
@@ -337,7 +337,7 @@ struct ActivityTimelineRow: View {
                         .frame(width: 12, height: 12)
                         .overlay(
                             Circle()
-                                .stroke(Color(.systemBackground), lineWidth: 2)
+                                .stroke(Color(NSColor.controlBackgroundColor), lineWidth: 2)
                         )
                     
                     Rectangle()
@@ -499,9 +499,9 @@ struct ActivityFiltersView: View {
                 }
             }
             .navigationTitle("Activity Filters")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Button("Done") {
                         dismiss()
                     }

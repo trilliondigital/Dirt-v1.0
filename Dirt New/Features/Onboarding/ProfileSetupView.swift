@@ -24,7 +24,7 @@ struct ProfileSetupView: View {
                 // Profile Image Placeholder
                 VStack(spacing: 12) {
                     Circle()
-                        .fill(Color(.systemGray5))
+                        .fill(Color.gray.opacity(0.2))
                         .frame(width: 100, height: 100)
                         .overlay(
                             Image(systemName: "person.fill")
@@ -44,8 +44,6 @@ struct ProfileSetupView: View {
                     
                     TextField("Enter username or stay anonymous", text: $username)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .autocapitalization(.none)
-                        .disableAutocorrection(true)
                     
                     Text("Leave blank to remain completely anonymous")
                         .font(.caption)

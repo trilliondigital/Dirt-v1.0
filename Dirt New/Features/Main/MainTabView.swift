@@ -251,8 +251,6 @@ struct MainTabView: View {
     }
 }
 
-}
-
 // MARK: - Tab Item View Component
 
 struct TabItemView: View {

@@ -8,7 +8,7 @@ struct PostDetailView: View {
     @State private var showingReportSheet = false
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     // Post Content
@@ -25,7 +25,7 @@ struct PostDetailView: View {
                 .padding()
             }
             .navigationTitle("Post")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Close") {
@@ -33,7 +33,7 @@ struct PostDetailView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Menu {
                         Button("Save Post") {
                             viewModel.savePost(post)
@@ -114,7 +114,7 @@ struct PostDetailHeader: View {
         HStack(spacing: 12) {
             // Author Avatar
             Circle()
-                .fill(Color(.systemGray5))
+                .fill(Color.gray.opacity(0.2))
                 .frame(width: 50, height: 50)
                 .overlay(
                     Image(systemName: "person.fill")
@@ -205,7 +205,7 @@ struct PostDetailEngagementBar: View {
             .foregroundColor(.secondary)
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(12)
     }
 }
@@ -269,7 +269,7 @@ struct CommentInputBar: View {
             .disabled(text.isEmpty)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(NSColor.controlBackgroundColor))
         .overlay(
             Rectangle()
                 .frame(height: 0.5)

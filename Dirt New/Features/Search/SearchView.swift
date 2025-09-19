@@ -6,7 +6,7 @@ struct SearchView: View {
     @State private var selectedPost: Post?
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             VStack(spacing: 0) {
                 // Search Bar
                 SearchBar(text: $searchText, onSearchButtonClicked: {
@@ -48,7 +48,7 @@ struct SearchView: View {
                 }
             }
             .navigationTitle("Search")
-            .navigationBarTitleDisplayMode(.large)
+            
             .sheet(item: $selectedPost) { post in
                 PostDetailView(post: post)
             }
@@ -89,7 +89,7 @@ struct SearchBar: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(Color(.systemGray6))
+            .background(Color.gray.opacity(0.1))
             .cornerRadius(10)
             
             if isSearchFocused {
@@ -102,7 +102,7 @@ struct SearchBar: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .background(Color(.systemBackground))
+        .background(Color(NSColor.controlBackgroundColor))
     }
 }
 
@@ -211,7 +211,7 @@ struct PopularPostRow: View {
                     .foregroundColor(.secondary)
             }
             .padding()
-            .background(Color(.systemGray6))
+            .background(Color.gray.opacity(0.1))
             .cornerRadius(8)
         }
         .buttonStyle(PlainButtonStyle())
@@ -297,7 +297,7 @@ struct SearchTips: View {
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(12)
     }
 }

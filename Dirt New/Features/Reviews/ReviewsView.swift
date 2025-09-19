@@ -5,7 +5,7 @@ struct ReviewsView: View {
     @EnvironmentObject var appState: AppState
     
     var body: some View {
-        NavigationStack(path: $appState.navigationPath) {
+        NavigationView {
             VStack(spacing: 0) {
                 // Header with filter button
                 HStack {
@@ -259,7 +259,7 @@ struct ReviewCard: View {
             }
             .padding(.horizontal, 4)
         }
-        .background(Color(.systemBackground))
+        .background(Color(NSColor.controlBackgroundColor))
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
     }

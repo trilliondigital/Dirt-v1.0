@@ -11,7 +11,7 @@ struct EditProfileView: View {
     @State private var isLoading = false
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             Form {
                 // Profile Settings
                 Section("Profile") {
@@ -19,7 +19,7 @@ struct EditProfileView: View {
                         Text("Profile Picture")
                         Spacer()
                         Circle()
-                            .fill(Color(.systemGray5))
+                            .fill(Color.gray.opacity(0.2))
                             .frame(width: 50, height: 50)
                             .overlay(
                                 Image(systemName: "person.fill")
@@ -88,7 +88,7 @@ struct EditProfileView: View {
                 }
             }
             .navigationTitle("Edit Profile")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
@@ -96,7 +96,7 @@ struct EditProfileView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Button("Save") {
                         saveProfile()
                     }
@@ -113,7 +113,7 @@ struct EditProfileView: View {
                         .overlay(
                             ProgressView("Saving...")
                                 .padding()
-                                .background(Color(.systemBackground))
+                                .background(Color(NSColor.controlBackgroundColor))
                                 .cornerRadius(8)
                         )
                 }
@@ -166,7 +166,7 @@ struct CategoryToggle: View {
             .padding(.vertical, 6)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(isSelected ? Color.blue : Color(.systemGray6))
+                    .fill(isSelected ? Color.blue : Color.gray.opacity(0.1))
             )
             .foregroundColor(isSelected ? .white : .primary)
         }

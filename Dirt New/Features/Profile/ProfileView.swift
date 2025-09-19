@@ -7,7 +7,7 @@ struct ProfileView: View {
     @State private var showingEditProfile = false
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ScrollView {
                 VStack(spacing: 24) {
                     // Profile Header
@@ -38,9 +38,9 @@ struct ProfileView: View {
                 .padding()
             }
             .navigationTitle("Profile")
-            .navigationBarTitleDisplayMode(.large)
+            
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Button(action: { showingSettings = true }) {
                         Image(systemName: "gearshape")
                     }
@@ -71,7 +71,7 @@ struct ProfileHeader: View {
             VStack(spacing: 12) {
                 // Profile Image
                 Circle()
-                    .fill(Color(.systemGray5))
+                    .fill(Color.gray.opacity(0.2))
                     .frame(width: 80, height: 80)
                     .overlay(
                         Image(systemName: "person.fill")
@@ -111,7 +111,7 @@ struct ProfileHeader: View {
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(16)
     }
 }
@@ -165,7 +165,7 @@ struct ReputationSection: View {
                 ReputationProgress(currentReputation: user.reputation)
             }
             .padding()
-            .background(Color(.systemGray6))
+            .background(Color.gray.opacity(0.1))
             .cornerRadius(12)
         }
     }
@@ -408,7 +408,7 @@ struct QuickActionRow: View {
                     .foregroundColor(.secondary)
             }
             .padding()
-            .background(Color(.systemGray6))
+            .background(Color.gray.opacity(0.1))
             .cornerRadius(8)
         }
         .buttonStyle(PlainButtonStyle())

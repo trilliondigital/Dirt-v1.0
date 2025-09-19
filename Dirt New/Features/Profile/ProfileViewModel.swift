@@ -33,7 +33,7 @@ class ProfileViewModel: ObservableObject {
     
     private func loadUserStats() async -> UserStats {
         // Simulate loading user stats
-        await Task.sleep(nanoseconds: 500_000_000)
+        try await Task.sleep(nanoseconds: 500_000_000)
         
         return UserStats(
             postCount: Int.random(in: 5...25),

@@ -5,7 +5,7 @@ struct NotificationsView: View {
     @State private var selectedFilter: NotificationFilter = .all
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             VStack(spacing: 0) {
                 // Filter Bar
                 NotificationFilterBar(selectedFilter: $selectedFilter)
@@ -43,9 +43,9 @@ struct NotificationsView: View {
                 }
             }
             .navigationTitle("Notifications")
-            .navigationBarTitleDisplayMode(.large)
+            
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Menu {
                         Button("Mark All as Read") {
                             viewModel.markAllAsRead()
@@ -92,7 +92,7 @@ struct NotificationFilterBar: View {
             .padding(.horizontal)
         }
         .padding(.vertical, 8)
-        .background(Color(.systemBackground))
+        .background(Color(NSColor.controlBackgroundColor))
     }
 }
 

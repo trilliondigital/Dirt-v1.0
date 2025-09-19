@@ -24,9 +24,9 @@ struct NotificationHistoryView: View {
                 }
             }
             .navigationTitle("Notification History")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Menu {
                         Button("Export History") {
                             exportHistory()
@@ -71,7 +71,7 @@ struct NotificationHistoryView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(10)
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
@@ -311,7 +311,7 @@ struct NotificationHistoryView: View {
                 .foregroundColor(.secondary)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 2)
-                .background(Color(.systemGray5))
+                .background(Color.gray.opacity(0.2))
                 .cornerRadius(8)
         }
     }
@@ -493,7 +493,7 @@ struct StatisticCard: View {
                 .foregroundColor(.secondary)
         }
         .padding(12)
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(8)
         .frame(maxWidth: .infinity)
     }

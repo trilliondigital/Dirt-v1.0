@@ -35,7 +35,7 @@ struct PostCard: View {
                 )
             }
             .padding()
-            .background(Color(.systemBackground))
+            .background(Color(NSColor.controlBackgroundColor))
             .cornerRadius(16)
             .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
         }
@@ -57,7 +57,7 @@ struct PostHeader: View {
         HStack(spacing: 12) {
             // Author Avatar
             Circle()
-                .fill(Color(.systemGray5))
+                .fill(Color.gray.opacity(0.2))
                 .frame(width: 40, height: 40)
                 .overlay(
                     Image(systemName: "person.fill")
@@ -172,7 +172,7 @@ struct TagsView: View {
                         .font(.caption)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)
-                        .background(Color(.systemGray6))
+                        .background(Color.gray.opacity(0.1))
                         .foregroundColor(.secondary)
                         .cornerRadius(8)
                 }
@@ -191,7 +191,7 @@ struct PostMediaView: View {
             HStack(spacing: 8) {
                 ForEach(mediaURLs, id: \.self) { url in
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(Color(.systemGray5))
+                        .fill(Color.gray.opacity(0.2))
                         .frame(width: 120, height: 80)
                         .overlay(
                             Image(systemName: "photo")
@@ -296,5 +296,5 @@ struct EngagementButton: View {
         }
         .padding()
     }
-    .background(Color(.systemGray6))
+    .background(Color.gray.opacity(0.1))
 }

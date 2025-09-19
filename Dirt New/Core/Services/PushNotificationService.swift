@@ -1,5 +1,8 @@
 import Foundation
 import UserNotifications
+#if canImport(UIKit)
+import UIKit
+#endif
 import Combine
 
 @MainActor
@@ -52,7 +55,7 @@ class PushNotificationService: NSObject, ObservableObject {
     
     private func getActionsForCategory(_ category: NotificationCategory) -> [UNNotificationAction] {
         switch category {
-        case .interaction:
+        case NotificationCategory.interaction:
             return [
                 UNNotificationAction(
                     identifier: "REPLY_ACTION",
@@ -65,7 +68,7 @@ class PushNotificationService: NSObject, ObservableObject {
                     options: [.foreground]
                 )
             ]
-        case .milestone, .achievement:
+        case NotificationCategory.milestone, NotificationCategory.achievement:
             return [
                 UNNotificationAction(
                     identifier: "VIEW_ACTION",
@@ -78,7 +81,7 @@ class PushNotificationService: NSObject, ObservableObject {
                     options: []
                 )
             ]
-        case .community:
+        case NotificationCategory.community:
             return [
                 UNNotificationAction(
                     identifier: "VIEW_ACTION",
@@ -159,7 +162,7 @@ class PushNotificationService: NSObject, ObservableObject {
         guard preferences.isTypeEnabled(notification.type) else { return }
         
         // Check quiet hours
-        if preferences.isInQuietHours() && notification.type.priority != .urgent {
+        if preferences.isInQuietHours() && notification.type.priority != NotificationPriority.urgent {
             return
         }
         
@@ -225,7 +228,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .reply,
+            type: NotificationType.reply,
             title: "New Reply",
             message: "\(authorName) replied to your post",
             data: NotificationData(
@@ -244,7 +247,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .upvote,
+            type: NotificationType.upvote,
             title: "Post Upvoted",
             message: "\(authorName) upvoted your post",
             data: NotificationData(
@@ -263,7 +266,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .mention,
+            type: NotificationType.mention,
             title: "You were mentioned",
             message: "\(authorName) mentioned you in a post",
             data: NotificationData(
@@ -282,7 +285,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .comment,
+            type: NotificationType.comment,
             title: "New Comment",
             message: "\(authorName) commented on your post",
             data: NotificationData(
@@ -303,7 +306,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .reputationMilestone,
+            type: NotificationType.reputationMilestone,
             title: "Reputation Milestone! 🎉",
             message: "You've reached \(milestone) reputation points!",
             data: NotificationData(
@@ -321,7 +324,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .postMilestone,
+            type: NotificationType.postMilestone,
             title: "Post Milestone! 📝",
             message: "You've created \(count) posts!",
             data: NotificationData(
@@ -339,7 +342,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .engagementMilestone,
+            type: NotificationType.engagementMilestone,
             title: "Engagement Milestone! ❤️",
             message: "Your posts have received \(totalEngagement) total engagements!",
             data: NotificationData(
@@ -357,7 +360,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .anniversaryMilestone,
+            type: NotificationType.anniversaryMilestone,
             title: "Anniversary! 🎂",
             message: "You've been part of the community for \(months) months!",
             data: NotificationData(
@@ -369,16 +372,15 @@ class PushNotificationService: NSObject, ObservableObject {
         await addNotification(notification)
         await scheduleLocalNotification(notification)
     }
-}    
-   
- // MARK: - Achievement Notifications
+    
+    // MARK: - Achievement Notifications
     
     func notifyFirstPost() async {
         guard let currentUser = SupabaseManager.shared.currentUser else { return }
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .firstPost,
+            type: NotificationType.firstPost,
             title: "First Post! 🎉",
             message: "Welcome to the community! You've made your first post.",
             data: NotificationData(
@@ -396,7 +398,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .firstUpvote,
+            type: NotificationType.firstUpvote,
             title: "First Upvote! 👍",
             message: "Someone liked your content! You received your first upvote.",
             data: NotificationData(
@@ -414,7 +416,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .popularPost,
+            type: NotificationType.popularPost,
             title: "Popular Post! 🔥",
             message: "Your post is trending with \(upvotes) upvotes!",
             data: NotificationData(
@@ -433,7 +435,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .helpfulContributor,
+            type: NotificationType.helpfulContributor,
             title: "Helpful Contributor! 🌟",
             message: "Your advice has been helping others in the community!",
             data: NotificationData(
@@ -451,7 +453,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .communityChampion,
+            type: NotificationType.communityChampion,
             title: "Community Champion! 👑",
             message: "You've become a pillar of the community! Thank you for your contributions.",
             data: NotificationData(
@@ -473,7 +475,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .announcement,
+            type: NotificationType.announcement,
             title: title,
             message: message,
             data: NotificationData(
@@ -491,7 +493,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .featureUpdate,
+            type: NotificationType.featureUpdate,
             title: "New Feature: \(feature)",
             message: description,
             data: NotificationData(
@@ -513,7 +515,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .communityEvent,
+            type: NotificationType.communityEvent,
             title: "Community Event: \(event)",
             message: "Join us on \(formatter.string(from: date))",
             data: NotificationData(
@@ -531,7 +533,7 @@ class PushNotificationService: NSObject, ObservableObject {
         
         let notification = DirtNotification(
             userId: currentUser.id,
-            type: .moderationUpdate,
+            type: NotificationType.moderationUpdate,
             title: "Moderation Update",
             message: "\(action): \(reason)",
             data: NotificationData(
@@ -646,6 +648,7 @@ class PushNotificationService: NSObject, ObservableObject {
 
 // MARK: - UNUserNotificationCenterDelegate
 
+@MainActor
 extension PushNotificationService: UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(

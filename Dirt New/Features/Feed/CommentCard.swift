@@ -11,7 +11,7 @@ struct CommentCard: View {
             HStack(spacing: 12) {
                 // Author Avatar
                 Circle()
-                    .fill(Color(.systemGray5))
+                    .fill(Color.gray.opacity(0.2))
                     .frame(width: 32, height: 32)
                     .overlay(
                         Image(systemName: "person.fill")
@@ -72,7 +72,7 @@ struct CommentCard: View {
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(12)
         .sheet(isPresented: $showingReportSheet) {
             ReportCommentSheet(comment: comment)
@@ -88,7 +88,7 @@ struct ReportCommentSheet: View {
     @State private var additionalInfo = ""
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             VStack(alignment: .leading, spacing: 20) {
                 Text("Why are you reporting this comment?")
                     .font(.headline)
@@ -124,9 +124,9 @@ struct ReportCommentSheet: View {
             }
             .padding()
             .navigationTitle("Report Comment")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Button("Cancel") {
                         dismiss()
                     }
@@ -175,7 +175,7 @@ struct ReportReasonRow: View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Circle()
-                    .fill(isSelected ? Color.blue : Color(.systemGray5))
+                    .fill(isSelected ? Color.blue : Color.gray.opacity(0.2))
                     .frame(width: 20, height: 20)
                     .overlay(
                         Circle()

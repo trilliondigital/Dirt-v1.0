@@ -6,7 +6,7 @@ struct CreatePostView: View {
     @State private var showingDiscardAlert = false
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ScrollView {
                 VStack(spacing: 24) {
                     // Post Type Selection
@@ -36,7 +36,7 @@ struct CreatePostView: View {
                 .padding()
             }
             .navigationTitle("Create Post")
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
@@ -48,7 +48,7 @@ struct CreatePostView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Button("Post") {
                         Task {
                             await viewModel.createPost()
@@ -75,7 +75,7 @@ struct CreatePostView: View {
                         .overlay(
                             ProgressView("Creating post...")
                                 .padding()
-                                .background(Color(.systemBackground))
+                                .background(Color(NSColor.controlBackgroundColor))
                                 .cornerRadius(8)
                         )
                 }
@@ -158,7 +158,7 @@ struct SentimentButton: View {
             .padding(.vertical, 8)
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(isSelected ? Color(sentiment.color) : Color(.systemGray6))
+                    .fill(isSelected ? Color(sentiment.color) : Color.gray.opacity(0.1))
             )
             .foregroundColor(isSelected ? .white : Color(sentiment.color))
         }
@@ -184,7 +184,7 @@ struct CategoryButton: View {
             .padding(.vertical, 6)
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(isSelected ? Color.blue : Color(.systemGray6))
+                    .fill(isSelected ? Color.blue : Color.gray.opacity(0.1))
             )
             .foregroundColor(isSelected ? .white : .primary)
         }
@@ -373,7 +373,7 @@ struct MediaAttachment: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color(.systemGray6))
+                .background(Color.gray.opacity(0.1))
                 .cornerRadius(8)
             }
             .buttonStyle(PlainButtonStyle())
@@ -414,7 +414,7 @@ struct PostingGuidelines: View {
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.gray.opacity(0.1))
         .cornerRadius(12)
     }
 }

@@ -8,7 +8,7 @@ struct ReportSheet: View {
     @State private var isSubmitting = false
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     // Header
@@ -39,7 +39,7 @@ struct ReportSheet: View {
                                 .lineLimit(3)
                         }
                         .padding()
-                        .background(Color(.systemGray6))
+                        .background(Color.gray.opacity(0.1))
                         .cornerRadius(8)
                     }
                     
@@ -93,7 +93,7 @@ struct ReportSheet: View {
                 }
                 .padding()
             }
-            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
@@ -101,7 +101,7 @@ struct ReportSheet: View {
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .trailing) {
                     Button("Submit") {
                         submitReport()
                     }
@@ -115,7 +115,7 @@ struct ReportSheet: View {
                         .overlay(
                             ProgressView("Submitting report...")
                                 .padding()
-                                .background(Color(.systemBackground))
+                                .background(Color(NSColor.controlBackgroundColor))
                                 .cornerRadius(8)
                         )
                 }

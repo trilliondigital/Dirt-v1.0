@@ -11,7 +11,7 @@ class SupabaseManager: ObservableObject {
     private let supabaseURL = "YOUR_SUPABASE_URL"
     private let supabaseAnonKey = "YOUR_SUPABASE_ANON_KEY"
     
-    private init() {}
+    init() {}
     
     func initialize() {
         // Initialize Supabase client

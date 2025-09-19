@@ -67,7 +67,7 @@ struct AuthenticationView: View {
                         .multilineTextAlignment(.center)
                 }
                 .padding()
-                .background(Color(.systemGray6))
+                .background(Color.gray.opacity(0.1))
                 .cornerRadius(12)
             }
             
