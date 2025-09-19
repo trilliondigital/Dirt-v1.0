@@ -14,13 +14,14 @@ struct MainTabView: View {
                 }
                 .tag(TabItem.feed)
             
-            // Search Tab
-            SearchView()
+            // Reviews Tab
+            ReviewsView()
                 .tabItem {
-                    Image(systemName: appState.selectedTab == .search ? TabItem.search.selectedIconName : TabItem.search.iconName)
-                    Text(TabItem.search.rawValue)
+                    Image(systemName: appState.selectedTab == .reviews ? TabItem.reviews.selectedIconName : TabItem.reviews.iconName)
+                    Text(TabItem.reviews.rawValue)
                 }
-                .tag(TabItem.search)
+                .tag(TabItem.reviews)
+                .badge(appState.getBadgeCount(for: .reviews) > 0 ? appState.getBadgeCount(for: .reviews) : nil)
             
             // Create Tab
             CreatePostView()
@@ -48,6 +49,34 @@ struct MainTabView: View {
                 .tag(TabItem.profile)
         }
         .accentColor(.blue)
+        .animation(.easeInOut(duration: 0.2), value: appState.selectedTab)
+        .onReceive(appState.$deepLinkPath) { path in
+            handleDeepLink(path)
+        }
+    }
+    
+    private func handleDeepLink(_ path: String?) {
+        guard let path = path else { return }
+        
+        // Handle deep linking to specific tabs and paths
+        let components = path.components(separatedBy: "/")
+        
+        if let firstComponent = components.first {
+            switch firstComponent {
+            case "feed":
+                appState.selectedTab = .feed
+            case "reviews":
+                appState.selectedTab = .reviews
+            case "create":
+                appState.selectedTab = .create
+            case "notifications":
+                appState.selectedTab = .notifications
+            case "profile":
+                appState.selectedTab = .profile
+            default:
+                break
+            }
+        }
     }
 }
 

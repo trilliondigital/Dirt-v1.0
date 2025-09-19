@@ -39,6 +39,46 @@ class AppState: ObservableObject {
     func setLoading(_ loading: Bool) {
         isLoading = loading
     }
+    
+    // MARK: - Deep Linking
+    
+    func handleDeepLink(_ url: URL) {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let host = components.host else { return }
+        
+        switch host {
+        case "feed":
+            selectedTab = .feed
+        case "reviews":
+            selectedTab = .reviews
+        case "create":
+            selectedTab = .create
+        case "notifications":
+            selectedTab = .notifications
+        case "profile":
+            selectedTab = .profile
+        default:
+            break
+        }
+        
+        // Store the path for further navigation within the tab
+        deepLinkPath = components.path
+    }
+    
+    func handleDeepLink(to tab: TabItem, path: String? = nil) {
+        selectedTab = tab
+        deepLinkPath = path
+    }
+    
+    // MARK: - Badge Management
+    
+    func updateBadge(for tab: TabItem, count: Int) {
+        notificationBadges[tab] = count
+    }
+    
+    func getBadgeCount(for tab: TabItem) -> Int {
+        return notificationBadges[tab] ?? 0
+    }
 }
 
 enum TabItem: String, CaseIterable {

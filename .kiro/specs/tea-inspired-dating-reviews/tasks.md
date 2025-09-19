@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 8. Develop main navigation and UI components
+- [x] 8. Develop main navigation and UI components
   - Create comprehensive navigation system and core UI components for the tea-inspired dating reviews feature
   - Integrate with existing Dirt app architecture and design patterns
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 2.5, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4_
@@ -12,7 +12,7 @@
   - Implement tab badge notifications
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 8.2 Build feed and content browsing interface
+- [x] 8.2 Build feed and content browsing interface
   - Create infinite scroll feed with pull-to-refresh
   - Implement content filtering and sorting options
   - Add content loading states and error handling
