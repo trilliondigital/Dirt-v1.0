@@ -14,7 +14,7 @@ class NotificationManager: ObservableObject {
         print("Initializing notification system...")
         
         // Mock initialization
-        await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(nanoseconds: 500_000_000)
         
         isInitialized = true
         totalUnreadCount = 3 // Mock unread count

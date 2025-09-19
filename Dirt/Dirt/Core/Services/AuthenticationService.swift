@@ -30,12 +30,7 @@ class AuthenticationService: ObservableObject {
     func checkAuthenticationState() async {
         isLoading = true
         defer { isLoading = false }
-        
-        do {
-            await supabaseManager.checkAuthenticationState()
-        } catch {
-            self.error = AuthError.sessionCheckFailed
-        }
+        await supabaseManager.checkAuthenticationState()
     }
     
     func signInWithApple() async {
@@ -77,15 +72,30 @@ class AuthenticationService: ObservableObject {
     }
     
     func updateUserProfile(username: String?, preferences: [PostCategory]) async {
-        guard var user = currentUser else { return }
+        guard let user = currentUser else { return }
         
         isLoading = true
         defer { isLoading = false }
         
+        let updatedUser = User(
+            id: user.id,
+            email: user.email,
+            username: username,
+            createdAt: user.createdAt,
+            lastActiveAt: user.lastActiveAt,
+            isVerified: user.isVerified,
+            reputation: user.reputation,
+            profileImageURL: user.profileImageURL,
+            isAnonymous: user.isAnonymous,
+            allowDirectMessages: user.allowDirectMessages,
+            showOnlineStatus: user.showOnlineStatus,
+            preferredCategories: preferences,
+            blockedUsers: user.blockedUsers,
+            savedPosts: user.savedPosts
+        )
+        
         do {
-            user.username = username
-            user.preferredCategories = preferences
-            try await supabaseManager.updateUserProfile(user)
+            try await supabaseManager.updateUserProfile(updatedUser)
         } catch {
             self.error = AuthError.profileUpdateFailed
         }

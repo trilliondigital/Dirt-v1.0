@@ -26,7 +26,7 @@ class SupabaseManager: ObservableObject {
         print("Checking authentication state...")
         
         // Mock implementation
-        await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
+        try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
         
         // For demo purposes, we'll create a mock user
         // In production, this would come from Supabase
@@ -37,7 +37,7 @@ class SupabaseManager: ObservableObject {
         print("Signing in with Apple...")
         
         // Mock implementation
-        await Task.sleep(nanoseconds: 1_000_000_000)
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
         
         let user = User(
             email: "user@example.com",
@@ -53,7 +53,7 @@ class SupabaseManager: ObservableObject {
         print("Signing in anonymously...")
         
         // Mock implementation
-        await Task.sleep(nanoseconds: 1_000_000_000)
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
         
         let user = User(
             email: nil,
@@ -68,7 +68,7 @@ class SupabaseManager: ObservableObject {
         // Sign out from Supabase
         print("Signing out...")
         
-        await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(nanoseconds: 500_000_000)
         currentUser = nil
     }
     
@@ -76,7 +76,7 @@ class SupabaseManager: ObservableObject {
         // Update user profile in Supabase
         print("Updating user profile...")
         
-        await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(nanoseconds: 500_000_000)
         currentUser = user
     }
     
@@ -86,7 +86,7 @@ class SupabaseManager: ObservableObject {
         // Fetch posts from Supabase
         print("Fetching posts...")
         
-        await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(nanoseconds: 500_000_000)
         
         // Mock data
         return generateMockPosts(count: limit)
@@ -96,7 +96,7 @@ class SupabaseManager: ObservableObject {
         // Create post in Supabase
         print("Creating post...")
         
-        await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(nanoseconds: 500_000_000)
         return post
     }
     
@@ -104,7 +104,7 @@ class SupabaseManager: ObservableObject {
         // Update post in Supabase
         print("Updating post...")
         
-        await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(nanoseconds: 500_000_000)
         return post
     }
     
@@ -112,7 +112,7 @@ class SupabaseManager: ObservableObject {
         // Delete post from Supabase
         print("Deleting post...")
         
-        await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(nanoseconds: 500_000_000)
     }
     
     // MARK: - Mock Data Generation
@@ -158,3 +158,4 @@ class SupabaseManager: ObservableObject {
         }
     }
 }
+

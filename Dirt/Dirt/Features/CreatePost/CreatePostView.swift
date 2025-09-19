@@ -54,18 +54,26 @@ struct CreatePostView: View {
     
     private func createPost() {
         isPosting = true
-        
-        // Simulate posting
+
         Task {
-            await Task.sleep(nanoseconds: 1_000_000_000)
-            
-            await MainActor.run {
-                // Reset form
-                title = ""
-                content = ""
-                selectedCategory = .general
-                selectedSentiment = .neutral
-                isPosting = false
+            do {
+                // Simulate posting delay
+                try await Task.sleep(nanoseconds: 1_000_000_000)
+
+                await MainActor.run {
+                    // Reset form
+                    title = ""
+                    content = ""
+                    selectedCategory = .general
+                    selectedSentiment = .neutral
+                    isPosting = false
+                }
+            } catch {
+                // Handle cancellation or other errors from sleep or future throwing calls
+                await MainActor.run {
+                    isPosting = false
+                }
+                print("CreatePostView.createPost error: \(error)")
             }
         }
     }
