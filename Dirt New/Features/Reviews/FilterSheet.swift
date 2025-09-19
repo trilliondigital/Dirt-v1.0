@@ -100,6 +100,16 @@ struct FilterSheet: View {
                             }
                         }
                     }
+                    
+                    // Location Filter
+                    FilterSection(title: "Location") {
+                        TextField("Enter location", text: Binding(
+                            get: { tempFilter.location ?? "" },
+                            set: { tempFilter.location = $0.isEmpty ? nil : $0 }
+                        ))
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .submitLabel(.done)
+                    }
                 }
                 .padding()
             }
@@ -134,27 +144,6 @@ struct FilterSheet: View {
 }
 
 // MARK: - Supporting Views
-
-struct FilterSection<Content: View>: View {
-    let title: String
-    let content: Content
-    
-    init(title: String, @ViewBuilder content: () -> Content) {
-        self.title = title
-        self.content = content()
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.primary)
-            
-            content
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
 
 struct SortOptionCard: View {
     let option: SortOption

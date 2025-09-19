@@ -30,12 +30,19 @@ struct ReviewsView: View {
                 if viewModel.isLoading && viewModel.reviews.isEmpty {
                     // Loading state
                     ReviewsLoadingView()
+                } else if let errorMessage = viewModel.errorMessage {
+                    // Error state
+                    ReviewsErrorView(errorMessage: errorMessage) {
+                        Task {
+                            await viewModel.loadReviews()
+                        }
+                    }
                 } else if viewModel.reviews.isEmpty {
                     // Empty state
                     ReviewsEmptyView()
                 } else {
                     // Reviews grid
-                    ReviewsGridView(reviews: viewModel.reviews)
+                    ReviewsGridView(reviews: viewModel.filteredReviews)
                         .refreshable {
                             await viewModel.refreshReviews()
                         }
@@ -73,16 +80,67 @@ struct ReviewsView: View {
 // MARK: - Supporting Views
 
 struct ReviewsLoadingView: View {
+    @State private var columns: [GridItem] = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
+    
     var body: some View {
-        LazyVGrid(columns: [
-            GridItem(.flexible()),
-            GridItem(.flexible())
-        ], spacing: 16) {
-            ForEach(0..<6, id: \.self) { _ in
-                ReviewCardSkeleton()
+        GeometryReader { geometry in
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 16) {
+                    ForEach(0..<6, id: \.self) { _ in
+                        ReviewCardSkeleton()
+                    }
+                }
+                .padding()
+                .onAppear {
+                    updateColumns(for: geometry.size)
+                }
             }
         }
+    }
+    
+    private func updateColumns(for size: CGSize) {
+        let padding: CGFloat = 32
+        let spacing: CGFloat = 16
+        let minCardWidth: CGFloat = 160
+        
+        let availableWidth = size.width - padding
+        let numberOfColumns = max(1, min(Int(availableWidth / (minCardWidth + spacing)), 3))
+        
+        columns = Array(repeating: GridItem(.flexible()), count: numberOfColumns)
+    }
+}
+
+struct ReviewsErrorView: View {
+    let errorMessage: String
+    let onRetry: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 60))
+                .foregroundColor(.orange)
+            
+            VStack(spacing: 8) {
+                Text("Unable to load reviews")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                
+                Text(errorMessage)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            
+            Button("Try Again") {
+                onRetry()
+            }
+            .buttonStyle(.borderedProminent)
+        }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
@@ -115,37 +173,52 @@ struct ReviewsEmptyView: View {
 struct ReviewsGridView: View {
     let reviews: [Review]
     @State private var columns: [GridItem] = []
+    @State private var screenSize: CGSize = .zero
     
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(reviews) { review in
-                    ReviewCard(review: review)
-                        .onTapGesture {
-                            // Navigate to review detail
-                        }
+        GeometryReader { geometry in
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 16) {
+                    ForEach(reviews) { review in
+                        ReviewCard(review: review)
+                            .onTapGesture {
+                                // Navigate to review detail
+                            }
+                    }
+                }
+                .padding()
+                .onAppear {
+                    updateGridLayout(for: geometry.size)
+                }
+                .onChange(of: geometry.size) { newSize in
+                    if newSize != screenSize {
+                        screenSize = newSize
+                        updateGridLayout(for: newSize)
+                    }
                 }
             }
-            .padding()
-        }
-        .onAppear {
-            updateGridLayout()
-        }
-        .onChange(of: UIScreen.main.bounds.size) { _ in
-            updateGridLayout()
         }
     }
     
-    private func updateGridLayout() {
-        let screenWidth = UIScreen.main.bounds.width
+    private func updateGridLayout(for size: CGSize) {
         let padding: CGFloat = 32 // 16 on each side
         let spacing: CGFloat = 16
         let minCardWidth: CGFloat = 160
+        let maxCardWidth: CGFloat = 200
         
-        let availableWidth = screenWidth - padding
-        let numberOfColumns = max(1, Int(availableWidth / (minCardWidth + spacing)))
+        let availableWidth = size.width - padding
+        let idealColumns = Int(availableWidth / (minCardWidth + spacing))
+        let numberOfColumns = max(1, min(idealColumns, 3)) // Max 3 columns
         
-        columns = Array(repeating: GridItem(.flexible()), count: numberOfColumns)
+        // Calculate actual card width to ensure good proportions
+        let actualCardWidth = (availableWidth - CGFloat(numberOfColumns - 1) * spacing) / CGFloat(numberOfColumns)
+        
+        // Use flexible columns if card width is reasonable, otherwise use fixed width
+        if actualCardWidth <= maxCardWidth {
+            columns = Array(repeating: GridItem(.flexible(), spacing: spacing), count: numberOfColumns)
+        } else {
+            columns = Array(repeating: GridItem(.fixed(maxCardWidth), spacing: spacing), count: numberOfColumns)
+        }
     }
 }
 

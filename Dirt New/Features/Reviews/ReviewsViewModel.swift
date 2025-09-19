@@ -4,12 +4,14 @@ import Combine
 @MainActor
 class ReviewsViewModel: ObservableObject {
     @Published var reviews: [Review] = []
+    @Published var filteredReviews: [Review] = []
     @Published var isLoading = false
     @Published var showingFilterSheet = false
     @Published var currentFilter = ContentFilter()
     @Published var errorMessage: String?
     
     private var cancellables = Set<AnyCancellable>()
+    private var allReviews: [Review] = []
     
     init() {
         setupObservers()
@@ -20,9 +22,14 @@ class ReviewsViewModel: ObservableObject {
         $currentFilter
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .sink { [weak self] _ in
-                Task {
-                    await self?.loadReviews()
-                }
+                self?.applyFilters()
+            }
+            .store(in: &cancellables)
+        
+        // Update filtered reviews when reviews change
+        $reviews
+            .sink { [weak self] _ in
+                self?.applyFilters()
             }
             .store(in: &cancellables)
     }
@@ -30,18 +37,23 @@ class ReviewsViewModel: ObservableObject {
     // MARK: - Data Loading
     
     func loadReviews() async {
+        guard !isLoading else { return }
+        
         isLoading = true
         errorMessage = nil
         
         do {
             // Simulate API call - replace with actual service call
-            try await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
+            try await Task.sleep(nanoseconds: 800_000_000) // 0.8 second delay
             
             // Mock data for now
-            reviews = generateMockReviews()
+            let loadedReviews = generateMockReviews()
+            allReviews = loadedReviews
+            reviews = loadedReviews
             
         } catch {
             errorMessage = "Failed to load reviews: \(error.localizedDescription)"
+            print("Error loading reviews: \(error)")
         }
         
         isLoading = false
@@ -60,6 +72,55 @@ class ReviewsViewModel: ObservableObject {
     
     func clearFilters() {
         currentFilter = ContentFilter()
+    }
+    
+    private func applyFilters() {
+        var filtered = reviews
+        
+        // Apply category filter
+        if !currentFilter.categories.isEmpty {
+            filtered = filtered.filter { review in
+                // For now, we'll use tags as categories since Review model doesn't have category
+                return currentFilter.categories.contains { category in
+                    review.tags.contains(category.rawValue.lowercased())
+                }
+            }
+        }
+        
+        // Apply rating filter
+        filtered = filtered.filter { review in
+            review.rating >= currentFilter.ratingRange.lowerBound &&
+            review.rating <= currentFilter.ratingRange.upperBound
+        }
+        
+        // Apply date range filter
+        if let dateRange = currentFilter.dateRange {
+            filtered = filtered.filter { review in
+                review.createdAt >= dateRange.start && review.createdAt <= dateRange.end
+            }
+        }
+        
+        // Apply location filter
+        if let location = currentFilter.location, !location.isEmpty {
+            filtered = filtered.filter { review in
+                review.location?.localizedCaseInsensitiveContains(location) == true
+            }
+        }
+        
+        // Apply sorting
+        switch currentFilter.sortBy {
+        case .recent:
+            filtered.sort { $0.createdAt > $1.createdAt }
+        case .rating:
+            filtered.sort { $0.rating > $1.rating }
+        case .popular:
+            filtered.sort { $0.likeCount > $1.likeCount }
+        case .nearby:
+            // For now, just sort by location name
+            filtered.sort { ($0.location ?? "") < ($1.location ?? "") }
+        }
+        
+        filteredReviews = filtered
     }
     
     // MARK: - Mock Data Generation

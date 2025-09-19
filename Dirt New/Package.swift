@@ -21,7 +21,18 @@ let package = Package(
             dependencies: [
                 .product(name: "Supabase", package: "supabase-swift")
             ],
-            path: "Dirt/Dirt"
+            path: ".",
+            exclude: [
+                "Reference",
+                "README.md",
+                ".swiftpm"
+            ],
+            sources: [
+                "Core",
+                "Features",
+                "DirtApp.swift",
+                "ContentView.swift"
+            ]
         )
     ]
 )

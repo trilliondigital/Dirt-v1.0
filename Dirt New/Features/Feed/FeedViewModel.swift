@@ -12,11 +12,14 @@ class FeedViewModel: ObservableObject {
     @Published var selectedContentType: ContentType = .all
     @Published var error: FeedError?
     @Published var hasMoreContent = true
+    @Published var isLoadingMore = false
+    @Published var isRefreshing = false
     
     private let supabaseManager = SupabaseManager.shared
     private var cancellables = Set<AnyCancellable>()
     private var currentPage = 0
     private let pageSize = 20
+    private var isLoadingMoreContent = false
     
     init() {
         setupBindings()
@@ -35,8 +38,41 @@ class FeedViewModel: ObservableObject {
     }
     
     func loadFeed() async {
+        guard !isLoading else { return }
+        
         isLoading = true
         error = nil
+        currentPage = 0
+        hasMoreContent = true
+        
+        do {
+            // Add artificial delay to show loading state
+            try await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+            
+            let (fetchedPosts, fetchedReviews) = try await loadContent()
+            
+            posts = fetchedPosts
+            reviews = fetchedReviews
+            feedItems = createMixedFeed(posts: fetchedPosts, reviews: fetchedReviews)
+            
+            // Determine if there's more content
+            hasMoreContent = fetchedPosts.count >= pageSize || fetchedReviews.count >= pageSize
+            
+        } catch {
+            self.error = .loadingFailed
+            print("Error loading feed: \(error)")
+        }
+        
+        isLoading = false
+    }
+    
+    func refreshFeed() async {
+        guard !isRefreshing else { return }
+        
+        isRefreshing = true
+        error = nil
+        
+        // Reset pagination
         currentPage = 0
         hasMoreContent = true
         
@@ -47,24 +83,27 @@ class FeedViewModel: ObservableObject {
             reviews = fetchedReviews
             feedItems = createMixedFeed(posts: fetchedPosts, reviews: fetchedReviews)
             
+            hasMoreContent = fetchedPosts.count >= pageSize || fetchedReviews.count >= pageSize
+            
         } catch {
             self.error = .loadingFailed
+            print("Error refreshing feed: \(error)")
         }
         
-        isLoading = false
-    }
-    
-    func refreshFeed() async {
-        await loadFeed()
+        isRefreshing = false
     }
     
     func loadMoreContent() async {
-        guard hasMoreContent && !isLoading else { return }
+        guard hasMoreContent && !isLoading && !isLoadingMoreContent else { return }
         
-        isLoading = true
+        isLoadingMoreContent = true
+        isLoadingMore = true
         currentPage += 1
         
         do {
+            // Add small delay for better UX
+            try await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
+            
             let (morePosts, moreReviews) = try await loadContent()
             
             if morePosts.isEmpty && moreReviews.isEmpty {
@@ -75,13 +114,18 @@ class FeedViewModel: ObservableObject {
                 
                 let newItems = createMixedFeed(posts: morePosts, reviews: moreReviews)
                 feedItems.append(contentsOf: newItems)
+                
+                // Check if we've reached the end
+                hasMoreContent = morePosts.count >= pageSize || moreReviews.count >= pageSize
             }
             
         } catch {
-            self.error = .loadingFailed
+            self.error = .actionFailed
+            print("Error loading more content: \(error)")
         }
         
-        isLoading = false
+        isLoadingMore = false
+        isLoadingMoreContent = false
     }
     
     private func loadContent() async throws -> ([Post], [Review]) {
@@ -299,44 +343,86 @@ class FeedViewModel: ObservableObject {
     private func generateMockPosts() -> [Post] {
         let categories = PostCategory.allCases
         let sentiments = PostSentiment.allCases
+        let postTitles = [
+            "First date went amazing!",
+            "Red flags I wish I'd noticed earlier",
+            "How to handle dating anxiety?",
+            "Best coffee shops for dates in the city",
+            "Dating app success story",
+            "When should you have 'the talk'?",
+            "Dealing with ghosting - need advice",
+            "Perfect date night ideas for winter",
+            "How to split the bill gracefully",
+            "Meeting their friends for the first time"
+        ]
         
-        return (0..<10).map { index in
+        let startIndex = currentPage * pageSize
+        let endIndex = min(startIndex + pageSize, postTitles.count * 3) // Allow for multiple pages
+        
+        return (startIndex..<endIndex).map { index in
+            let titleIndex = index % postTitles.count
             Post(
                 authorId: UUID(),
-                title: "Dating Experience #\(index + 1)",
-                content: "This is a sample post about dating experiences and advice for the community.",
+                title: postTitles[titleIndex],
+                content: "This is a detailed post about dating experiences, advice, and insights from the community. It contains valuable information that others can learn from and engage with.",
                 category: categories.randomElement() ?? .general,
                 sentiment: sentiments.randomElement() ?? .neutral,
-                tags: ["dating", "advice", "experience"].shuffled().prefix(Int.random(in: 1...3)).map(String.init),
-                createdAt: Date().addingTimeInterval(-Double.random(in: 0...604800)),
+                tags: ["dating", "advice", "experience", "relationships", "tips"].shuffled().prefix(Int.random(in: 1...3)).map(String.init),
+                createdAt: Date().addingTimeInterval(-Double.random(in: 0...604800) - Double(index * 3600)),
                 upvotes: Int.random(in: 0...100),
                 downvotes: Int.random(in: 0...20),
-                commentCount: Int.random(in: 0...50)
+                commentCount: Int.random(in: 0...50),
+                viewCount: Int.random(in: 50...500),
+                shareCount: Int.random(in: 0...25),
+                saveCount: Int.random(in: 0...15)
             )
         }
     }
     
     private func generateMockReviews() -> [Review] {
-        let titles = [
-            "Amazing Coffee Date at Local Café",
-            "Perfect Dinner Experience Downtown",
+        let reviewTitles = [
+            "Amazing Coffee Date at Blue Bottle",
+            "Perfect Dinner at Italian Bistro",
             "Fun Mini Golf Adventure",
-            "Romantic Walk in the Park",
-            "Great Museum Visit Together"
+            "Romantic Walk in Golden Gate Park",
+            "Great Museum Visit at SFMOMA",
+            "Cozy Bookstore Date at City Lights",
+            "Exciting Escape Room Challenge",
+            "Beautiful Sunset at Crissy Field",
+            "Wine Tasting in Napa Valley",
+            "Concert at the Fillmore"
         ]
         
-        return titles.enumerated().map { index, title in
+        let locations = [
+            "San Francisco, CA",
+            "Oakland, CA",
+            "Berkeley, CA",
+            "Palo Alto, CA",
+            "San Jose, CA"
+        ]
+        
+        let startIndex = currentPage * pageSize
+        let endIndex = min(startIndex + pageSize, reviewTitles.count * 3) // Allow for multiple pages
+        
+        return (startIndex..<endIndex).map { index in
+            let titleIndex = index % reviewTitles.count
             Review(
                 authorId: "user_\(index)",
                 authorName: "User \(index + 1)",
-                title: title,
-                content: "This was an incredible experience that I would highly recommend to anyone looking for a great date idea. The atmosphere was perfect and we had such a wonderful time together.",
+                title: reviewTitles[titleIndex],
+                content: "This was an incredible experience that I would highly recommend to anyone looking for a great date idea. The atmosphere was perfect, the service was excellent, and we had such a wonderful time together. Would definitely go back!",
                 rating: Double.random(in: 3.0...5.0),
-                tags: ["coffee", "romantic", "fun", "date"].shuffled().prefix(Int.random(in: 1...3)).map(String.init),
-                createdAt: Date().addingTimeInterval(-Double.random(in: 0...604800)),
+                tags: ["coffee", "romantic", "fun", "date", "recommended"].shuffled().prefix(Int.random(in: 1...4)).map(String.init),
+                createdAt: Date().addingTimeInterval(-Double.random(in: 0...604800) - Double(index * 3600)),
                 likeCount: Int.random(in: 0...50),
                 commentCount: Int.random(in: 0...20),
-                location: "San Francisco, CA"
+                location: locations.randomElement(),
+                venue: reviewTitles[titleIndex].components(separatedBy: " at ").last,
+                cost: CostLevel.allCases.randomElement(),
+                duration: TimeInterval.random(in: 3600...14400), // 1-4 hours
+                viewCount: Int.random(in: 25...300),
+                shareCount: Int.random(in: 0...20),
+                saveCount: Int.random(in: 0...10)
             )
         }
     }
@@ -369,18 +455,33 @@ enum FeedFilter: String, CaseIterable {
 enum FeedError: LocalizedError {
     case loadingFailed
     case actionFailed
+    case networkError
+    case noConnection
     
     var errorDescription: String? {
         switch self {
         case .loadingFailed:
-            return "Failed to load posts"
+            return "Unable to load content. Please check your connection and try again."
         case .actionFailed:
-            return "Action failed"
+            return "Action failed. Please try again."
+        case .networkError:
+            return "Network error occurred. Please check your internet connection."
+        case .noConnection:
+            return "No internet connection. Please connect to the internet and try again."
+        }
+    }
+    
+    var recoverySuggestion: String? {
+        switch self {
+        case .loadingFailed, .networkError, .noConnection:
+            return "Check your internet connection and tap 'Try Again'"
+        case .actionFailed:
+            return "Please try the action again"
         }
     }
 }
-// MARK
-: - Content Type
+
+// MARK: - Content Type
 
 enum ContentType: String, CaseIterable {
     case all = "All"

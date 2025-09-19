@@ -21,6 +21,12 @@ struct FeedView: View {
                 // Mixed Content Feed
                 if viewModel.isLoading && viewModel.feedItems.isEmpty {
                     FeedLoadingView()
+                } else if let error = viewModel.error {
+                    FeedErrorView(error: error) {
+                        Task {
+                            await viewModel.loadFeed()
+                        }
+                    }
                 } else if viewModel.feedItems.isEmpty {
                     EmptyFeedView()
                 } else {
@@ -38,17 +44,28 @@ struct FeedView: View {
                                     onShare: { viewModel.shareItem(item) },
                                     onReport: { viewModel.reportItem(item) }
                                 )
+                                .onAppear {
+                                    // Trigger load more when approaching end
+                                    if item.id == viewModel.feedItems.last?.id {
+                                        Task {
+                                            await viewModel.loadMoreContent()
+                                        }
+                                    }
+                                }
                             }
                             
-                            // Infinite scroll loading
-                            if viewModel.hasMoreContent {
-                                ProgressView()
-                                    .padding()
+                            // Infinite scroll loading indicator
+                            if viewModel.hasMoreContent && !viewModel.isLoading {
+                                InfiniteScrollLoader()
                                     .onAppear {
                                         Task {
                                             await viewModel.loadMoreContent()
                                         }
                                     }
+                            } else if viewModel.isLoading && !viewModel.feedItems.isEmpty {
+                                LoadingMoreIndicator()
+                            } else if !viewModel.hasMoreContent && !viewModel.feedItems.isEmpty {
+                                EndOfFeedIndicator()
                             }
                         }
                         .padding()
@@ -195,8 +212,8 @@ struct EmptyFeedView: View {
     FeedView()
         .environmentObject(AppState())
 }
-// M
-ARK: - Enhanced Filter Bar
+
+// MARK: - Enhanced Filter Bar
 struct EnhancedFilterBar: View {
     @Binding var selectedFilter: FeedFilter
     @Binding var selectedCategory: PostCategory?
@@ -469,6 +486,80 @@ struct FeedLoadingView: View {
     }
 }
 
+// MARK: - Feed Error View
+struct FeedErrorView: View {
+    let error: FeedError
+    let onRetry: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 60))
+                .foregroundColor(.orange)
+            
+            VStack(spacing: 8) {
+                Text("Something went wrong")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                
+                Text(error.localizedDescription)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            
+            Button("Try Again") {
+                onRetry()
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+// MARK: - Infinite Scroll Components
+struct InfiniteScrollLoader: View {
+    var body: some View {
+        HStack {
+            ProgressView()
+                .scaleEffect(0.8)
+            Text("Loading more...")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+    }
+}
+
+struct LoadingMoreIndicator: View {
+    var body: some View {
+        HStack {
+            ProgressView()
+                .scaleEffect(0.8)
+            Text("Loading...")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+    }
+}
+
+struct EndOfFeedIndicator: View {
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "checkmark.circle")
+                .font(.title3)
+                .foregroundColor(.secondary)
+            
+            Text("You're all caught up!")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+    }
+}
+
 struct FeedItemSkeleton: View {
     @State private var isAnimating = false
     
@@ -550,23 +641,243 @@ struct FeedFilterSheet: View {
     @Binding var selectedContentType: ContentType
     @Environment(\.dismiss) private var dismiss
     
+    @State private var tempFilter: FeedFilter
+    @State private var tempCategory: PostCategory?
+    @State private var tempContentType: ContentType
+    
+    init(selectedFilter: Binding<FeedFilter>, selectedCategory: Binding<PostCategory?>, selectedContentType: Binding<ContentType>) {
+        self._selectedFilter = selectedFilter
+        self._selectedCategory = selectedCategory
+        self._selectedContentType = selectedContentType
+        self._tempFilter = State(initialValue: selectedFilter.wrappedValue)
+        self._tempCategory = State(initialValue: selectedCategory.wrappedValue)
+        self._tempContentType = State(initialValue: selectedContentType.wrappedValue)
+    }
+    
     var body: some View {
         NavigationView {
-            VStack {
-                Text("Filter options would go here")
-                    .padding()
-                
-                Spacer()
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Content Type Filter
+                    FilterSection(title: "Content Type") {
+                        LazyVGrid(columns: [
+                            GridItem(.flexible()),
+                            GridItem(.flexible()),
+                            GridItem(.flexible())
+                        ], spacing: 12) {
+                            ForEach(ContentType.allCases, id: \.self) { type in
+                                ContentTypeChip(
+                                    type: type,
+                                    isSelected: tempContentType == type
+                                ) {
+                                    tempContentType = type
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Sort Options
+                    FilterSection(title: "Sort By") {
+                        LazyVGrid(columns: [
+                            GridItem(.flexible()),
+                            GridItem(.flexible())
+                        ], spacing: 12) {
+                            ForEach(FeedFilter.allCases, id: \.self) { filter in
+                                FeedFilterCard(
+                                    filter: filter,
+                                    isSelected: tempFilter == filter
+                                ) {
+                                    tempFilter = filter
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Post Categories (only show if Posts or All is selected)
+                    if tempContentType == .posts || tempContentType == .all {
+                        FilterSection(title: "Post Categories") {
+                            LazyVGrid(columns: [
+                                GridItem(.flexible()),
+                                GridItem(.flexible())
+                            ], spacing: 12) {
+                                // Clear category option
+                                PostCategoryChip(
+                                    category: nil,
+                                    isSelected: tempCategory == nil
+                                ) {
+                                    tempCategory = nil
+                                }
+                                
+                                ForEach(PostCategory.allCases, id: \.self) { category in
+                                    PostCategoryChip(
+                                        category: category,
+                                        isSelected: tempCategory == category
+                                    ) {
+                                        tempCategory = category
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding()
             }
-            .navigationTitle("Filters")
+            .navigationTitle("Feed Filters")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
                         dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    HStack {
+                        Button("Clear") {
+                            tempFilter = .latest
+                            tempCategory = nil
+                            tempContentType = .all
+                        }
+                        .foregroundColor(.red)
+                        
+                        Button("Apply") {
+                            selectedFilter = tempFilter
+                            selectedCategory = tempCategory
+                            selectedContentType = tempContentType
+                            dismiss()
+                        }
+                        .fontWeight(.semibold)
                     }
                 }
             }
         }
+    }
+}
+
+// MARK: - Feed Filter Components
+struct ContentTypeChip: View {
+    let type: ContentType
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            Text(type.displayName)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(isSelected ? Color.accentColor : Color(.systemGray6))
+                )
+                .foregroundColor(isSelected ? .white : .primary)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+struct FeedFilterCard: View {
+    let filter: FeedFilter
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            VStack(spacing: 8) {
+                Image(systemName: filter.iconName)
+                    .font(.title2)
+                    .foregroundColor(isSelected ? .white : .primary)
+                
+                Text(filter.displayName)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(isSelected ? .white : .primary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? Color.accentColor : Color(.systemGray6))
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+struct PostCategoryChip: View {
+    let category: PostCategory?
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 6) {
+                Image(systemName: category?.iconName ?? "circle")
+                    .font(.caption)
+                
+                Text(category?.displayName ?? "All Categories")
+                    .font(.caption)
+                    .fontWeight(.medium)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(isSelected ? Color.blue : Color(.systemGray6))
+            )
+            .foregroundColor(isSelected ? .white : .primary)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+// MARK: - Shared Filter Section
+struct FilterSection<Content: View>: View {
+    let title: String
+    let content: Content
+    
+    init(title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.primary)
+            
+            content
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Shimmer Effect Extension
+extension View {
+    func shimmer(isAnimating: Bool) -> some View {
+        self.overlay(
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.clear,
+                            Color.white.opacity(0.6),
+                            Color.clear
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .rotationEffect(.degrees(30))
+                .offset(x: isAnimating ? 200 : -200)
+                .animation(
+                    Animation.linear(duration: 1.5)
+                        .repeatForever(autoreverses: false),
+                    value: isAnimating
+                )
+        )
+        .clipped()
     }
 }

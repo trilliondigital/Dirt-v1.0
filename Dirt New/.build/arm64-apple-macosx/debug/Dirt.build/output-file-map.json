@@ -1,0 +1,334 @@
+{
+  "": {
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/master.swiftdeps"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/ContentView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ContentView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ContentView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ContentView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ContentView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ContentView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/AppState.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AppState.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AppState.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AppState~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AppState.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AppState.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/Models/Comment.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Comment.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Comment.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Comment~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Comment.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Comment.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/Models/DirtNotification.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/DirtNotification.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/DirtNotification.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/DirtNotification~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/DirtNotification.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/DirtNotification.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/Models/Notification.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Notification.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Notification.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Notification~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Notification.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Notification.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/Models/Post.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Post.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Post.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Post~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Post.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Post.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/Models/Review.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Review.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Review.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Review~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Review.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/Review.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/Models/User.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/User.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/User.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/User~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/User.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/User.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/Services/AuthenticationService.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AuthenticationService.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AuthenticationService.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AuthenticationService~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AuthenticationService.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AuthenticationService.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/Services/CommunityAnnouncementService.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CommunityAnnouncementService.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CommunityAnnouncementService.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CommunityAnnouncementService~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CommunityAnnouncementService.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CommunityAnnouncementService.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/Services/NotificationBadgeManager.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationBadgeManager.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationBadgeManager.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationBadgeManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationBadgeManager.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationBadgeManager.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/Services/NotificationManager.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationManager.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationManager.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationManager.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationManager.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/Services/PushNotificationService.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PushNotificationService.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PushNotificationService.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PushNotificationService~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PushNotificationService.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PushNotificationService.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Core/Services/SupabaseManager.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SupabaseManager.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SupabaseManager.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SupabaseManager~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SupabaseManager.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SupabaseManager.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/DirtApp.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/DirtApp.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/DirtApp.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/DirtApp~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/DirtApp.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/DirtApp.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/CreatePost/CreatePostView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CreatePostView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CreatePostView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CreatePostView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CreatePostView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CreatePostView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/CreatePost/CreatePostViewModel.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CreatePostViewModel.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CreatePostViewModel.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CreatePostViewModel~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CreatePostViewModel.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CreatePostViewModel.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Feed/CommentCard.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CommentCard.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CommentCard.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CommentCard~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CommentCard.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/CommentCard.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Feed/FeedView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FeedView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FeedView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FeedView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FeedView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FeedView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Feed/FeedViewModel.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FeedViewModel.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FeedViewModel.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FeedViewModel~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FeedViewModel.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FeedViewModel.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Feed/PostCard.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostCard.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostCard.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostCard~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostCard.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostCard.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Feed/PostDetailView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostDetailView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostDetailView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostDetailView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostDetailView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostDetailView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Feed/PostDetailViewModel.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostDetailViewModel.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostDetailViewModel.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostDetailViewModel~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostDetailViewModel.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/PostDetailViewModel.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Feed/ReportSheet.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReportSheet.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReportSheet.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReportSheet~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReportSheet.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReportSheet.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Main/MainTabView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/MainTabView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/MainTabView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/MainTabView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/MainTabView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/MainTabView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Notifications/ActivityFeedView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ActivityFeedView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ActivityFeedView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ActivityFeedView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ActivityFeedView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ActivityFeedView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Notifications/AnnouncementRowView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AnnouncementRowView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AnnouncementRowView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AnnouncementRowView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AnnouncementRowView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AnnouncementRowView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Notifications/NotificationCenterView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationCenterView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationCenterView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationCenterView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationCenterView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationCenterView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Notifications/NotificationHistoryView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationHistoryView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationHistoryView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationHistoryView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationHistoryView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationHistoryView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Notifications/NotificationManagementView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationManagementView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationManagementView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationManagementView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationManagementView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationManagementView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Notifications/NotificationRowView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationRowView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationRowView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationRowView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationRowView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationRowView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Notifications/NotificationSettingsView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationSettingsView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationSettingsView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationSettingsView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationSettingsView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationSettingsView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Notifications/NotificationsView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationsView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationsView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationsView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationsView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationsView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Notifications/NotificationsViewModel.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationsViewModel.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationsViewModel.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationsViewModel~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationsViewModel.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/NotificationsViewModel.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Onboarding/AuthenticationView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AuthenticationView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AuthenticationView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AuthenticationView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AuthenticationView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/AuthenticationView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Onboarding/InterestsView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/InterestsView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/InterestsView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/InterestsView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/InterestsView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/InterestsView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Onboarding/OnboardingFlow.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/OnboardingFlow.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/OnboardingFlow.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/OnboardingFlow~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/OnboardingFlow.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/OnboardingFlow.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Onboarding/ProfileSetupView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileSetupView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileSetupView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileSetupView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileSetupView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileSetupView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Profile/EditProfileView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/EditProfileView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/EditProfileView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/EditProfileView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/EditProfileView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/EditProfileView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Profile/ProfileView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Profile/ProfileViewModel.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileViewModel.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileViewModel.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileViewModel~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileViewModel.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ProfileViewModel.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Profile/SettingsView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SettingsView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SettingsView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SettingsView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SettingsView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SettingsView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Reviews/FilterSheet.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FilterSheet.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FilterSheet.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FilterSheet~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FilterSheet.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/FilterSheet.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Reviews/ReviewsView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReviewsView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReviewsView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReviewsView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReviewsView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReviewsView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Reviews/ReviewsViewModel.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReviewsViewModel.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReviewsViewModel.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReviewsViewModel~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReviewsViewModel.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/ReviewsViewModel.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Search/SearchView.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SearchView.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SearchView.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SearchView~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SearchView.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SearchView.dia"
+  },
+  "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/Features/Search/SearchViewModel.swift": {
+    "dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SearchViewModel.d",
+    "object": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SearchViewModel.swift.o",
+    "swiftmodule": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SearchViewModel~partial.swiftmodule",
+    "swift-dependencies": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SearchViewModel.swiftdeps",
+    "diagnostics": "/Users/kaeganbraud/Desktop/Dirt v1.0/Dirt-v1.0/Dirt New/.build/arm64-apple-macosx/debug/Dirt.build/SearchViewModel.dia"
+  }
+}

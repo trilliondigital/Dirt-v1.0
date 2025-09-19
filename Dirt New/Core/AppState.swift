@@ -13,6 +13,11 @@ class AppState: ObservableObject {
     @Published var navigationPath = NavigationPath()
     @Published var deepLinkPath: String?
     @Published var notificationBadges: [TabItem: Int] = [:]
+    @Published var tabNavigationPaths: [TabItem: NavigationPath] = [:]
+    
+    // Tab state management
+    @Published var previousTab: TabItem = .feed
+    @Published var tabHistory: [TabItem] = []
     
     // Theme and appearance
     @Published var isDarkMode = false
@@ -40,33 +45,85 @@ class AppState: ObservableObject {
         isLoading = loading
     }
     
+    // MARK: - Tab Navigation Management
+    
+    func selectTab(_ tab: TabItem) {
+        // Store previous tab for potential back navigation
+        if selectedTab != tab {
+            previousTab = selectedTab
+            tabHistory.append(selectedTab)
+            
+            // Keep history manageable
+            if tabHistory.count > 10 {
+                tabHistory.removeFirst()
+            }
+        }
+        
+        selectedTab = tab
+        
+        // Restore navigation path for the selected tab
+        if let savedPath = tabNavigationPaths[tab] {
+            navigationPath = savedPath
+        } else {
+            navigationPath = NavigationPath()
+        }
+    }
+    
+    func saveNavigationState(for tab: TabItem) {
+        tabNavigationPaths[tab] = navigationPath
+    }
+    
+    func clearNavigationPath(for tab: TabItem? = nil) {
+        if let tab = tab {
+            tabNavigationPaths[tab] = NavigationPath()
+            if selectedTab == tab {
+                navigationPath = NavigationPath()
+            }
+        } else {
+            navigationPath = NavigationPath()
+            tabNavigationPaths[selectedTab] = NavigationPath()
+        }
+    }
+    
     // MARK: - Deep Linking
     
     func handleDeepLink(_ url: URL) {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               let host = components.host else { return }
         
+        let targetTab: TabItem?
         switch host {
         case "feed":
-            selectedTab = .feed
+            targetTab = .feed
         case "reviews":
-            selectedTab = .reviews
+            targetTab = .reviews
         case "create":
-            selectedTab = .create
+            targetTab = .create
         case "notifications":
-            selectedTab = .notifications
+            targetTab = .notifications
         case "profile":
-            selectedTab = .profile
+            targetTab = .profile
         default:
-            break
+            targetTab = nil
         }
         
+        guard let tab = targetTab else { return }
+        
+        // Navigate to tab
+        selectTab(tab)
+        
         // Store the path for further navigation within the tab
-        deepLinkPath = components.path
+        if let path = components.path, !path.isEmpty {
+            deepLinkPath = path
+        }
     }
     
     func handleDeepLink(to tab: TabItem, path: String? = nil) {
-        selectedTab = tab
+        selectTab(tab)
+        deepLinkPath = path
+    }
+    
+    func processDeepLinkPath(_ path: String) {
         deepLinkPath = path
     }
     
