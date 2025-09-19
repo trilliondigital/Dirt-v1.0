@@ -1,21 +1,37 @@
-//
-//  DirtApp.swift
-//  Dirt
-//
-//  Created by Kaegan Braud on 9/18/25.
-//
-
 import SwiftUI
-import CoreData
 
 @main
 struct DirtApp: App {
-    let persistenceController = PersistenceController.shared
-
+    @StateObject private var appState = AppState()
+    @StateObject private var authService = AuthenticationService()
+    @StateObject private var supabaseManager = SupabaseManager()
+    @StateObject private var notificationManager = NotificationManager.shared
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(appState)
+                .environmentObject(authService)
+                .environmentObject(supabaseManager)
+                .environmentObject(notificationManager)
+                .onAppear {
+                    setupApp()
+                }
+        }
+    }
+    
+    private func setupApp() {
+        // Initialize core services
+        supabaseManager.initialize()
+        
+        // Initialize notification system
+        Task {
+            await notificationManager.initialize()
+        }
+        
+        // Check authentication state
+        Task {
+            await authService.checkAuthenticationState()
         }
     }
 }
