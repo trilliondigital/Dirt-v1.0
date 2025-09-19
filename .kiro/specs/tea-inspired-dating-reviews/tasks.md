@@ -35,29 +35,29 @@
     - Create review validation and submission logic
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 8.1_
 
-  - [ ] 3.2 Build discussion post creation
+  - [x] 3.2 Build discussion post creation
     - Implement post creation form with rich text editor
     - Add category selection (Advice, Experience, Question, Strategy)
     - Create tag system for content discoverability
     - Implement post validation and submission
     - _Requirements: 4.1, 4.5_
 
-  - [ ] 3.3 Create content display components
+  - [-] 3.3 Create content display components
     - Build review card component with ratings display
     - Create discussion post component with engagement metrics
     - Implement threaded comment system
     - Add upvote/downvote functionality
     - _Requirements: 3.5, 4.2, 4.3_
 
-- [-] 4. Implement reputation and gamification system
-  - [-] 4.1 Create reputation tracking service
+- [x] 4. Implement reputation and gamification system
+  - [x] 4.1 Create reputation tracking service
     - Implement reputation point calculation based on community feedback
     - Create achievement and badge system
     - Add reputation-based feature unlocking
     - Write tests for reputation algorithms
     - _Requirements: 2.2, 2.3, 2.4, 9.1, 9.2, 9.3_
 
-  - [ ] 4.2 Build user profile and reputation display
+  - [x] 4.2 Build user profile and reputation display
     - Create anonymous profile view with reputation metrics
     - Implement achievement badge display
     - Add contribution history tracking

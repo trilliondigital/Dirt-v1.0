@@ -9,7 +9,7 @@ enum AppError: LocalizedError, Equatable {
     case authentication(AuthError)
     case validation(ValidationError)
     case storage(StorageError)
-    case media(MediaError)
+    case media(MediaServiceError)
     case generic(String)
     
     var errorDescription: String? {

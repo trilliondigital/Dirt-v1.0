@@ -70,6 +70,9 @@ class ServiceContainer: ObservableObject {
     /// Post submission and validation
     lazy var postSubmissionService = PostSubmissionService.shared
     
+    /// Discussion post creation and management
+    lazy var discussionPostService = DiscussionPostService.shared
+    
     /// Content moderation and safety
     lazy var moderationService = ModerationService.shared
     

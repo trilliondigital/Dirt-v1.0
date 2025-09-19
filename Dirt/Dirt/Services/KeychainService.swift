@@ -99,6 +99,7 @@ class KeychainService {
             // If item doesn't exist, create it
             if status == errSecItemNotFound {
                 try store(data, forKey: key)
+                return
             } else {
                 throw KeychainError.updateFailed(status)
             }
