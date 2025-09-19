@@ -1,79 +1,72 @@
 import SwiftUI
 
 struct CreatePostView: View {
-    @State private var title = ""
-    @State private var content = ""
-    @State private var selectedCategory = PostCategory.general
-    @State private var selectedSentiment = PostSentiment.neutral
-    @State private var isPosting = false
+    @StateObject private var viewModel = CreatePostViewModel()
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         NavigationView {
-            Form {
-                Section("Post Details") {
-                    TextField("Title", text: $title)
-                    
-                    Picker("Category", selection: $selectedCategory) {
-                        ForEach(PostCategory.allCases, id: \.self) { category in
-                            Label(category.displayName, systemImage: category.iconName)
-                                .tag(category)
-                        }
-                    }
-                    
-                    Picker("Sentiment", selection: $selectedSentiment) {
-                        ForEach(PostSentiment.allCases, id: \.self) { sentiment in
-                            Label(sentiment.displayName, systemImage: sentiment.iconName)
-                                .tag(sentiment)
-                        }
-                    }
-                }
+            VStack(spacing: 0) {
+                // Progress Header
+                ProgressHeaderView(
+                    currentStep: viewModel.currentStep,
+                    progress: viewModel.progressPercentage
+                )
                 
-                Section("Content") {
-                    TextEditor(text: $content)
-                        .frame(minHeight: 100)
+                // Step Content
+                TabView(selection: $viewModel.currentStep) {
+                    ContentStepView(viewModel: viewModel)
+                        .tag(PostCreationStep.content)
+                    
+                    CategorizationStepView(viewModel: viewModel)
+                        .tag(PostCreationStep.categorization)
+                    
+                    MediaStepView(viewModel: viewModel)
+                        .tag(PostCreationStep.media)
+                    
+                    PreviewStepView(viewModel: viewModel)
+                        .tag(PostCreationStep.preview)
+                    
+                    PublishingStepView(viewModel: viewModel)
+                        .tag(PostCreationStep.publishing)
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .animation(.easeInOut(duration: 0.3), value: viewModel.currentStep)
                 
-                Section {
-                    Button("Post") {
-                        createPost()
-                    }
-                    .disabled(title.isEmpty || content.isEmpty || isPosting)
+                // Navigation Controls (hide during publishing)
+                if viewModel.currentStep != .publishing {
+                    NavigationControlsView(viewModel: viewModel)
                 }
             }
             .navigationTitle("Create Post")
-            .disabled(isPosting)
-            .overlay {
-                if isPosting {
-                    ProgressView("Posting...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.black.opacity(0.3))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    if viewModel.currentStep != .publishing {
+                        Button("Cancel") {
+                            if viewModel.hasUnsavedChanges {
+                                // Show confirmation alert
+                            } else {
+                                dismiss()
+                            }
+                        }
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if viewModel.currentStep != .publishing {
+                        AutoSaveStatusView(status: viewModel.autoSaveStatus)
+                    }
                 }
             }
-        }
-    }
-    
-    private func createPost() {
-        isPosting = true
-
-        Task {
-            do {
-                // Simulate posting delay
-                try await Task.sleep(nanoseconds: 1_000_000_000)
-
-                await MainActor.run {
-                    // Reset form
-                    title = ""
-                    content = ""
-                    selectedCategory = .general
-                    selectedSentiment = .neutral
-                    isPosting = false
+            .alert("Unsaved Changes", isPresented: .constant(viewModel.hasUnsavedChanges && viewModel.currentStep == .content)) {
+                Button("Keep Editing") { }
+                Button("Discard", role: .destructive) {
+                    viewModel.resetForm()
+                    dismiss()
                 }
-            } catch {
-                // Handle cancellation or other errors from sleep or future throwing calls
-                await MainActor.run {
-                    isPosting = false
-                }
-                print("CreatePostView.createPost error: \(error)")
+            } message: {
+                Text("You have unsaved changes. Do you want to keep editing or discard them?")
             }
         }
     }

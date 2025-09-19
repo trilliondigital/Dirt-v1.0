@@ -159,6 +159,39 @@ struct ColorPalette {
     }
 }
 
+// MARK: - Convenience Properties
+extension ColorPalette {
+    // Primary colors
+    static let primary = Brand.primaryFallback
+    static let secondary = Brand.secondaryFallback
+    static let accent = Brand.accentFallback
+    
+    // Semantic colors
+    static let success = Semantic.success
+    static let warning = Semantic.warning
+    static let error = Semantic.error
+    static let info = Semantic.info
+    
+    // Text colors
+    static let textPrimary = Semantic.textPrimary
+    static let textSecondary = Semantic.textSecondary
+    static let textTertiary = Semantic.textTertiary
+    static let textQuaternary = Semantic.textQuaternary
+    
+    // Background colors
+    static let backgroundPrimary = Semantic.backgroundPrimary
+    static let backgroundSecondary = Semantic.backgroundSecondary
+    static let backgroundTertiary = Semantic.backgroundTertiary
+    
+    // Surface colors
+    static let surfacePrimary = Semantic.surface
+    static let surfaceSecondary = Semantic.surfaceElevated
+    
+    // Border colors
+    static let border = Semantic.border
+    static let borderSecondary = Semantic.borderSecondary
+}
+
 // MARK: - Color Accessibility Utilities
 extension ColorPalette {
     

@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import Combine
 
 /// Animation preferences and utilities for consistent motion design throughout the app
 @MainActor
@@ -58,25 +59,25 @@ class AnimationPreferences: ObservableObject {
     
     /// Standard easing animation
     var standardEasing: Animation {
-        guard animationsEnabled && !reducedMotion else { return .none }
+        guard animationsEnabled && !reducedMotion else { return .easeInOut(duration: 0) }
         return .easeInOut(duration: standardDuration)
     }
     
     /// Quick easing animation for immediate feedback
     var quickEasing: Animation {
-        guard animationsEnabled && !reducedMotion else { return .none }
+        guard animationsEnabled && !reducedMotion else { return .easeInOut(duration: 0) }
         return .easeInOut(duration: quickDuration)
     }
     
     /// Slow easing animation for dramatic effects
     var slowEasing: Animation {
-        guard animationsEnabled && !reducedMotion else { return .none }
+        guard animationsEnabled && !reducedMotion else { return .easeInOut(duration: 0) }
         return .easeInOut(duration: slowDuration)
     }
     
     /// Spring animation with consistent parameters
     var standardSpring: Animation {
-        guard animationsEnabled && !reducedMotion else { return .none }
+        guard animationsEnabled && !reducedMotion else { return .easeInOut(duration: 0) }
         return .spring(
             response: DesignTokens.Animation.springResponse,
             dampingFraction: DesignTokens.Animation.springDamping
@@ -85,7 +86,7 @@ class AnimationPreferences: ObservableObject {
     
     /// Bouncy spring animation for playful interactions
     var bouncySpring: Animation {
-        guard animationsEnabled && !reducedMotion else { return .none }
+        guard animationsEnabled && !reducedMotion else { return .easeInOut(duration: 0) }
         return .spring(
             response: DesignTokens.Animation.springResponse * 0.8,
             dampingFraction: DesignTokens.Animation.springDamping * 0.7
@@ -94,7 +95,7 @@ class AnimationPreferences: ObservableObject {
     
     /// Gentle spring animation for subtle effects
     var gentleSpring: Animation {
-        guard animationsEnabled && !reducedMotion else { return .none }
+        guard animationsEnabled && !reducedMotion else { return .easeInOut(duration: 0) }
         return .spring(
             response: DesignTokens.Animation.springResponse * 1.2,
             dampingFraction: DesignTokens.Animation.springDamping * 1.1
@@ -230,7 +231,9 @@ class AnimationPreferences: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.reducedMotion = UIAccessibility.isReduceMotionEnabled
+            Task { @MainActor in
+                self?.reducedMotion = UIAccessibility.isReduceMotionEnabled
+            }
         }
     }
 }

@@ -345,7 +345,7 @@ extension ActionButton {
                     print("Secondary tapped")
                 }
                 
-                ActionButton("Tertiary Button", style: .tertiary, systemImage: "info.circle") {
+                ActionButton("Tertiary Button", systemImage: "info.circle", style: .tertiary) {
                     print("Tertiary tapped")
                 }
                 

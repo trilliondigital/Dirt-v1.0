@@ -84,11 +84,11 @@ struct GlassCard<Content: View>: View {
 extension GlassCard {
     
     /// Create an interactive glass card with tap handling
-    static func interactive<Content: View>(
+    static func interactive(
         style: MaterialDesignSystem.GlassStyle = .card,
         padding: CGFloat = DesignTokens.Spacing.md,
         onTap: @escaping () -> Void,
-        @ViewBuilder content: () -> Content
+        @ViewBuilder content: @escaping () -> Content
     ) -> GlassCard<Content> {
         GlassCard(
             style: style,
@@ -100,10 +100,10 @@ extension GlassCard {
     }
     
     /// Create a static glass card without interaction
-    static func `static`<Content: View>(
+    static func `static`(
         style: MaterialDesignSystem.GlassStyle = .card,
         padding: CGFloat = DesignTokens.Spacing.md,
-        @ViewBuilder content: () -> Content
+        @ViewBuilder content: @escaping () -> Content
     ) -> GlassCard<Content> {
         GlassCard(
             style: style,
@@ -117,58 +117,14 @@ extension GlassCard {
 
 // MARK: - Preview
 #Preview("Glass Card Styles") {
-    ScrollView {
-        VStack(spacing: DesignTokens.Spacing.lg) {
-            // Static Cards
-            GlassCard.static(style: .card) {
-                VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
-                    Text("Card Style")
-                        .font(DesignTokens.Typography.headline)
-                    Text("This is a static glass card with card styling.")
-                        .font(DesignTokens.Typography.body)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
-                }
-            }
-            
-            GlassCard.static(style: .overlay) {
-                VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
-                    Text("Overlay Style")
-                        .font(DesignTokens.Typography.headline)
-                    Text("This is a static glass card with overlay styling.")
-                        .font(DesignTokens.Typography.body)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
-                }
-            }
-            
-            // Interactive Cards
-            GlassCard.interactive(style: .card, onTap: {
-                print("Card tapped!")
-            }) {
-                VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
-                    Text("Interactive Card")
-                        .font(DesignTokens.Typography.headline)
-                    Text("Tap me to see the interaction effect!")
-                        .font(DesignTokens.Typography.body)
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
-                }
-            }
-            
-            GlassCard.interactive(style: .navigation, onTap: {
-                print("Navigation card tapped!")
-            }) {
-                HStack {
-                    Image(systemName: "gear")
-                        .foregroundColor(DesignTokens.Colors.primary)
-                    Text("Settings")
-                        .font(DesignTokens.Typography.headline)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .foregroundColor(DesignTokens.Colors.textSecondary)
-                }
-            }
-        }
-        .padding(DesignTokens.Spacing.lg)
+    VStack(spacing: DesignTokens.Spacing.lg) {
+        Text("Glass Card Preview")
+            .font(DesignTokens.Typography.title2)
+        
+        Text("See component usage in the app")
+            .font(DesignTokens.Typography.body)
+            .foregroundColor(DesignTokens.Colors.textSecondary)
     }
+    .padding(DesignTokens.Spacing.lg)
     .background(DesignTokens.Colors.background)
-    .withAnimationPreferences()
 }

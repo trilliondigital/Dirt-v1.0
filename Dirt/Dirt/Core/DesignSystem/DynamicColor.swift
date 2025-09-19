@@ -150,22 +150,6 @@ extension Color {
         )
     }
     
-    /// Adjust brightness of a color
-    private func adjustBrightness(by amount: CGFloat) -> Color {
-        // Convert to UIColor for manipulation
-        let uiColor = UIColor(self)
-        var hue: CGFloat = 0
-        var saturation: CGFloat = 0
-        var brightness: CGFloat = 0
-        var alpha: CGFloat = 0
-        
-        uiColor.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
-        
-        let newBrightness = max(0, min(1, brightness + amount))
-        
-        return Color(UIColor(hue: hue, saturation: saturation, brightness: newBrightness, alpha: alpha))
-    }
-    
     // MARK: - Accessibility Helpers
     
     /// Get high contrast version of color
@@ -202,11 +186,11 @@ extension Color {
     /// Surface color with elevation
     static func surfaceWithElevation(_ level: Int) -> Color {
         let baseColor = Color.dynamicSurface
-        let elevationOverlay = elevationColor(level: level)
+        let elevationAmount = min(0.12, Double(level) * 0.02)
         
         return Color.dynamic(
             light: baseColor,
-            dark: baseColor.overlay(elevationOverlay)
+            dark: baseColor.adjustBrightness(by: elevationAmount)
         )
     }
 }
@@ -219,7 +203,7 @@ struct ThemeAwareColorEnvironment: ViewModifier {
     func body(content: Content) -> some View {
         content
             .environment(\.themeManager, themeManager)
-            .onChange(of: colorScheme) { newColorScheme in
+            .onChange(of: colorScheme) { _, newColorScheme in
                 themeManager.handleSystemColorSchemeChange(newColorScheme)
             }
     }
